@@ -2,8 +2,9 @@ import { Outlet, useNavigate } from "react-router-dom";
 import Player from "../layouts/Player";
 import Sidebar from "../layouts/Sidebar";
 import { useEffect, useState } from "react";
-import axios from "axios";
 import Loading from "./Loading";
+import { api } from "../utils/axiosUtil";
+import axios from "axios";
 
 export default function Main() {
   const [isLoading, setIsLoading] = useState(true);
@@ -16,18 +17,15 @@ export default function Main() {
 
     const reissueToken = async () => {
       try {
-        const url: string = "http://localhost:8080/reissue";
-        const response = await axios.post(
-          url,
-          {},
-          {
-            withCredentials: true,
-          }
-        );
-        localStorage.setItem("access_token", response.headers.access);
+        const response = await api.post("/reissue");
+        localStorage.setItem("accessToken", response.headers.access);
       } catch (error) {
         // 추후 401 Unauthorized 등 에러 종류에 따라 구별 필요
-        navigate("/login");
+        if (axios.isAxiosError(error)) {
+          if(error.response?.status === 401) {
+            navigate("/login");
+          }
+        }
       } finally {
         setIsLoading(false);
       }
