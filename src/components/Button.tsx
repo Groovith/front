@@ -14,7 +14,7 @@ export const buttonStyles = cva(["transition-colors"], {
       ],
     },
     size: {
-      default: ["rounded-full", "p-2.5"],
+      default: ["rounded-xl", "p-2.5"],
       //   icon: [
       //     "rounded-full",
       //     "w-10",

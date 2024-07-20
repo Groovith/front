@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "../components/Button";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -7,6 +7,11 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
+
+  // 토큰 유효성 확인 성공시 메인으로 리디렉트
+  useEffect(() => {
+    // 토큰 유효성 검사 API
+  },[]);
 
   // 로그인 폼 제출
   const handleSubmit = async (e: any) => {

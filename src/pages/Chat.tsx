@@ -1,3 +1,7 @@
 export default function Chat() {
-    return <></>;
+    return (
+      <div className="w-full">
+        채팅
+      </div>
+    );
   }

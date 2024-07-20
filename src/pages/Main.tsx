@@ -31,7 +31,8 @@ export default function Main() {
       }
     };
 
-    reissueToken();
+    // reissueToken();
+    setIsLoading(false); // 테스트용 토큰 재발급 요청 생략 -> 후에 삭제
   }, []);
 
   // 로딩 중일 경우 로딩 페이지 반환
@@ -40,9 +41,8 @@ export default function Main() {
   }
 
   return (
-    <div>
-      <div>
-        <h1>메인</h1>
+    <div className="flex flex-col w-screen h-screen">
+      <div className="flex h-full">
         <Sidebar />
         <Outlet />
       </div>
