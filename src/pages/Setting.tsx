@@ -5,7 +5,7 @@ import { Button } from "../components/Button";
 export default function Setting() {
   return (
     <div className="flex h-full w-full justify-center">
-      <div className="flex w-full max-w-[720px] flex-col gap-10 py-20">
+      <div className="flex w-full max-w-[720px] flex-col gap-10 py-20 px-10">
         <h1 className="text-4xl font-bold">설정</h1>
         {/* 스트리밍 서비스 */}
         <div>

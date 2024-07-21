@@ -1,4 +1,12 @@
-import { Home, Menu, Search, Send, UserRound, Settings } from "lucide-react";
+import {
+  Home,
+  Menu,
+  Search,
+  Send,
+  UserRound,
+  Settings,
+  LogOut,
+} from "lucide-react";
 import logo from "../assets/Logo-Full-BW.png";
 import { Button } from "../components/Button";
 import { useNavigate } from "react-router-dom";
@@ -8,10 +16,26 @@ export default function Sidebar() {
   const navigate = useNavigate();
 
   // 더보기 버튼
-  const moreButtonItems = [{ label: "설정", action: () => {navigate("/setting")}, Icon: Settings }];
+  const moreButtonItems = [
+    {
+      label: "설정",
+      action: () => {
+        navigate("/setting");
+      },
+      Icon: Settings,
+    },
+    {
+      label: "로그아웃",
+      action: () => {
+        // 로그아웃 로직 (로그아웃 API 호출 -> localStorage에서 토큰 삭제)
+        navigate("/login");
+      },
+      Icon: LogOut,
+    },
+  ];
 
   return (
-    <div className="flex flex-none h-full w-[80px] flex-col items-center justify-start gap-y-10 border-r border-gray-200 pt-3">
+    <div className="flex h-full w-[80px] flex-none flex-col items-center justify-start gap-y-10 border-r border-gray-200 pt-3">
       {/* 로고 버튼 */}
       <div>
         <Button variant={"ghost"}>
