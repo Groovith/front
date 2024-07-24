@@ -1,6 +1,10 @@
 import axios from "axios";
 
-const serverURL: string = "http://localhost:8080";
+/**
+ * Axios 설정
+ */
+
+const serverURL: string = "http://localhost:8080/api";
 
 // axios 인스턴스 생성
 export const api = axios.create({
@@ -61,3 +65,13 @@ api.interceptors.response.use(
     return Promise.reject(error);
   },
 );
+
+/**
+ * API 목록
+ */
+
+type Validate = () => void;
+type Login = (username: string, password: string) => void;
+
+export const validate: Validate = async () => {};
+export const login: Login = async (username, password) => {};

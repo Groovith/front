@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { api } from "../utils/axiosUtil";
+import { api } from "../utils/api";
 import { useNavigate } from "react-router-dom";
 import { Button } from "../components/Button";
 
@@ -8,7 +8,7 @@ export default function Signup() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [passwordVerify, setPasswordVerify] = useState("");
-  
+
   const navigate = useNavigate();
 
   // 회원가입 폼 제출
