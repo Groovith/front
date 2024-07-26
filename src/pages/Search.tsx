@@ -19,20 +19,23 @@ export default function Search() {
   };
 
   return (
-    <div className="flex w-full flex-col px-20 py-10">
-      <form className="flex w-fit items-center" onSubmit={handleSearch}>
+    <div className="flex w-full flex-col gap-y-10 px-20 py-10">
+      <form
+        className="relative flex w-fit items-center"
+        onSubmit={handleSearch}
+      >
         <input
           ref={inputRef}
           type="search"
           placeholder="노래, 채팅방, 사용자 검색"
-          className="w-[450px] rounded-lg border bg-gray-100 py-2 pl-12 pr-3"
+          className="w-[500px] rounded-lg border border-neutral-300 bg-neutral-200 py-2.5 pl-12 pr-3 placeholder:text-neutral-500"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
         />
         <Button
           variant={"ghost"}
-          onClick={() => inputRef.current && inputRef.current.focus()}
-          className="absolute text-gray-500 hover:bg-transparent hover:text-black"
+          onClick={() => inputRef.current?.focus()}
+          className="absolute left-1 text-neutral-500 hover:bg-transparent hover:text-black"
         >
           <SearchIcon />
         </Button>

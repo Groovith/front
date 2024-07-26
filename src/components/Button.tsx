@@ -5,8 +5,8 @@ import { twMerge } from "tailwind-merge";
 export const buttonStyles = cva(["transition-colors"], {
   variants: {
     variant: {
-      default: ["bg-black", "text-white"],
-      ghost: ["hover:bg-gray-100"],
+      default: ["bg-neutral-800", "text-white", "hover:bg-neutral-700"],
+      ghost: ["hover:bg-neutral-100"],
       dark: [
         "bg-secondary-dark",
         "hover:bg-secondary-dark-hover",
@@ -14,7 +14,7 @@ export const buttonStyles = cva(["transition-colors"], {
       ],
     },
     size: {
-      default: ["rounded-xl", "p-2.5"],
+      default: ["rounded-xl", "p-2"],
       //   icon: [
       //     "rounded-full",
       //     "w-10",
