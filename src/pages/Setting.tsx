@@ -1,6 +1,7 @@
 import spotifyLogo from "../assets/Spotify_Primary_Logo_RGB_Green.png";
 import appleMusicLogo from "../assets/Apple_Music_Icon_RGB_lg_073120.svg";
 import { Button } from "../components/Button";
+import { SPOTIFY_AUTH_URL } from "../utils/config";
 
 export default function Setting() {
   return (
@@ -19,7 +20,9 @@ export default function Setting() {
                 <img src={spotifyLogo} alt="Spotify" className="w-8" />
                 <p className="font-bold">Spotify</p>
               </div>
-              <Button>연결</Button>
+              <Button
+              onClick={() => (window.location.href = SPOTIFY_AUTH_URL)}
+              >연결</Button>
             </div>
             <div className="flex w-full justify-between rounded-xl bg-gray-50 p-3">
               <div className="flex items-center gap-4">

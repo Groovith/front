@@ -11,6 +11,7 @@ import logo from "../assets/Logo-Full-BW.png";
 import { Button } from "../components/Button";
 import { useNavigate } from "react-router-dom";
 import DropdownButton from "../components/DropdownButton";
+import { logout } from "../utils/apis/serverAPI";
 
 export default function Sidebar() {
   const navigate = useNavigate();
@@ -26,9 +27,16 @@ export default function Sidebar() {
     },
     {
       label: "로그아웃",
-      action: () => {
+      action: async () => {
         // 로그아웃 로직 (로그아웃 API 호출 -> localStorage에서 토큰 삭제)
-        navigate("/login");
+        try {
+          await logout();
+        } catch (e) {
+          console.log("로그아웃 에러: ", e);
+        } finally {
+          localStorage.removeItem("accessToken");
+          navigate("/login");
+        }
       },
       Icon: LogOut,
     },

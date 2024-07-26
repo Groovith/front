@@ -1,34 +1,31 @@
 import { useEffect, useState } from "react";
 import { Button } from "../components/Button";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import { useMutation } from "@tanstack/react-query";
+import { login } from "../utils/apis/serverAPI";
 
 export default function Login() {
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
+  const createLoginMutation = useMutation({
+    mutationFn: login
+  });
 
   // 토큰 유효성 확인 성공시 메인으로 리디렉트
   useEffect(() => {
     // 토큰 유효성 검사 API
-  },[]);
+    
+  }, []);
 
   // 로그인 폼 제출
   const handleSubmit = async (e: any) => {
     e.preventDefault();
 
-    try {
-      const response = await axios.post("http://localhost:8080/login", {
-        username: email,
-        password: password,
-      });
-      // 엑세스 토큰 저장 -> 로컬 스토리지
-      localStorage.setItem("access_token", response.headers.access);
-      // Main으로 리디렉트
+    createLoginMutation.mutate({username, password}, {onSuccess: (data) => {
+      localStorage.setItem("accessToken", data.headers.access);
       navigate("/");
-    } catch (error) {
-      console.error("로그인 요청 오류: ", error);
-    }
+    }});
   };
 
   return (
@@ -38,13 +35,13 @@ export default function Login() {
           <h1 className="text-3xl font-bold">Groovith에 로그인하기</h1>
           <form onSubmit={handleSubmit}>
             <div className="mb-6 flex flex-col gap-3">
-              <label htmlFor="email">이메일 또는 사용자이름</label>
+              <label htmlFor="username">사용자이름</label>
               <input
-                id="email"
+                id="username"
                 type="text"
                 required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
                 className="h-8 w-full rounded-lg border px-3 py-5"
               />
             </div>

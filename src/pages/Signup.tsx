@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { api } from "../utils/api";
+import { api } from "../utils/apis/serverAPI";
 import { useNavigate } from "react-router-dom";
 import { Button } from "../components/Button";
 
