@@ -12,9 +12,13 @@ import { Button } from "../components/Button";
 import { useNavigate } from "react-router-dom";
 import DropdownButton from "../components/DropdownButton";
 import { logout } from "../utils/apis/serverAPI";
+import { useUser } from "../hooks/useUser";
+import { useChatRoomStore } from "../stores/useChatRoomStore";
 
 export default function Sidebar() {
   const navigate = useNavigate();
+  const { getUsername } = useUser();
+  const { setCurrentChatRoomId } = useChatRoomStore();
 
   // 더보기 버튼
   const moreButtonItems = [
@@ -42,8 +46,12 @@ export default function Sidebar() {
     },
   ];
 
+  const handleUserClick = async () => {
+    navigate(`/user/${getUsername()}`);
+  };
+
   return (
-    <div className="flex h-full w-[80px] flex-none flex-col items-center justify-start gap-y-10 border-r border-gray-200 pt-3">
+    <div className="flex h-full w-[80px] flex-none flex-col items-center justify-start gap-y-10 border-r border-gray-200 pt-8">
       {/* 로고 버튼 */}
       <div>
         <Button variant={"ghost"}>
@@ -72,20 +80,18 @@ export default function Sidebar() {
           variant={"ghost"}
           onClick={() => {
             navigate("/chat");
+            setCurrentChatRoomId(-1);
           }}
         >
           <Send />
         </Button>
-        <Button
-          variant={"ghost"}
-          onClick={() => {
-            navigate("/profile");
-          }}
-        >
+        <Button variant={"ghost"} onClick={handleUserClick}>
           <UserRound />
         </Button>
         <DropdownButton items={moreButtonItems}>
-          <Menu />
+          <Button variant={"ghost"}>
+            <Menu />
+          </Button>
         </DropdownButton>
       </div>
     </div>

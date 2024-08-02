@@ -2,7 +2,7 @@ import { LucideIcon } from "lucide-react";
 import { ReactNode, useEffect, useRef, useState } from "react";
 import { Button } from "./Button";
 
-interface DropdownItem {
+export interface DropdownItem {
   label: string;
   action: () => void;
   Icon?: LucideIcon;
@@ -37,22 +37,27 @@ export default function DropdownButton({ children, items }: DropdownProps) {
     setIsOpen(!isOpen);
   };
 
+  const handleButtonClick = (action: () => void) => {
+    action();
+    setIsOpen(false);
+  }
+
   return (
     <div>
-      <Button variant={"ghost"} onClick={handleClick}>
+      <div className="flex gap-2" onClick={handleClick}>
         {children}
-      </Button>
+      </div>
       {isOpen && (
         <div
           ref={menuRef}
-          className="absolute flex flex-col rounded-md border bg-white py-2 shadow-lg min-w-[200px]"
+          className="absolute flex flex-col rounded-lg border bg-white py-3 shadow-lg min-w-[220px]"
         >
           {items.map((item, index) => (
             <Button
               key={index}
               variant={"ghost"}
-              onClick={item.action}
-              className="flex gap-3 rounded-none"
+              onClick={() => handleButtonClick(item.action)}
+              className="flex gap-3 rounded-none px-4"
             >
               {item.Icon && <item.Icon />}
               {item.label}

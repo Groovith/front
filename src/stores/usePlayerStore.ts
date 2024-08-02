@@ -24,8 +24,8 @@ export const usePlayerStore = create<PlayerStoreType>((set) => ({
   // 플레이어 일반
   player: {},
   deviceId: "",
-  setPlayer: (s: {}) => set({ player: s }),
-  setDeviceId: (s: string) => set({ deviceId: s }),
+  setPlayer: (player: {}) => set({ player }),
+  setDeviceId: (deviceId: string) => set({ deviceId }),
   initializePlayer: () => {
     let player: any;
     const script = document.createElement("script");
@@ -81,8 +81,8 @@ export const usePlayerStore = create<PlayerStoreType>((set) => ({
   // 현재 플레이리스트 정보
   currentPlaylist: [],
   currentPlaylistIndex: 0,
-  setCurrentPlaylist: (playlist: any[]) => set({ currentPlaylist: playlist }),
-  setCurrentPlaylistIndex: (s: number) => set({ currentPlaylistIndex: s }),
+  setCurrentPlaylist: (currentPlaylist: any[]) => set({ currentPlaylist }),
+  setCurrentPlaylistIndex: (currentPlaylistIndex: number) => set({ currentPlaylistIndex }),
 
   // 재생 정보
   currentTrack: {},

@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { api } from "../utils/apis/serverAPI";
+import { api, signup } from "../utils/apis/serverAPI";
 import { useNavigate } from "react-router-dom";
 import { Button } from "../components/Button";
+import { useMutation } from "@tanstack/react-query";
 
 export default function Signup() {
   const [email, setEmail] = useState("");
@@ -11,20 +12,21 @@ export default function Signup() {
 
   const navigate = useNavigate();
 
+  const { mutate } = useMutation({
+    mutationKey: ["signup"],
+    mutationFn: () => signup({ username: username, password: password }),
+    onSuccess: () => {
+      navigate("/login");
+    },
+    onError: (e) => {
+      console.log("회원가입 에러: ", e);
+    },
+  });
+
   // 회원가입 폼 제출
   const handleSubmit = async (e: any) => {
     e.preventDefault();
-
-    try {
-      await api.post("/signup", {
-        email: email,
-        password: password,
-      });
-      // 로그인으로 리디렉트
-      navigate("/login");
-    } catch (error) {
-      console.error("로그인 요청 오류: ", error);
-    }
+    mutate();
   };
 
   return (
@@ -33,7 +35,7 @@ export default function Signup() {
         <div className="flex w-[400px] flex-col gap-y-14 rounded-xl border border-gray-300 p-10">
           <h1 className="text-3xl font-bold">가입하고 같이 들어요!</h1>
           <form onSubmit={handleSubmit}>
-            <div className="mb-6 flex flex-col gap-3">
+            {/* <div className="mb-6 flex flex-col gap-3">
               <label htmlFor="email">이메일</label>
               <input
                 id="email"
@@ -43,7 +45,7 @@ export default function Signup() {
                 onChange={(e) => setEmail(e.target.value)}
                 className="h-8 w-full rounded-lg border px-3 py-5"
               />
-            </div>
+            </div> */}
             <div className="mb-6 flex flex-col gap-3">
               <label htmlFor="username">사용자 이름</label>
               <input
@@ -78,7 +80,6 @@ export default function Signup() {
                 className="h-8 w-full rounded-lg border px-3 py-5"
               />
             </div>
-
             <Button className="w-full">가입하기</Button>
           </form>
           <div className="flex items-center gap-4">

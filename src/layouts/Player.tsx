@@ -26,23 +26,23 @@ export default function Player() {
         value={0}
         onChange={() => {}}
       />
-      <div className="ml-5 flex items-center gap-1">
-        <Button variant={"ghost"}>
+      <div className="ml-6 flex items-center gap-1">
+        <Button variant={"transparent"}>
           <SkipBack />
         </Button>
         {playing ? (
-          <Button variant={"ghost"}>
+          <Button variant={"transparent"}>
             <Pause />
           </Button>
         ) : (
-          <Button variant={"ghost"}>
+          <Button variant={"transparent"}>
             <Play />
           </Button>
         )}
-        <Button variant={"ghost"}>
+        <Button variant={"transparent"}>
           <SkipForward />
         </Button>
-        <div className="flex items-center gap-1 text-sm text-neutral-400">
+        <div className="ml-2 flex items-center gap-1 text-sm text-neutral-400">
           <p>{formatDuation(position)}</p>
           <p>/</p>
           <p>{formatDuation(duration)}</p>
@@ -52,13 +52,13 @@ export default function Player() {
         {currentTrack != null ? (
           <div></div>
         ) : (
-          <p className="text-sm text-neutral-500">
-            현재 재생 중인 곡이 없습니다
+          <p className="text-sm text-neutral-400">
+            재생 중인 곡이 없습니다
           </p>
         )}
       </div>
-      <div className="mr-5 flex items-center">
-        <Button variant={"ghost"}>
+      <div className="mr-6 flex items-center">
+        <Button variant={"transparent"}>
           <ChevronUp />
         </Button>
       </div>

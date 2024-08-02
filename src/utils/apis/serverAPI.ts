@@ -1,4 +1,5 @@
 import axios, { AxiosResponse } from "axios";
+import { ChatRoomDetailsType, MessageType, UserDetailsType } from "../types";
 
 /**
  * Axios 설정
@@ -24,7 +25,7 @@ api.interceptors.request.use(
 
     // 토큰 있으면 요청 헤더에 추가
     if (accessToken) {
-      config.headers["access"] = accessToken;
+      config.headers.Authorization = `Bearer ${accessToken}`;
     }
 
     return config;
@@ -49,10 +50,12 @@ api.interceptors.response.use(
     if (error.response && error.response.status === 401) {
       // 401 Unauthorized 에러 처리 -> 토큰 재발급
       try {
-        console.log("토큰 재요청");
-        const response = await api.post("/reissue");
+        const response = await axios.post("/reissue");
 
-        const newAccessToken = response.headers.access;
+        const newAccessToken = response.headers['authorization'].replace(
+          "Bearer ",
+          "",
+        );
         localStorage.setItem("accessToken", newAccessToken);
 
         error.config.headers.access = newAccessToken;
@@ -60,7 +63,7 @@ api.interceptors.response.use(
       } catch (e) {
         console.error("토큰 재요청 실패", e);
         localStorage.removeItem("accessToken"); // Access 토큰 삭제
-        window.location.href = "/login"; // 로그인 페이지로 리디렉션
+        window.location.replace("/login"); // 로그인 페이지로 리디렉션
       }
     }
 
@@ -78,6 +81,17 @@ export const validateToken = async () => {
   return response;
 };
 
+interface SignupRequest {
+  username: string;
+  password: string;
+}
+
+// 회원가입
+export const signup = async (request: SignupRequest) => {
+  const response = await axios.post("http://localhost:8080/api/join", request);
+  return response.data;
+};
+
 // 로그인
 export const login = async (credentials: {
   username: string;
@@ -86,6 +100,7 @@ export const login = async (credentials: {
   const response = await axios.post(
     "http://localhost:8080/api/login",
     credentials,
+    { withCredentials: true },
   );
   return response;
 };
@@ -95,29 +110,113 @@ export const logout = async () => {
   await axios.get("/logout");
 };
 
-// 스트리밍 서비스 조회
-export const getStreaming = async () => {
-  const response = await api.get("/streaming");
-  return response;
-};
-
-// 검색
-export const search = async (query: string) => {
-  const response = await api.get(`/streaming/search?query=${query}`);
+// 현재 유저 정보 요청
+export const getUserDetails = async () => {
+  const response = await api.get<UserDetailsType>("/users/me");
   return response.data;
 };
 
-interface ConnectSporifyResponse {
-  message: string,
-  spotifyAccessToken: string,
-  spotifyRefreshToken: string,
+// 유저네임으로 유저 정보 요청
+export const getUserDetailsByUsername = async (username: string) => {
+  const response = await api.get<UserDetailsType>(`/users/${username}`);
+  return response.data;
+};
+
+interface SporifyTokenResponse {
+  message: string;
+  spotifyAccessToken: string;
 }
 
 // Spotify 연결
 export const connectSpotify = async (code: string) => {
-  const response = await api.post<ConnectSporifyResponse>("/streaming/spotify", { code: code });
+  const response = await api.post<SporifyTokenResponse>("/streaming/spotify", {
+    code: code,
+  });
+  return response.data;
+};
+
+// Spotify 연결 해제
+export const disconnectSpotify = async () => {
+  const response = await api.delete("/streaming/spotify");
   return response.data;
 };
 
 // Spotify 토큰 재발급
-export const getSpotifyToken = async () => {} 
+export const getSpotifyToken = async () => {
+  const response = await api.get<SporifyTokenResponse>("/streaming/spotify");
+  return response.data;
+};
+
+interface SearchUsersResponse {
+  users: UserDetailsType[];
+}
+
+// 유저 검색
+export const searchUsers = async (query: string) => {
+  const response = await api.get<SearchUsersResponse>(
+    `/search/users?query=${query}`,
+  );
+  return response.data;
+};
+
+interface SearchChatRoomsResponse {
+  chatRooms: ChatRoomDetailsType[];
+}
+
+// 채팅방 검색
+export const searchChatRooms = async (query: string) => {
+  const response = await api.get<SearchChatRoomsResponse>(
+    `/search/chatrooms?query=${query}`,
+  );
+  return response.data;
+};
+
+/**
+ * 채팅 관련 API
+ */
+
+// 내 채팅방 목록 요청
+export const fetchChatRooms = async () => {
+  const response = await api.get<{ chatRooms: ChatRoomDetailsType[] }>(
+    "/chatroom",
+  );
+  return response.data;
+};
+
+interface CreateChatRoomRequest {
+  name: string;
+}
+
+// 채팅방 생성
+export const createChatRoom = async (request: CreateChatRoomRequest) => {
+  const response = await api.post<{ chatRoomId: number }>("/chatroom", request);
+  return response.data;
+};
+
+// 채팅방 참가
+export const joinChatRoom = async (chatRoomId: number) => {
+  const response = await api.post(`/chatroom/${chatRoomId}`);
+  return response.data;
+};
+
+// 채팅방 나가기
+export const leaveChatRoom = async (chatRoomId: number) => {
+  const response = await api.put(`/chatroom/${chatRoomId}`);
+  return response.data;
+};
+
+// 채팅방 아이디로 채팅방 상세 정보 조회
+export const getChatRoomDetails = async (chatRoomId: string) => {
+  const response = await api.get<ChatRoomDetailsType>(
+    `/chatroom/${chatRoomId}`,
+  );
+  return response.data;
+};
+
+// 채팅방 메시지 불러오기
+export const getChatRoomMessages = async (chatRoomId: string) => {
+  const response = await api.get<{ data: MessageType[] }>(
+    `/chat/${chatRoomId}`,
+  );
+  return response.data;
+};

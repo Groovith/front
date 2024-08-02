@@ -1,31 +1,28 @@
 import { useEffect, useState } from "react";
 import { Button } from "../components/Button";
 import { useNavigate } from "react-router-dom";
-import { useMutation } from "@tanstack/react-query";
 import { login } from "../utils/apis/serverAPI";
 
 export default function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
-  const createLoginMutation = useMutation({
-    mutationFn: login
-  });
 
   // 토큰 유효성 확인 성공시 메인으로 리디렉트
   useEffect(() => {
     // 토큰 유효성 검사 API
-    
   }, []);
 
   // 로그인 폼 제출
   const handleSubmit = async (e: any) => {
     e.preventDefault();
-
-    createLoginMutation.mutate({username, password}, {onSuccess: (data) => {
-      localStorage.setItem("accessToken", data.headers.access);
+    try {
+      const response = await login({username: username, password: password});
+      localStorage.setItem("accessToken", response.headers['authorization'].replace("Bearer ", ""));
       navigate("/");
-    }});
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   return (
