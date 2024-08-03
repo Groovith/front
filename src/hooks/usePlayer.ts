@@ -1,5 +1,7 @@
 import axios from "axios";
 import { usePlayerStore } from "../stores/usePlayerStore";
+import { SpotifyTrack } from "../utils/types";
+import { playTrack } from "../utils/apis/spotifyAPI";
 
 export function usePlayer() {
   const {
@@ -21,14 +23,16 @@ export function usePlayer() {
 
   // Spotify Web Playback SDK 초기화 및 리스너 추가
   const initializePlayer = () => {
-    let player: any;
+    if (player) return;
+
+    let newPlayer: any;
     const script = document.createElement("script");
     script.src = "https://sdk.scdn.co/spotify-player.js";
     script.async = true;
     document.body.appendChild(script);
 
     window.onSpotifyWebPlaybackSDKReady = () => {
-      player = new window.Spotify.Player({
+      newPlayer = new window.Spotify.Player({
         name: "Web Playback SDK",
         getOAuthToken: (cb: any) => {
           cb(localStorage.getItem("spotifyAccessToken"));
@@ -36,36 +40,36 @@ export function usePlayer() {
         volume: 0.5,
       });
 
-      setPlayer(player);
-
-      player.addListener("ready", ({ device_id }: any) => {
+      newPlayer.addListener("ready", ({ device_id }: any) => {
         console.log("Ready with Device ID", device_id);
         setDeviceId(device_id);
       });
 
-      player.addListener("not_ready", ({ device_id }: any) => {
+      newPlayer.addListener("not_ready", ({ device_id }: any) => {
         console.log("Device ID has gone offline", device_id);
       });
 
-      player.addListener("player_state_changed", (state: any) => {
+      newPlayer.addListener("player_state_changed", (state: any) => {
         if (!state) return;
 
-        setCurrentTrack(state.track_window.current_track);
         setPaused(state.paused);
         setDuration(state.duration);
         setPosition(state.position);
 
-        if (state.paused === true && state.position === 0) {
+        if (state.paused === true && state.position === 0 && state.loading === true) {
           console.log("Track Ended!");
         }
       });
 
-      player.connect();
+      newPlayer.connect();
+
+      setPlayer(newPlayer);
     };
 
     return () => {
-      if (player) {
-        player.disconnect();
+      if (newPlayer) {
+        newPlayer.disconnect();
+        setPlayer(null);
       }
     };
   };
@@ -76,34 +80,13 @@ export function usePlayer() {
     player.togglePlay();
   };
 
-  // 트랙 재생 요청 API
-  const playTrack = async (track: any) => {
-    try {
-      const url = `https://api.spotify.com/v1/me/player/play?device_id=${
-        deviceId
-      }`;
-      const body = {
-        // context_uri: track.album.uri,
-        // offset: { uri: track.uri },
-        uris: [track.uri],
-      };
-
-      await axios.put(url, body, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("spotify_access_token")}`,
-          "Content-Type": "application/json",
-        },
-      });
-    } catch (e) {
-      console.error("트랙 재생 에러: ", e);
-    }
-  };
-
   // 새로운 트랙 재생. 플레이리스트 초기화
-  const playNewTrack = async (track: any) => {
+  const playNewTrack = async (track: SpotifyTrack) => {
     setCurrentPlaylist([track]);
     setCurrentPlaylistIndex(0);
-    await playTrack(track);
+    setCurrentTrack(track);
+    setPosition(0);
+    await playTrack(track.uri, deviceId);
   };
 
   // 특정 위치로 이동
@@ -116,7 +99,7 @@ export function usePlayer() {
   // 특정 인덱스의 트랙 재생
   const playAtIndex = async (index: number) => {
     if (index >= 0 && index < currentPlaylist.length) {
-      await playTrack(currentPlaylist[index]);
+      await playTrack(currentPlaylist[index].uri, deviceId);
       setCurrentPlaylistIndex(index);
     }
   };
@@ -161,14 +144,24 @@ export function usePlayer() {
   const addToCurrentPlaylist = (track: any) => {
     const updatedCurrentPlaylist = [...currentPlaylist, track];
     setCurrentPlaylist(updatedCurrentPlaylist);
-  }
+  };
 
   // 현재 재생목록에서 삭제
   const removeFromCurrentPlaylist = (index: number) => {
     const updatedCurrentPlaylist = [...currentPlaylist];
     updatedCurrentPlaylist.splice(index, 1);
     setCurrentPlaylist(updatedCurrentPlaylist);
-  }
+  };
 
-  return { initializePlayer, playNewTrack, playAtIndex, nextTrack, previousTrack, addToCurrentPlaylist, removeFromCurrentPlaylist };
+  return {
+    initializePlayer,
+    playNewTrack,
+    playAtIndex,
+    nextTrack,
+    previousTrack,
+    addToCurrentPlaylist,
+    removeFromCurrentPlaylist,
+    togglePlay,
+    seek,
+  };
 }

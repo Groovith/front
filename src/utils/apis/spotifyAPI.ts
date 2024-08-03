@@ -1,5 +1,6 @@
 import axios, { AxiosHeaders } from "axios";
 import { getSpotifyToken } from "./serverAPI";
+import { SpotifySearchResponse } from "../types";
 
 /**
  * Spotify API 통신용 Axios 인스턴스와 API 호출 함수들.
@@ -78,84 +79,27 @@ spotifyApi.interceptors.response.use(
  * type 패러미터를 이용해 검색 결과 변경 가능
  * 현재는 Track으로 한정
  */
-interface SpotifySearchResponse {
-  tracks: {
-    href: string;
-    items: SpotifyTrack[];
-    limit: number;
-    next: string | null;
-    offset: number;
-    previous: string | null;
-    total: number;
-  };
-}
-
-interface SpotifyAlbum {
-  album_type: string;
-  total_tracks: number;
-  available_markets: string[];
-  external_urls: ExternalUrls;
-  href: string;
-  id: string;
-  images: {
-    url: string;
-    height: number;
-    width: number;
-  }[];
-  name: string;
-  release_date_precision: string;
-  restrictions: {
-    reason: string;
-  };
-  type: string;
-  uri: string;
-  artists: SpotifySimplifiedArtist[];
-}
-
-interface SpotifySimplifiedArtist {
-  external_urls: ExternalUrls;
-  href: string;
-  id: string;
-  name: string;
-  type: string;
-  uri: string;
-}
-
-interface ExternalUrls {
-  spotify: string;
-}
-
-interface SpotifyTrack {
-  album: SpotifyAlbum;
-  artists: SpotifySimplifiedArtist[];
-  disc_number: 1;
-  duration_ms: number;
-  explicit: boolean;
-  external_ids: {
-    isrc: number;
-    eam: number;
-    upc: number;
-  };
-  external_urls: ExternalUrls;
-  href: string;
-  id: string;
-  is_playable: boolean;
-  linked_from: {};
-  restrictions: {
-    reason: string;
-  };
-  name: string;
-  popularity: number;
-  preview_url: string | null;
-  track_number: number;
-  type: string;
-  uri: string;
-  is_local: boolean;
-}
-
 export const spotifySearch = async (query: string) => {
   const response = await spotifyApi.get<SpotifySearchResponse>(
     `/search?q=${encodeURIComponent(query)}&type=track`,
   );
   return response.data;
+};
+
+// 트랙 재생 요청 API
+export const playTrack = async (trackUri: string, deviceId: string) => {
+  try {
+    const url = `https://api.spotify.com/v1/me/player/play?device_id=${
+      deviceId
+    }`;
+    const body = {
+      // context_uri: track.album.uri,
+      // offset: { uri: track.uri },
+      uris: [trackUri],
+    };
+
+    await spotifyApi.put(url, body);
+  } catch (e) {
+    console.error("트랙 재생 에러: ", e);
+  }
 };

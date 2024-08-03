@@ -13,14 +13,13 @@ import {
 import { Client } from "@stomp/stompjs";
 import { useStompStore } from "../stores/useStompStore";
 import { useChatRoomStore } from "../stores/useChatRoomStore";
-import { useEffect, useState } from "react";
+import CurrentChatRoom from "../components/CurrentChatRoom";
 
 export default function Main() {
   const navigate = useNavigate();
   const { updateUserDetails } = useUser();
   const { stompClient, setStompClient } = useStompStore();
-  const { setChatRoomList, setNewMessage } =
-    useChatRoomStore();
+  const { setChatRoomList, setNewMessage } = useChatRoomStore();
 
   /**
    * 메인 화면 접속 시.
@@ -83,12 +82,9 @@ export default function Main() {
         setStompClient(client);
 
         const callback = function (message: any) {
-          // called when the client receives a STOMP message from the server
           if (message.body) {
             const chatMessage: MessageType = JSON.parse(message.body);
             setNewMessage(chatMessage);
-          } else {
-            console.log("got empty message");
           }
         };
 
@@ -118,7 +114,10 @@ export default function Main() {
     <div className="flex h-screen w-screen flex-col">
       <div className="flex h-full overflow-hidden">
         <Sidebar />
-        <Outlet />
+        <div className="relative flex h-full w-full">
+          <CurrentChatRoom />
+          <Outlet />
+        </div>
       </div>
       <Player />
     </div>

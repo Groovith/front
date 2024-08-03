@@ -13,12 +13,14 @@ import {
 import defaultUserImage from "../assets/default-user-image.png";
 import defaultChatRoomImage from "../assets/default-image-mountain.png";
 import DropdownButton from "./DropdownButton";
+import { usePlayer } from "../hooks/usePlayer";
 
 export function SearchResults() {
   const queryClient = useQueryClient();
   const location = useLocation();
   const [query, setQuery] = useState<string | null>(null);
   const navigate = useNavigate();
+  const { playNewTrack } = usePlayer();
 
   useEffect(() => {
     const urlParams = new URLSearchParams(location.search);
@@ -96,7 +98,10 @@ export function SearchResults() {
                 key={track.id}
                 className="group flex w-full items-center justify-between rounded-md px-3 py-3 text-left hover:bg-neutral-100"
               >
-                <div className="flex items-center gap-3">
+                <div
+                  className="flex items-center gap-3 hover:cursor-pointer"
+                  onClick={() => playNewTrack(track)}
+                >
                   <img
                     src={track.album.images[0].url}
                     className="size-12 rounded-sm"
@@ -191,12 +196,19 @@ export function SearchResults() {
                     <h2 className="font-medium">{user.username}</h2>
                   </div>
                 </div>
-                <DropdownButton items={[{
-                  label: "채팅방에 초대",
-                  action: () => {},
-                  Icon: UserPlus
-                }]}>
-                  <Button variant={"transparent"} className="opacity-0 group-hover:opacity-100">
+                <DropdownButton
+                  items={[
+                    {
+                      label: "채팅방에 초대",
+                      action: () => {},
+                      Icon: UserPlus,
+                    },
+                  ]}
+                >
+                  <Button
+                    variant={"transparent"}
+                    className="opacity-0 group-hover:opacity-100"
+                  >
                     <EllipsisVertical />
                   </Button>
                 </DropdownButton>

@@ -9,6 +9,8 @@ import DropdownButton from "../components/DropdownButton";
 import { useNavigate, useParams } from "react-router-dom";
 import { ChatRoom } from "../components/ChatRoom";
 import { useChatRoomStore } from "../stores/useChatRoomStore";
+import { useStompStore } from "../stores/useStompStore";
+import { MessageType } from "../utils/types";
 
 export default function Chat() {
   const { chatRoomId } = useParams();
@@ -16,13 +18,38 @@ export default function Chat() {
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newChatRoomName, setNewChatRoomName] = useState("");
-  const { chatRoomList, setCurrentChatRoomId, currentChatRoomId } =
-    useChatRoomStore();
+  const { stompClient } = useStompStore();
+  const {
+    chatRoomList,
+    currentChatRoomId,
+    setNewMessage,
+  } = useChatRoomStore();
 
   // 새 채팅방 생성 Mutation
   const { mutate: createChatRoomMutate } = useMutation({
     mutationFn: createChatRoom,
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["chatRooms"] }),
+    onSuccess: (data) => {
+      // 새 채팅방 구독 -> 모듈화 필요
+      const accessToken = localStorage.getItem("accessToken");
+      if (!accessToken) {
+        return;
+      }
+      const headers = { Authorization: `Bearer ${accessToken}` };
+      const callback = function (message: any) {
+        if (message.body) {
+          const chatMessage: MessageType = JSON.parse(message.body);
+          setNewMessage(chatMessage);
+        }
+      };
+
+      stompClient?.subscribe(
+        `/sub/api/chat/${data.chatRoomId}`,
+        callback,
+        headers,
+      );
+
+      queryClient.invalidateQueries({ queryKey: ["chatRooms"] });
+    },
   });
 
   // 채팅방 나가기 Mutation
@@ -40,7 +67,6 @@ export default function Chat() {
     } else {
       alert("채팅방 이름을 입력해주세요.");
     }
-
     setIsModalOpen(false);
   };
 
@@ -95,7 +121,11 @@ export default function Chat() {
           </div>
         </div>
         {chatRoomList && chatRoomList.length === 0 && (
-          <p className="text-sm text-neutral-400">아직 참여한 채팅이 없어요</p>
+          <div className="flex h-full w-full items-center justify-center">
+            <p className="text-sm text-neutral-400">
+              아직 참여한 채팅이 없어요
+            </p>
+          </div>
         )}
         {chatRoomList && chatRoomList.length > 0 && (
           <ul className="flex flex-col">

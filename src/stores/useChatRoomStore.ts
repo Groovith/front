@@ -6,10 +6,12 @@ interface useChatRoomStoreType {
   currentChatRoomId: number;
   currentChatRoomMessages: MessageType[];
   newMessage: MessageType | null;
+  isCurrentChatRoomOpen: boolean;
   setChatRoomList: ([]: ChatRoomDetailsType[]) => void;
   setCurrentChatRoomId: (currentChatRoomId: number) => void;
   setCurrentChatRoomMessages: ([]: MessageType[]) => void;
   setNewMessage: (newMessage: MessageType) => void;
+  toggleCurrentChatRoomOpen: () => void;
   getChatRoomById: (chatRoomId: number) => ChatRoomDetailsType | undefined;
   addToCurrentChatRoomMessages: (message: MessageType) => void;
 }
@@ -19,6 +21,7 @@ export const useChatRoomStore = create<useChatRoomStoreType>((set, get) => ({
   currentChatRoomId: -1,
   currentChatRoomMessages: [],
   newMessage: null,
+  isCurrentChatRoomOpen: false,
   setChatRoomList: (chatRoomList: ChatRoomDetailsType[]) =>
     set({ chatRoomList }),
   setCurrentChatRoomId: (currentChatRoomId: number) =>
@@ -26,6 +29,8 @@ export const useChatRoomStore = create<useChatRoomStoreType>((set, get) => ({
   setCurrentChatRoomMessages: (currentChatRoomMessages: MessageType[]) =>
     set({ currentChatRoomMessages }),
   setNewMessage: (newMessage: MessageType) => set({ newMessage }),
+  toggleCurrentChatRoomOpen: () =>
+    set((state) => ({ isCurrentChatRoomOpen: !state.isCurrentChatRoomOpen })),
   getChatRoomById: (chatRoomId: number) =>
     get().chatRoomList.find((chatRoom) => chatRoom.chatRoomId === chatRoomId),
   addToCurrentChatRoomMessages: (message: MessageType) => {
