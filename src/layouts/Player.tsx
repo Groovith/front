@@ -90,19 +90,19 @@ export default function Player() {
         <>
           {currentTrack ? (
             <input
-              className="absolute z-10 h-1 w-full cursor-pointer appearance-none bg-neutral-200 accent-black outline-none disabled:accent-gray-200"
+              className="absolute z-10 h-1 w-full cursor-pointer appearance-none bg-neutral-200 accent-[#FF6735] outline-none disabled:accent-gray-200"
               type="range"
               min="0"
               max={duration}
               value={position}
               onChange={handleSeek}
               style={{
-                background: `linear-gradient(to right, black ${(position / duration) * 100}%, #E5E7EB ${(position / duration) * 100}%)`,
+                background: `linear-gradient(to right, #FF6735 ${(position / duration) * 100}%, #E5E7EB ${(position / duration) * 100}%)`,
               }}
             />
           ) : (
             <input
-              className="absolute z-10 h-1 w-full cursor-pointer appearance-none bg-neutral-200 accent-black outline-none disabled:accent-gray-200"
+              className="absolute z-10 h-1 w-full cursor-pointer appearance-none bg-neutral-200 accent-[#FF6735] outline-none disabled:accent-gray-200"
               type="range"
               min="0"
               max="100"
@@ -111,19 +111,27 @@ export default function Player() {
             />
           )}
           <div className="ml-6 flex items-center gap-1">
-            <Button variant={"transparent"}>
+            <Button variant={"transparent"} className="text-neutral-600">
               <SkipBack />
             </Button>
             {paused ? (
-              <Button variant={"transparent"} onClick={togglePlay}>
+              <Button
+                variant={"transparent"}
+                className="text-neutral-600"
+                onClick={togglePlay}
+              >
                 <Play />
               </Button>
             ) : (
-              <Button variant={"transparent"} onClick={togglePlay}>
+              <Button
+                variant={"transparent"}
+                className="text-neutral-600"
+                onClick={togglePlay}
+              >
                 <Pause />
               </Button>
             )}
-            <Button variant={"transparent"}>
+            <Button variant={"transparent"} className="text-neutral-600">
               <SkipForward />
             </Button>
             <div className="ml-2 flex items-center gap-1 text-sm text-neutral-400">
@@ -140,7 +148,9 @@ export default function Player() {
                   className="mr-3 size-12 rounded-sm"
                 />
                 <div className="flex flex-col">
-                  <p className="text-neutral-900">{currentTrack.name}</p>
+                  <p className="text-neutral-900">
+                    {currentTrack.name}
+                  </p>
                   <p className="text-neutral-500">
                     {currentTrack.artists[0].name} • {currentTrack.album.name} •{" "}
                     {currentTrack.album.release_date.split("-")[0]}

@@ -104,9 +104,9 @@ export default function Chat() {
       )}
       <div className="flex h-full w-[300px] flex-none flex-col border-r py-10">
         <div className="mb-10 flex w-full items-center justify-between px-5">
-          <h1 className="text-xl font-bold">채팅방</h1>
-          <div className="flex">
-            <Button variant={"transparent"} className="p-1">
+          <h1 className="text-xl font-bold pl-1">채팅방</h1>
+          <div className="flex gap-1">
+            <Button variant={"transparent"} className="p-0">
               <SearchIcon />
             </Button>
             <Button
@@ -159,7 +159,7 @@ export default function Chat() {
                 >
                   <Button
                     variant={"transparent"}
-                    className="opacity-0 group-hover:opacity-100"
+                    className="opacity-0 group-hover:opacity-100 p-0"
                   >
                     <EllipsisVertical />
                   </Button>
@@ -174,7 +174,7 @@ export default function Chat() {
       ) : (
         <div className="flex h-full w-full flex-col items-center justify-center">
           <h1 className="mb-4 text-4xl font-extrabold leading-none tracking-tight text-neutral-900">
-            내 채팅
+            내 음악 채팅
           </h1>
           <p className="mb-6 text-center text-neutral-400">
             새로운 채팅을 만들고 친구를 초대해 음악을 같이 들어보세요.
@@ -185,7 +185,7 @@ export default function Chat() {
               setIsModalOpen(true);
             }}
           >
-            채팅 만들기
+            채팅 만들기 ♫
           </Button>
         </div>
       )}

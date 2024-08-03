@@ -179,7 +179,7 @@ export function ChatRoom() {
               </form>
             </div>
           </div>
-          <div className="flex w-[400px] flex-col"></div>
+          <div className="flex max-w-[500px] w-full flex-col"></div>
         </div>
       )}
     </>
