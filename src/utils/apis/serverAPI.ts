@@ -1,5 +1,12 @@
-import axios from "axios";
-import { ChatRoomDetailsType, MessageType, UserDetailsType } from "../types";
+import axios, { AxiosResponse } from "axios";
+import {
+  ChatRoomDetailsType,
+  MessageType,
+  PlayerDetailsDto,
+  PlayerRequestDto,
+  SpotifyTrack,
+  UserDetailsType,
+} from "../types";
 
 /**
  * Axios 설정
@@ -52,7 +59,7 @@ api.interceptors.response.use(
       try {
         const response = await axios.post("/reissue");
 
-        const newAccessToken = response.headers['authorization'].replace(
+        const newAccessToken = response.headers["authorization"].replace(
           "Bearer ",
           "",
         );
@@ -217,6 +224,116 @@ export const getChatRoomDetails = async (chatRoomId: string) => {
 export const getChatRoomMessages = async (chatRoomId: string) => {
   const response = await api.get<{ data: MessageType[] }>(
     `/chat/${chatRoomId}`,
+  );
+  return response.data;
+};
+
+// ------------------ 같이 듣기 ----------------------
+
+// 채팅방 플레이어 정보 불러오기
+export const getPlayer = async (chatRoomId: string) => {
+  const response = await api.get<PlayerDetailsDto>(
+    `/chatrooms/${chatRoomId}/player`,
+  );
+  return response.data;
+};
+
+// 같이 듣기 참가
+export const joinPlayer = async (chatRoomId: string) => {
+  const response = await api.patch<PlayerDetailsDto>(`/chatrooms/${chatRoomId}/player/join`);
+  return response.data;
+};
+
+// 같이 듣기 나가기
+export const leavePlayer = async (chatRoomId: string) => {
+  const response = await api.patch(`/chatrooms/${chatRoomId}/player/leave`);
+  return response.data;
+};
+
+// 토글 재생
+export const requestTogglePlay = async (
+  chatRoomId: string | number,
+  playerRequestDto: PlayerRequestDto
+) => {
+  const response: AxiosResponse<void> = await api.patch(
+    `/chatrooms/${chatRoomId}/player/toggle`,
+    playerRequestDto,
+  );
+  return response.data;
+};
+
+// 재생 위치 이동
+export const requestSeek = async (
+  chatRoomId: string | number,
+  position: number,
+) => {
+  const response: AxiosResponse<void> = await api.patch(
+    `/chatrooms/${chatRoomId}/player/seek?position=${position}`,
+  );
+  return response.data;
+};
+
+// 새 트랙 재생
+export const requestPlayNewTrack = async (
+  chatRoomId: string | number,
+  playerRequestDto: PlayerRequestDto,
+) => {
+  const response: AxiosResponse<void> = await api.post(
+    `/chatrooms/${chatRoomId}/player/track`,
+    playerRequestDto,
+  );
+  return response.data;
+};
+
+// 특정 인덱스의 트랙 재생
+export const requestPlayAtIndex = async (
+  chatRoomId: string | number,
+  index: number,
+) => {
+  const response: AxiosResponse<void> = await api.patch(
+    `/chatrooms/${chatRoomId}/player/track/${index}`,
+  );
+
+  return response.data;
+};
+
+// 다음 곡 재생
+export const requestNextTrack = async (chatRoomId: string | number) => {
+  const response: AxiosResponse<void> = await api.patch(
+    `/chatrooms/${chatRoomId}/player/track/next`,
+  );
+
+  return response.data;
+};
+
+// 이전 곡 재생
+export const requestPreviousTrack = async (chatRoomId: string | number) => {
+  const response: AxiosResponse<void> = await api.patch(
+    `/chatrooms/${chatRoomId}/player/track/previous`,
+  );
+
+  return response.data;
+};
+
+// 현재 플레이리스트에 추가
+export const requestAddToCurrentPlaylist = async (
+  chatRoomId: string | number,
+  track: SpotifyTrack,
+) => {
+  const response: AxiosResponse<void> = await api.post(
+    `/chatrooms/${chatRoomId}/player/current-playlist`,
+    { track: track },
+  );
+  return response.data;
+};
+
+// 현재 플레이리스트에서 삭제
+export const requestRemoveFromCurrentPlaylist = async (
+  chatRoomId: string | number,
+  index: number,
+) => {
+  const response: AxiosResponse<void> = await api.delete(
+    `/chatrooms/${chatRoomId}/player/current-playlist/${index}`,
   );
   return response.data;
 };

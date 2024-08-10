@@ -1,7 +1,22 @@
-import axios from "axios";
 import { usePlayerStore } from "../stores/usePlayerStore";
-import { SpotifyTrack } from "../utils/types";
-import { playTrack } from "../utils/apis/spotifyAPI";
+import {
+  PlayerDetailsDto,
+  PlayerRequestDto,
+  SpotifyTrack,
+} from "../utils/types";
+import { addItemToPlaybackQueue, playTrack } from "../utils/apis/spotifyAPI";
+import { useQueryClient } from "@tanstack/react-query";
+import {
+  requestAddToCurrentPlaylist,
+  requestNextTrack,
+  requestPlayAtIndex,
+  requestPlayNewTrack,
+  requestPreviousTrack,
+  requestRemoveFromCurrentPlaylist,
+  requestSeek,
+  requestTogglePlay,
+} from "../utils/apis/serverAPI";
+import { useStompStore } from "../stores/useStompStore";
 
 export function usePlayer() {
   const {
@@ -11,15 +26,21 @@ export function usePlayer() {
     currentPlaylistIndex,
     position,
     repeat,
+    paused,
+    isListenTogetherConnected,
+    listenTogetherId,
     setPlayer,
     setDeviceId,
-    setCurrentTrack,
     setPaused,
     setDuration,
     setPosition,
     setCurrentPlaylist,
     setCurrentPlaylistIndex,
+    setLoading,
+    decreaseCurrentPlaylistIndex,
   } = usePlayerStore();
+  const queryClient = useQueryClient();
+  const { stompClient } = useStompStore();
 
   // Spotify Web Playback SDK 초기화 및 리스너 추가
   const initializePlayer = () => {
@@ -33,7 +54,7 @@ export function usePlayer() {
 
     window.onSpotifyWebPlaybackSDKReady = () => {
       newPlayer = new window.Spotify.Player({
-        name: "Web Playback SDK",
+        name: "Groovith",
         getOAuthToken: (cb: any) => {
           cb(localStorage.getItem("spotifyAccessToken"));
         },
@@ -52,13 +73,11 @@ export function usePlayer() {
       newPlayer.addListener("player_state_changed", (state: any) => {
         if (!state) return;
 
+        console.log(state);
+
         setPaused(state.paused);
         setDuration(state.duration);
         setPosition(state.position);
-
-        if (state.paused === true && state.position === 0 && state.loading === true) {
-          console.log("Track Ended!");
-        }
       });
 
       newPlayer.connect();
@@ -76,81 +95,342 @@ export function usePlayer() {
 
   // 플레이어 조작
   // 재생/일시 정지 토글
-  const togglePlay = () => {
-    player.togglePlay();
+  // const togglePlay = (force?: boolean) => {
+  //   if (force) {
+  //     player.togglePlay();
+  //     return;
+  //   }
+
+  //   if (isListenTogetherConnected && listenTogetherId) {
+  //     const requestDto: PlayerRequestDto = {
+  //       paused: !paused,
+  //       position: position,
+  //       action: "TOGGLE_PLAY",
+  //     };
+  //     sendPlayerMessage(listenTogetherId, requestDto);
+  //   } else {
+  //     player.togglePlay();
+  //   }
+  // };
+
+  // 플레이어 정지
+  const pausePlayer = (force?: boolean) => {
+    if (force) {
+      player.pause();
+      return;
+    }
+
+    if (isListenTogetherConnected && listenTogetherId) {
+      const requestDto: PlayerRequestDto = {
+        position: position,
+        action: "PAUSE",
+      };
+      sendPlayerMessage(listenTogetherId, requestDto);
+    } else {
+      player.pause();
+    }
+  };
+
+  // 플레이어 다시 재생
+  const resumePlayer = (force?: boolean) => {
+    if (force) {
+      player.resume();
+      return;
+    }
+
+    if (isListenTogetherConnected && listenTogetherId) {
+      const requestDto: PlayerRequestDto = {
+        position: position,
+        action: "RESUME",
+      };
+      sendPlayerMessage(listenTogetherId, requestDto);
+    } else {
+      player.resume();
+    }
+  };
+
+  // 트랙 종료 메시지
+  const trackEnded = () => {
+    const requestDto: PlayerRequestDto = {
+      action: "TRACK_ENDED",
+    };
+    if (isListenTogetherConnected && listenTogetherId) {
+      sendPlayerMessage(listenTogetherId, requestDto);
+    }
   };
 
   // 새로운 트랙 재생. 플레이리스트 초기화
-  const playNewTrack = async (track: SpotifyTrack) => {
-    setCurrentPlaylist([track]);
-    setCurrentPlaylistIndex(0);
-    setCurrentTrack(track);
-    setPosition(0);
-    await playTrack(track.uri, deviceId);
+  const playNewTrack = async (track: SpotifyTrack, force?: boolean) => {
+    if (force) {
+      setPosition(0);
+      setCurrentPlaylistIndex(0);
+      setCurrentPlaylist([track]);
+      setPaused(false);
+      setLoading(true);
+      try {
+        await playTrack(track.uri, deviceId);
+      } finally {
+        setLoading(false);
+      }
+
+      return;
+    }
+
+    if (isListenTogetherConnected && listenTogetherId) {
+      const requestDto: PlayerRequestDto = {
+        action: "PLAY_NEW_TRACK",
+        track: track,
+      };
+      sendPlayerMessage(listenTogetherId, requestDto);
+    } else {
+      setPosition(0);
+      setCurrentPlaylistIndex(0);
+      setCurrentPlaylist([track]);
+      setPaused(false);
+      setLoading(true);
+      try {
+        await playTrack(track.uri, deviceId);
+      } finally {
+        setLoading(false);
+      }
+    }
   };
 
   // 특정 위치로 이동
-  const seek = (position: number) => {
-    player.seek(position).then(() => {
-      setPosition(position);
-    });
+  const seek = async (position: number, force?: boolean) => {
+    if (force) {
+      player.seek(position).then(() => {
+        setPosition(position);
+      });
+      return;
+    }
+
+    if (isListenTogetherConnected && listenTogetherId) {
+      const requestDto: PlayerRequestDto = {
+        action: "SEEK",
+        position: position,
+      };
+      sendPlayerMessage(listenTogetherId, requestDto);
+    } else {
+      player.seek(position).then(() => {
+        setPosition(position);
+      });
+    }
   };
 
   // 특정 인덱스의 트랙 재생
-  const playAtIndex = async (index: number) => {
-    if (index >= 0 && index < currentPlaylist.length) {
-      await playTrack(currentPlaylist[index].uri, deviceId);
-      setCurrentPlaylistIndex(index);
+  const playAtIndex = async (index: number, force?: boolean) => {
+    if (force) {
+      if (index >= 0 && index < currentPlaylist.length) {
+        try {
+          await playTrack(currentPlaylist[index].uri, deviceId);
+          setCurrentPlaylistIndex(index);
+        } catch (e) {
+          console.log(e);
+        }
+      }
+
+      return;
+    }
+
+    if (isListenTogetherConnected && listenTogetherId) {
+      const requestDto: PlayerRequestDto = {
+        action: "PLAY_AT_INDEX",
+        index: index,
+      };
+      sendPlayerMessage(listenTogetherId, requestDto);
+    } else {
+      if (index >= 0 && index < currentPlaylist.length) {
+        try {
+          await playTrack(currentPlaylist[index].uri, deviceId);
+          setCurrentPlaylistIndex(index);
+        } catch (e) {
+          console.log(e);
+        }
+      }
     }
   };
 
   // 다음 곡 재생
-  const nextTrack = async () => {
-    const nextIndex = currentPlaylistIndex + 1;
+  const nextTrack = async (force?: boolean) => {
+    if (force) {
+      const nextIndex = currentPlaylistIndex + 1;
+      if (nextIndex < currentPlaylist.length) {
+        // 다음 곡이 있는 경우
+        await playAtIndex(nextIndex);
+      } else if (repeat) {
+        // 다음 곡이 없지만 반복재생이 설정되어 있는 경우
+        await playAtIndex(0);
+      } else {
+        // 다음 곡이 없고 반복재생이 설정되어 있지 않은 경우
+        player.seek(0).then(() => {
+          player.pause();
+        });
+      }
+      return;
+    }
 
-    if (nextIndex < currentPlaylist.length) {
-      // 다음 곡이 있는 경우
-      await playAtIndex(nextIndex);
-      setCurrentPlaylistIndex(nextIndex);
-    } else if (repeat) {
-      // 다음 곡이 없지만 반복재생이 설정되어 있는 경우
-      await playAtIndex(0);
-      setCurrentPlaylistIndex(0);
+    if (isListenTogetherConnected && listenTogetherId) {
+      const requestDto: PlayerRequestDto = {
+        action: "NEXT_TRACK",
+      };
+      sendPlayerMessage(listenTogetherId, requestDto);
     } else {
-      // 다음 곡이 없고 반복재생이 설정되어 있지 않은 경우
-      seek(0);
+      const nextIndex = currentPlaylistIndex + 1;
+      if (nextIndex < currentPlaylist.length) {
+        // 다음 곡이 있는 경우
+        await playAtIndex(nextIndex);
+      } else if (repeat) {
+        // 다음 곡이 없지만 반복재생이 설정되어 있는 경우
+        await playAtIndex(0);
+      } else {
+        // 다음 곡이 없고 반복재생이 설정되어 있지 않은 경우
+        player.seek(0).then(() => {
+          player.pause();
+        });
+      }
     }
   };
 
   // 이전 곡 재생
-  const previousTrack = async () => {
-    if (position > 3000) {
-      // 3초를 밀리초로 변환
-      seek(0); // 현재 트랙을 처음부터 다시 재생
+  const previousTrack = async (force?: boolean) => {
+    if (force) {
+      if (position > 3000) {
+        // 3초를 밀리초로 변환
+        seek(0); // 현재 트랙을 처음부터 다시 재생
+        return;
+      }
+
+      const previousIndex = currentPlaylistIndex! - 1;
+      if (previousIndex >= 0) {
+        await playAtIndex(previousIndex);
+      } else {
+        seek(0);
+      }
+
       return;
     }
 
-    const previousIndex = currentPlaylistIndex - 1;
-    if (previousIndex >= 0) {
-      await playAtIndex(previousIndex);
-      setCurrentPlaylistIndex(previousIndex);
+    if (isListenTogetherConnected && listenTogetherId) {
+      const requestDto: PlayerRequestDto = {
+        action: "PREVIOUS_TRACK",
+      };
+      sendPlayerMessage(listenTogetherId, requestDto);
     } else {
-      seek(0);
+      if (position > 3000) {
+        // 3초를 밀리초로 변환
+        seek(0); // 현재 트랙을 처음부터 다시 재생
+        return;
+      }
+
+      const previousIndex = currentPlaylistIndex! - 1;
+      if (previousIndex >= 0) {
+        await playAtIndex(previousIndex);
+      } else {
+        seek(0);
+      }
+    }
+  };
+
+  // 현재 유저 플레이백 큐에 추가
+  const addToPlaybackQueue = async (track: SpotifyTrack) => {
+    try {
+      addItemToPlaybackQueue(track.uri, deviceId).then(() => {
+        queryClient.invalidateQueries({ queryKey: ["userQueue"] });
+      });
+    } catch (e) {
+      console.error("addToPlaybackQueue error: ", e);
     }
   };
 
   // 현재 재생목록 관련
+
   // 현재 재생목록에 추가
-  const addToCurrentPlaylist = (track: any) => {
-    const updatedCurrentPlaylist = [...currentPlaylist, track];
-    setCurrentPlaylist(updatedCurrentPlaylist);
+  const addToCurrentPlaylist = async (track: SpotifyTrack, force?: boolean) => {
+    if (force) {
+      const updatedCurrentPlaylist = [...currentPlaylist, track];
+      setCurrentPlaylist(updatedCurrentPlaylist);
+      return;
+    }
+
+    if (isListenTogetherConnected && listenTogetherId) {
+      const requestDto: PlayerRequestDto = {
+        action: "ADD_TO_CURRENT_PLAYLIST",
+        track: track,
+      };
+      sendPlayerMessage(listenTogetherId, requestDto);
+    } else {
+      const updatedCurrentPlaylist = [...currentPlaylist, track];
+      setCurrentPlaylist(updatedCurrentPlaylist);
+      // 실행 중인 곡이 없을 때 첫번째 곡을 재생
+      if (!currentPlaylist[currentPlaylistIndex]) {
+        setCurrentPlaylistIndex(0);
+        playAtIndex(0);
+      }
+    }
   };
 
   // 현재 재생목록에서 삭제
-  const removeFromCurrentPlaylist = (index: number) => {
-    const updatedCurrentPlaylist = [...currentPlaylist];
-    updatedCurrentPlaylist.splice(index, 1);
-    setCurrentPlaylist(updatedCurrentPlaylist);
+  const removeFromCurrentPlaylist = async (index: number, force?: boolean) => {
+    if (force) {
+      const updatedCurrentPlaylist = [...currentPlaylist];
+      updatedCurrentPlaylist.splice(index, 1);
+      setCurrentPlaylist(updatedCurrentPlaylist);
+
+      const isCurrentTrackDeleted = index === currentPlaylistIndex;
+      const isLastTrackDeleted = updatedCurrentPlaylist.length === 0;
+
+      if (isCurrentTrackDeleted) {
+        if (isLastTrackDeleted) {
+          // 재생 목록이 비어있다면 정지
+          setPaused(true);
+          player.pause(); // 재생을 멈추는 로직 추가
+        } else {
+          // 다음 트랙을 재생
+          const newIndex =
+            index >= updatedCurrentPlaylist.length
+              ? updatedCurrentPlaylist.length - 1
+              : index;
+          setCurrentPlaylistIndex(newIndex);
+          playAtIndex(newIndex, true); // 다음 곡을 재생
+        }
+      } else if (index < currentPlaylistIndex) {
+        // 삭제된 인덱스가 현재 재생 인덱스보다 앞에 있으면 currentPlaylistIndex를 하나 줄임
+        decreaseCurrentPlaylistIndex(1);
+      }
+
+      return;
+    }
+
+    if (isListenTogetherConnected && listenTogetherId) {
+      const requestDto: PlayerRequestDto = {
+        action: "REMOVE_FROM_CURRENT_PLAYLIST",
+        index: index,
+      };
+      sendPlayerMessage(listenTogetherId, requestDto);
+    } else {
+      const updatedCurrentPlaylist = [...currentPlaylist];
+      updatedCurrentPlaylist.splice(index, 1);
+      setCurrentPlaylist(updatedCurrentPlaylist);
+      if (index === currentPlaylistIndex) {
+        playAtIndex(index);
+      }
+    }
+  };
+
+  // STOMP 플레이어 메시지 전송
+  const sendPlayerMessage = (
+    chatRoomId: string | number,
+    requestDto: PlayerRequestDto,
+  ) => {
+    const accessToken = localStorage.getItem("accessToken");
+    if (!stompClient || !accessToken) return;
+
+    stompClient.publish({
+      destination: `/pub/api/chatrooms/${chatRoomId}/player/listen-together`,
+      body: JSON.stringify(requestDto),
+      headers: { access: accessToken },
+    });
   };
 
   return {
@@ -161,7 +441,11 @@ export function usePlayer() {
     previousTrack,
     addToCurrentPlaylist,
     removeFromCurrentPlaylist,
-    togglePlay,
+    //togglePlay,
     seek,
+    addToPlaybackQueue,
+    trackEnded,
+    pausePlayer,
+    resumePlayer,
   };
 }

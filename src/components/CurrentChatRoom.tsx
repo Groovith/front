@@ -1,5 +1,6 @@
 import {
   AudioLines,
+  CirclePlus,
   EllipsisVertical,
   Headphones,
   Pause,
@@ -15,25 +16,28 @@ import { Button } from "./Button";
 import { usePlayer } from "../hooks/usePlayer";
 import { formatDuation } from "../utils/formatDuration";
 import { useState } from "react";
+import DropdownButton from "./DropdownButton";
 
 export default function CurrentChatRoom() {
   const { isCurrentChatRoomOpen } = useChatRoomStore();
-  const { seek, togglePlay } = usePlayer();
+  const { seek, resumePlayer, pausePlayer, playAtIndex, removeFromCurrentPlaylist } = usePlayer();
   const {
-    currentPlaylist,
-    currentTrack,
     duration,
     position,
     paused,
+    setPosition,
+    currentPlaylist,
     currentPlaylistIndex,
   } = usePlayerStore();
   const [hoveredTrackIndex, setHoveredTrackIndex] = useState<number | null>(
     null,
   );
+  const [newPosition, setNewPosition] = useState<number>();
 
   // 트랙 위치 변경
-  const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
-    seek(Number(e.target.value));
+  const handleSeek = () => {
+    if (!newPosition) return;
+    seek(newPosition);
   };
 
   return (
@@ -43,7 +47,7 @@ export default function CurrentChatRoom() {
       }`}
     >
       <div className="flex size-full flex-col border-r">
-        <div className="flex size-full justify-center items-center">
+        <div className="flex size-full items-center justify-center">
           <p className="text-sm text-neutral-400">
             현재 같이 듣기 중인 채팅방이 없습니다
           </p>
@@ -51,7 +55,7 @@ export default function CurrentChatRoom() {
       </div>
       <div className="flex size-full max-w-[500px] flex-col">
         <div className="flex size-full flex-1 flex-col items-center border-b p-5">
-          {currentTrack ? (
+          {currentPlaylist[currentPlaylistIndex] ? (
             <>
               <div className="mb-5 flex w-full justify-between">
                 <Button
@@ -69,15 +73,17 @@ export default function CurrentChatRoom() {
               </div>
               <div className="flex max-w-[300px] flex-none flex-col gap-4 overflow-hidden text-ellipsis whitespace-nowrap">
                 <img
-                  src={currentTrack?.album.images[0].url}
+                  src={
+                    currentPlaylist[currentPlaylistIndex].album.images[0].url
+                  }
                   className="w-full rounded-lg"
                 />
                 <div className="flex flex-col gap-1">
                   <p className="overflow-hidden text-ellipsis text-2xl font-semibold text-neutral-900">
-                    {currentTrack.name}
+                    {currentPlaylist[currentPlaylistIndex].name}
                   </p>
                   <p className="text-lg text-neutral-500">
-                    {currentTrack.artists[0].name}
+                    {currentPlaylist[currentPlaylistIndex].artists[0].name}
                   </p>
                 </div>
                 <div className="relative flex items-center justify-between gap-3">
@@ -90,7 +96,12 @@ export default function CurrentChatRoom() {
                     min="0"
                     max={duration}
                     value={position}
-                    onChange={handleSeek}
+                    onChange={(e) => {
+                      e.preventDefault();
+                      setNewPosition(Number(e.target.value));
+                      setPosition(Number(e.target.value));
+                    }}
+                    onMouseUp={handleSeek}
                     style={{
                       background: `linear-gradient(to right, #FF6735 ${(position / duration) * 100}%, #E5E7EB ${(position / duration) * 100}%)`,
                     }}
@@ -107,11 +118,11 @@ export default function CurrentChatRoom() {
                     <SkipBack />
                   </Button>
                   {paused ? (
-                    <Button className="rounded-full p-3" onClick={togglePlay}>
+                    <Button className="rounded-full p-3" onClick={() => resumePlayer()}>
                       <Play size={30} />
                     </Button>
                   ) : (
-                    <Button className="rounded-full p-3" onClick={togglePlay}>
+                    <Button className="rounded-full p-3" onClick={() => pausePlayer()}>
                       <Pause size={30} />
                     </Button>
                   )}
@@ -133,7 +144,7 @@ export default function CurrentChatRoom() {
           )}
         </div>
         {/*현재 플레이리스트*/}
-        <div className="flex size-full flex-1">
+        <div className="flex size-full flex-1 flex-col overflow-y-auto">
           {currentPlaylist &&
             currentPlaylist.map((track, index) => (
               <div
@@ -146,15 +157,21 @@ export default function CurrentChatRoom() {
                   <div className="relative rounded-sm">
                     <img
                       src={track.album.images[0].url}
-                      className="h-full max-h-14 rounded-sm"
+                      className="h-full max-h-14 rounded-sm hover:cursor-pointer"
                       alt="Album Art"
+                      onClick={() => playAtIndex(index)}
                     />
-                    <div className="absolute inset-0 flex items-center justify-center rounded-sm bg-black bg-opacity-50">
-                      <AudioLines className="text-white" />
-                    </div>
+                    {index === -1 && (
+                      <div className="absolute inset-0 flex items-center justify-center rounded-sm bg-black bg-opacity-50">
+                        <AudioLines className="text-white" />
+                      </div>
+                    )}
                   </div>
-                  <div className="flex w-full flex-col gap-0.5">
-                    <p className="overflow-hidden text-ellipsis whitespace-nowrap text-neutral-900">
+                  <div className="flex w-full flex-col gap-0.5 overflow-hidden text-ellipsis whitespace-nowrap">
+                    <p
+                      className="w-fit overflow-hidden text-ellipsis whitespace-nowrap text-neutral-900 hover:cursor-pointer"
+                      onClick={() => playAtIndex(index)}
+                    >
                       {track.name}
                     </p>
                     <p className="text-sm text-neutral-500">
@@ -162,11 +179,17 @@ export default function CurrentChatRoom() {
                     </p>
                   </div>
                 </div>
-                <div className="flex items-center gap-1">
+                <div className="flex w-10 items-center justify-center gap-1">
                   {index === hoveredTrackIndex ? (
-                    <Button variant={"transparent"} className="p-0">
-                      <EllipsisVertical />
-                    </Button>
+                    <DropdownButton
+                      items={[
+                        { label: "현재 재생목록에서 삭제", action: () => {removeFromCurrentPlaylist(index)} },
+                      ]}
+                    >
+                      <Button variant={"transparent"} className="p-0">
+                        <EllipsisVertical />
+                      </Button>
+                    </DropdownButton>
                   ) : (
                     <p className="text-neutral-500">
                       {formatDuation(track.duration_ms)}
@@ -175,6 +198,11 @@ export default function CurrentChatRoom() {
                 </div>
               </div>
             ))}
+          <div className="w-full flex justify-center items-center h-fit py-10">
+            <Button variant={"transparent"}>
+              <CirclePlus />
+            </Button>
+          </div>
         </div>
       </div>
     </div>

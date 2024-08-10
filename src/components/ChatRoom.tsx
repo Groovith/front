@@ -1,23 +1,59 @@
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
-import { MessageType } from "../utils/types";
+import {
+  MessageType,
+  PlayerDetailsDto,
+  PlayerResponseDto,
+  SpotifyTrack,
+} from "../utils/types";
 import {
   getChatRoomMessages,
+  getPlayer,
+  joinPlayer,
+  leavePlayer,
 } from "../utils/apis/serverAPI";
 import defaultChatRoomImage from "../assets/default-image-mountain.png";
 import defaultUserImage from "../assets/default-user-image.png";
 import { Button } from "./Button";
-import { Menu, SendHorizonal, UserPlus } from "lucide-react";
+import {
+  AudioLines,
+  EllipsisVertical,
+  Headphones,
+  Menu,
+  Pause,
+  Play,
+  Repeat,
+  SendHorizonal,
+  Shuffle,
+  SkipBack,
+  SkipForward,
+  UserPlus,
+  X,
+} from "lucide-react";
 import Loading from "../pages/Loading";
 import DropdownButton from "./DropdownButton";
 import React, { useEffect, useRef, useState } from "react";
 import { useStompStore } from "../stores/useStompStore";
 import { useChatRoomStore } from "../stores/useChatRoomStore";
 import { formatDateTime } from "../utils/formatDateTime";
+import { formatDuation } from "../utils/formatDuration";
+import { usePlayerStore } from "../stores/usePlayerStore";
+import { usePlayer } from "../hooks/usePlayer";
+import { playTrack } from "../utils/apis/spotifyAPI";
 
 export function ChatRoom() {
   const { chatRoomId } = useParams(); // 현재 주소 파라미터에서. "/chat/:chatRoomId".
   const [message, setMessage] = useState(""); // 입력창 메시지
+  const [chatRoomPosition, setChatRoomPosition] = useState<number>(0);
+  const [chatRoomPaused, setChatRoomPaused] = useState<boolean>(true);
+  const [chatRoomRepeat, setChatRoomRepeat] = useState<boolean>(false);
+  const [chatRoomCurrentPlaylist, setChatRoomCurrentPlaylist] = useState<
+    SpotifyTrack[]
+  >([]);
+  const [chatRoomCurrentPlaylistIndex, setChatRoomCurrentPlaylistIndex] =
+    useState<number>(-1);
+  const [hoveredTrackIndex, setHoveredTrackIndex] = useState<number | null>();
+
   const { stompClient } = useStompStore();
   const {
     getChatRoomById,
@@ -27,7 +63,28 @@ export function ChatRoom() {
     newMessage,
     addToCurrentChatRoomMessages,
   } = useChatRoomStore();
+  const {
+    isListenTogetherConnected,
+    listenTogetherId,
+    listenTogetherSubscription,
+    player,
+    paused,
+    deviceId,
+    currentPlaylist,
+    currentPlaylistIndex,
+    setRepeat,
+    setIsListenTogetherConnected,
+    setListenTogetherId,
+    setListenTogetherSubscription,
+    setCurrentPlaylist,
+    setCurrentPlaylistIndex,
+    setPaused,
+    setPosition,
+    setPlayerResponseMessage,
+  } = usePlayerStore();
+
   const chatContainerRef = useRef<HTMLDivElement>(null);
+  const timerRef = useRef<number | null>();
 
   // 현재 채팅방 정보를 가져옴
   const chatRoomDetails = getChatRoomById(Number(chatRoomId));
@@ -69,7 +126,147 @@ export function ChatRoom() {
     enabled: !!chatRoomId,
   });
 
-  // 채팅방 플레이리스트 불러오기
+  // 채팅방 플레이어 정보 불러오기
+  useQuery<PlayerDetailsDto>({
+    queryKey: ["player", chatRoomId],
+    queryFn: () =>
+      getPlayer(chatRoomId as string).then((data) => {
+        setChatRoomCurrentPlaylistIndex(data.currentPlaylistIndex);
+        setChatRoomCurrentPlaylist(data.currentPlaylist);
+        setChatRoomPaused(data.paused);
+        setChatRoomRepeat(data.repeat);
+        setChatRoomPosition(data.position);
+        return data;
+      }),
+    enabled: !!chatRoomId,
+  });
+
+  // 채팅방 현재 시간 업데이트
+  useEffect(() => {
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+    }
+
+    if (!chatRoomPaused) {
+      timerRef.current = setInterval(() => {
+        setChatRoomPosition((prevPosition) => prevPosition + 500);
+      }, 500);
+    }
+
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
+    };
+  }, [chatRoomPaused, chatRoomPosition, chatRoomId]);
+
+  // 채팅방 플레이어 상태 STOMP 구독 -> 컴포넌트 언마운트시 구독 해제
+  useEffect(() => {
+    if (!stompClient) return;
+
+    const accessToken = localStorage.getItem("accessToken");
+    if (!accessToken) {
+      return;
+    }
+
+    // STOMP 커스텀 헤더
+    const headers = { Authorization: `Bearer ${accessToken}` };
+
+    // 메시지 수신 Callback 함수
+    const callback = function (message: any) {
+      if (message.body) {
+        const playerMessage: PlayerDetailsDto = JSON.parse(message.body);
+        setChatRoomCurrentPlaylistIndex(playerMessage.currentPlaylistIndex);
+        setChatRoomCurrentPlaylist(playerMessage.currentPlaylist);
+        setChatRoomPaused(playerMessage.paused);
+        setChatRoomRepeat(playerMessage.repeat);
+        setChatRoomPosition(playerMessage.position);
+      }
+    };
+
+    const subscription = stompClient.subscribe(
+      `/sub/api/chatrooms/${chatRoomId}/player`,
+      callback,
+      headers,
+    );
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [stompClient, chatRoomId]);
+
+  // 같이 듣기 연결
+  const connectListenTogether = async () => {
+    const accessToken = localStorage.getItem("accessToken");
+    if (!accessToken || !stompClient || !player || !chatRoomId) {
+      return;
+    }
+
+    // 기존에 구독한 같이 듣기가 있다면 구독 해제 & 같이 듣기 연결 상태 해제
+    if (listenTogetherId != Number(chatRoomId) && listenTogetherSubscription) {
+      listenTogetherSubscription.unsubscribe();
+      setIsListenTogetherConnected(false);
+    }
+
+    // 채팅방 참가 및 초기화
+    joinPlayer(chatRoomId).then(async (data) => {
+      console.log(data);
+      setCurrentPlaylist(data.currentPlaylist);
+      setCurrentPlaylistIndex(data.currentPlaylistIndex);
+      setPaused(data.paused);
+      setPosition(data.position);
+
+      if (data.currentPlaylist.length > 0 && typeof data.currentPlaylistIndex === 'number') {
+        console.log("play start");
+        await playTrack(
+          data.currentPlaylist[data.currentPlaylistIndex].uri,
+          deviceId,
+          data.position,
+        );
+      }
+      // 일정 시간 후에 플레이어를 정지시키기 위해 setTimeout 사용
+      setTimeout(() => {
+        if (data.paused) {
+          player.pause();
+        }
+      }, 1000); // 잠시 후 메뉴얼 정지
+    });
+
+    // STOMP 커스텀 헤더
+    const headers = { Authorization: `Bearer ${accessToken}` };
+
+    // 같이 듣기 콜백 함수
+    const callback = async function (message: any) {
+      if (message.body) {
+        const playerMessage: PlayerResponseDto = JSON.parse(message.body);
+        // playerStore의 전역 변수에 저장하고 Player 컴포넌트에서 비교
+        setPlayerResponseMessage(playerMessage);
+      }
+    };
+
+    // STOMP 토픽 구독
+    const subscription = stompClient.subscribe(
+      `/sub/api/chatrooms/${chatRoomId}/player/listen-together`,
+      callback,
+      headers,
+    );
+
+    // 같이 듣기 변수 설정
+    setListenTogetherSubscription(subscription);
+    setIsListenTogetherConnected(true);
+    setListenTogetherId(Number(chatRoomId));
+  };
+
+  // 같이 듣기 연결 해제
+  const disconnectListenTogether = async () => {
+    leavePlayer(chatRoomId!);
+    if (chatRoomId) {
+      listenTogetherSubscription?.unsubscribe();
+      setIsListenTogetherConnected(false);
+    }
+
+    player.pause();
+  };
 
   // 메시지 보내기
   const sendMessage = (e: React.FormEvent<HTMLFormElement>) => {
@@ -113,7 +310,7 @@ export function ChatRoom() {
     <>
       {!chatRoomDetails ? (
         <div className="flex h-full w-full items-center justify-center text-sm text-neutral-400">
-          여긴 어디죠?
+          잘못된 접근입니다.
         </div>
       ) : (
         <div className="flex h-full w-full">
@@ -140,7 +337,7 @@ export function ChatRoom() {
               </div>
             </div>
             <div
-              className="flex h-full flex-col gap-5 overflow-auto bg-neutral-50 px-5 py-5"
+              className="flex h-full flex-col gap-5 overflow-auto bg-neutral-100 px-5 py-5"
               ref={chatContainerRef}
             >
               {currentChatRoomMessages &&
@@ -148,7 +345,7 @@ export function ChatRoom() {
                   <div key={message.messageId} className="flex gap-3">
                     <img src={defaultUserImage} className="size-10" />
                     <div className="flex flex-col gap-1">
-                      <div className="flex gap-2 items-center">
+                      <div className="flex items-center gap-2">
                         <p>{message.username}</p>
                         <p className="text-sm text-neutral-400">
                           {formatDateTime(message.createdAt)}
@@ -179,7 +376,173 @@ export function ChatRoom() {
               </form>
             </div>
           </div>
-          <div className="flex max-w-[500px] w-full flex-col"></div>
+          <div className="flex size-full max-w-[500px] flex-col">
+            <div className="flex size-full flex-1 flex-col items-center border-b p-5">
+              <div className="mb-5 flex w-full justify-between">
+                {/* 같이 듣기 중인 채팅방의 경우 같이 듣기 연결 해제 표시 */}
+                {isListenTogetherConnected &&
+                listenTogetherId === Number(chatRoomId) ? (
+                  <Button
+                    variant={"transparent"}
+                    onClick={disconnectListenTogether}
+                    className="flex items-center gap-2 text-neutral-900 hover:text-neutral-500"
+                  >
+                    <X />
+                  </Button>
+                ) : (
+                  <Button
+                    variant={"transparent"}
+                    onClick={connectListenTogether}
+                    className="flex items-center gap-2 text-neutral-900 hover:text-neutral-500"
+                  >
+                    <Headphones />
+                  </Button>
+                )}
+                <Button
+                  variant={"transparent"}
+                  className="text-neutral-900 hover:text-neutral-500"
+                >
+                  <EllipsisVertical />
+                </Button>
+              </div>
+              {chatRoomCurrentPlaylist &&
+              chatRoomCurrentPlaylist[chatRoomCurrentPlaylistIndex] ? (
+                <>
+                  <div className="flex max-w-[300px] flex-none flex-col gap-4 overflow-hidden text-ellipsis whitespace-nowrap">
+                    <img
+                      src={
+                        chatRoomCurrentPlaylist[chatRoomCurrentPlaylistIndex]
+                          ?.album.images[0].url
+                      }
+                      className="w-full rounded-lg"
+                    />
+                    <div className="flex flex-col gap-1">
+                      <p className="overflow-hidden text-ellipsis text-2xl font-semibold text-neutral-900">
+                        {
+                          chatRoomCurrentPlaylist[chatRoomCurrentPlaylistIndex]
+                            .name
+                        }
+                      </p>
+                      <p className="text-lg text-neutral-500">
+                        {
+                          chatRoomCurrentPlaylist[chatRoomCurrentPlaylistIndex]
+                            .artists[0].name
+                        }
+                      </p>
+                    </div>
+                    <div className="relative flex items-center justify-between gap-3">
+                      <p className="text-sm text-neutral-400">
+                        {formatDuation(chatRoomPosition)}
+                      </p>
+                      <input
+                        className="h-0.5 w-full cursor-pointer appearance-none bg-neutral-200 accent-[#FF6735] outline-none disabled:accent-gray-200"
+                        type="range"
+                        min="0"
+                        max={
+                          chatRoomCurrentPlaylist[chatRoomCurrentPlaylistIndex]
+                            .duration_ms
+                        }
+                        value={chatRoomPosition}
+                        onChange={() => {}}
+                        style={{
+                          background: `linear-gradient(to right, #FF6735 ${(chatRoomPosition / chatRoomCurrentPlaylist[chatRoomCurrentPlaylistIndex].duration_ms) * 100}%, #E5E7EB ${(chatRoomPosition / chatRoomCurrentPlaylist[chatRoomCurrentPlaylistIndex].duration_ms) * 100}%)`,
+                        }}
+                      />
+                      <p className="text-sm text-neutral-400">
+                        {formatDuation(
+                          chatRoomCurrentPlaylist[chatRoomCurrentPlaylistIndex]
+                            .duration_ms,
+                        )}
+                      </p>
+                    </div>
+                    <div className="flex w-full justify-between">
+                      <Button variant={"transparent"}>
+                        <Repeat size={18} />
+                      </Button>
+                      <Button
+                        variant={"transparent"}
+                        className="text-neutral-600"
+                      >
+                        <SkipBack />
+                      </Button>
+                      {chatRoomPaused ? (
+                        <Button className="rounded-full p-3" onClick={() => {}}>
+                          <Play size={30} />
+                        </Button>
+                      ) : (
+                        <Button className="rounded-full p-3" onClick={() => {}}>
+                          <Pause size={30} />
+                        </Button>
+                      )}
+                      <Button
+                        variant={"transparent"}
+                        className="text-neutral-600"
+                      >
+                        <SkipForward />
+                      </Button>
+                      <Button variant={"transparent"}>
+                        <Shuffle size={18} />
+                      </Button>
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="flex size-full items-center justify-center">
+                    <p className="text-sm text-neutral-400">
+                      재생 중인 곡이 없습니다
+                    </p>
+                  </div>
+                </>
+              )}
+            </div>
+            {/*현재 플레이리스트*/}
+            <div className="flex size-full flex-1 flex-col">
+              {chatRoomCurrentPlaylist &&
+                chatRoomCurrentPlaylist.map((track, index) => (
+                  <div
+                    key={index}
+                    className={`flex h-fit w-full items-center justify-between border-b px-4 py-2 hover:bg-neutral-100 ${index === chatRoomCurrentPlaylistIndex ? "bg-neutral-100" : ""}`}
+                    onMouseEnter={() => setHoveredTrackIndex(index)}
+                    onMouseLeave={() => setHoveredTrackIndex(null)}
+                  >
+                    <div className="flex w-full gap-4 overflow-hidden text-ellipsis whitespace-nowrap">
+                      <div className="relative rounded-sm">
+                        <img
+                          src={track.album.images[0].url}
+                          className="h-full max-h-14 rounded-sm"
+                          alt="Album Art"
+                        />
+                        {index === chatRoomCurrentPlaylistIndex && (
+                          <div className="absolute inset-0 flex items-center justify-center rounded-sm bg-black bg-opacity-50">
+                            <AudioLines className="text-white" />
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex w-full flex-col gap-0.5">
+                        <p className="overflow-hidden text-ellipsis whitespace-nowrap text-neutral-900">
+                          {track.name}
+                        </p>
+                        <p className="text-sm text-neutral-500">
+                          {track.artists[0].name}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      {index === hoveredTrackIndex ? (
+                        <Button variant={"transparent"} className="p-0">
+                          <EllipsisVertical />
+                        </Button>
+                      ) : (
+                        <p className="text-neutral-500">
+                          {formatDuation(track.duration_ms)}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                ))}
+            </div>
+          </div>
         </div>
       )}
     </>

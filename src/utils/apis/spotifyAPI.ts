@@ -1,6 +1,6 @@
-import axios, { AxiosHeaders } from "axios";
+import axios from "axios";
 import { getSpotifyToken } from "./serverAPI";
-import { SpotifySearchResponse } from "../types";
+import { SpotifySearchResponse, SpotifyTrack } from "../types";
 
 /**
  * Spotify API 통신용 Axios 인스턴스와 API 호출 함수들.
@@ -9,6 +9,9 @@ const baseURL: string = "https://api.spotify.com/v1";
 
 export const spotifyApi = axios.create({
   baseURL: baseURL,
+  headers: {
+    "Content-Type": "application/json",
+  },
 });
 
 // 요청 인터셉터
@@ -87,19 +90,42 @@ export const spotifySearch = async (query: string) => {
 };
 
 // 트랙 재생 요청 API
-export const playTrack = async (trackUri: string, deviceId: string) => {
+export const playTrack = async (
+  trackUri: string,
+  deviceId: string,
+  position: number = 0,
+  // albumUri?: string,
+) => {
   try {
-    const url = `https://api.spotify.com/v1/me/player/play?device_id=${
-      deviceId
-    }`;
     const body = {
-      // context_uri: track.album.uri,
-      // offset: { uri: track.uri },
+      //context_uri: albumUri,
+      //offset: { uri: trackUri },
       uris: [trackUri],
+      position_ms: position,
     };
 
-    await spotifyApi.put(url, body);
+    await spotifyApi.put(`me/player/play?device_id=${deviceId}`, body);
   } catch (e) {
     console.error("트랙 재생 에러: ", e);
   }
+};
+
+// 유저 큐 조회
+export const getUserQueue = async () => {
+  const response = await spotifyApi.get<UserQueueType>("/me/player/queue");
+  return response.data;
+};
+
+export interface UserQueueType {
+  currently_playing: SpotifyTrack;
+  queue: SpotifyTrack[];
+}
+
+// 유저 플레이백 큐에 추가
+export const addItemToPlaybackQueue = async (
+  trackUri: string,
+  deviceId: string,
+) => {
+  const response = await spotifyApi.post(`/me/player/queue?uri=${trackUri}&device_id=${deviceId}`);
+  return response.data;
 };

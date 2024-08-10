@@ -108,3 +108,51 @@ export interface SpotifyTrack {
   uri: string;
   is_local: boolean;
 }
+
+export type PlayerActionRequestType =
+  | "PLAY_NEW_TRACK"
+  | "PAUSE"
+  | "RESUME"
+  | "PLAY_AT_INDEX"
+  | "NEXT_TRACK"
+  | "PREVIOUS_TRACK"
+  | "SEEK"
+  | "ADD_TO_CURRENT_PLAYLIST"
+  | "REMOVE_FROM_CURRENT_PLAYLIST"
+  | "TRACK_ENDED";
+
+export type PlayerActionResponseType =
+  | "PLAY_TRACK"
+  | "PAUSE"
+  | "RESUME"
+  | "SEEK"
+  | "UPDATE"
+
+export interface PlayerDetailsDto {
+  _id: string;
+  chatRoomId: number;
+  userCount: number;
+  currentPlaylistIndex: number;
+  currentPlaylist: SpotifyTrack[];
+  paused: boolean;
+  repeat: boolean;
+  position: number;
+  duration: number;
+  action: PlayerActionRequestType;
+}
+
+export interface PlayerRequestDto {
+  track?: SpotifyTrack;
+  index?: number;
+  repeat?: boolean;
+  position?: number;
+  action: PlayerActionRequestType;
+}
+
+export interface PlayerResponseDto {
+  action: PlayerActionResponseType;
+  track?: SpotifyTrack;
+  position?: number;
+  currentPlaylist?: SpotifyTrack[];
+  index?: number;
+}

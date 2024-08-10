@@ -4,7 +4,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { spotifySearch } from "../utils/apis/spotifyAPI";
 import { formatDuation } from "../utils/formatDuration";
 import { Button } from "./Button";
-import { EllipsisVertical, UserPlus } from "lucide-react";
+import { EllipsisVertical, ListPlus, UserPlus } from "lucide-react";
 import {
   joinChatRoom,
   searchChatRooms,
@@ -20,7 +20,7 @@ export function SearchResults() {
   const location = useLocation();
   const [query, setQuery] = useState<string | null>(null);
   const navigate = useNavigate();
-  const { playNewTrack } = usePlayer();
+  const { playNewTrack, addToCurrentPlaylist } = usePlayer();
 
   useEffect(() => {
     const urlParams = new URLSearchParams(location.search);
@@ -123,12 +123,22 @@ export function SearchResults() {
                     </div>
                   </div>
                 </div>
-                <Button
-                  variant={"ghost"}
-                  className="text-neutral-500 opacity-0 hover:text-neutral-900 group-hover:opacity-100"
+                <DropdownButton
+                  items={[
+                    {
+                      label: "현재 재생목록에 추가",
+                      action: () => {addToCurrentPlaylist(track)},
+                      Icon: ListPlus,
+                    },
+                  ]}
                 >
-                  <EllipsisVertical />
-                </Button>
+                  <Button
+                    variant={"ghost"}
+                    className="text-neutral-500 opacity-0 hover:text-neutral-900 group-hover:opacity-100"
+                  >
+                    <EllipsisVertical />
+                  </Button>
+                </DropdownButton>
               </div>
             ))
           ) : (
