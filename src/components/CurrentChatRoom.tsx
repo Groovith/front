@@ -20,7 +20,13 @@ import DropdownButton from "./DropdownButton";
 
 export default function CurrentChatRoom() {
   const { isCurrentChatRoomOpen } = useChatRoomStore();
-  const { seek, resumePlayer, pausePlayer, playAtIndex, removeFromCurrentPlaylist } = usePlayer();
+  const {
+    seek,
+    resumePlayer,
+    pausePlayer,
+    playAtIndex,
+    removeFromCurrentPlaylist,
+  } = usePlayer();
   const {
     duration,
     position,
@@ -118,11 +124,17 @@ export default function CurrentChatRoom() {
                     <SkipBack />
                   </Button>
                   {paused ? (
-                    <Button className="rounded-full p-3" onClick={() => resumePlayer()}>
+                    <Button
+                      className="rounded-full p-3"
+                      onClick={() => resumePlayer()}
+                    >
                       <Play size={30} />
                     </Button>
                   ) : (
-                    <Button className="rounded-full p-3" onClick={() => pausePlayer()}>
+                    <Button
+                      className="rounded-full p-3"
+                      onClick={() => pausePlayer()}
+                    >
                       <Pause size={30} />
                     </Button>
                   )}
@@ -149,17 +161,19 @@ export default function CurrentChatRoom() {
             currentPlaylist.map((track, index) => (
               <div
                 key={index}
-                className={`flex h-fit w-full items-center justify-between border-b px-4 py-2 hover:bg-neutral-100 ${index === currentPlaylistIndex ? "bg-neutral-100" : ""}`}
+                className={`flex h-[65px] w-full flex-none items-center justify-between border-b px-4 py-2 hover:bg-neutral-100 ${index === currentPlaylistIndex ? "bg-neutral-100" : ""}`}
                 onMouseEnter={() => setHoveredTrackIndex(index)}
                 onMouseLeave={() => setHoveredTrackIndex(null)}
               >
                 <div className="flex w-full gap-4 overflow-hidden text-ellipsis whitespace-nowrap">
-                  <div className="relative rounded-sm">
+                  <div
+                    className="relative flex size-14 flex-none rounded-sm hover:cursor-pointer"
+                    onClick={() => playAtIndex(index)}
+                  >
                     <img
                       src={track.album.images[0].url}
-                      className="h-full max-h-14 rounded-sm hover:cursor-pointer"
+                      className="h-full rounded-sm object-cover"
                       alt="Album Art"
-                      onClick={() => playAtIndex(index)}
                     />
                     {index === -1 && (
                       <div className="absolute inset-0 flex items-center justify-center rounded-sm bg-black bg-opacity-50">
@@ -183,10 +197,18 @@ export default function CurrentChatRoom() {
                   {index === hoveredTrackIndex ? (
                     <DropdownButton
                       items={[
-                        { label: "현재 재생목록에서 삭제", action: () => {removeFromCurrentPlaylist(index)} },
+                        {
+                          label: "현재 재생목록에서 삭제",
+                          action: () => {
+                            removeFromCurrentPlaylist(index);
+                          },
+                        },
                       ]}
                     >
-                      <Button variant={"transparent"} className="p-0">
+                      <Button
+                        variant={"ghost"}
+                        className="rounded-full p-3 hover:bg-neutral-300"
+                      >
                         <EllipsisVertical />
                       </Button>
                     </DropdownButton>
@@ -198,7 +220,7 @@ export default function CurrentChatRoom() {
                 </div>
               </div>
             ))}
-          <div className="w-full flex justify-center items-center h-fit py-10">
+          <div className="flex h-fit w-full items-center justify-center py-10">
             <Button variant={"transparent"}>
               <CirclePlus />
             </Button>

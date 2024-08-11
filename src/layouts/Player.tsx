@@ -14,9 +14,7 @@ import { useUserStore } from "../stores/useUserStore";
 import { useNavigate } from "react-router-dom";
 import { usePlayerStore } from "../stores/usePlayerStore";
 import { useChatRoomStore } from "../stores/useChatRoomStore";
-import {
-  getSpotifyToken,
-} from "../utils/apis/serverAPI";
+import { getSpotifyToken } from "../utils/apis/serverAPI";
 import { playTrack } from "../utils/apis/spotifyAPI";
 
 export default function Player() {
@@ -56,6 +54,7 @@ export default function Player() {
   const [newPosition, setNewPosition] = useState<number>();
   const timerRef = useRef<number>(0); // 플레이어 상태 불러오는 타이머
   const [spotifyAccessToken, setSpotifyAccessToken] = useState<string>();
+  const { justPlayTrack } = usePlayer();
 
   // 유저 플레이백 큐 불러오기
   // const { data: userQueueData } = useQuery({
@@ -79,12 +78,11 @@ export default function Player() {
     if (streaming === "SPOTIFY") {
       updateSpotifyToken();
     }
-    
   }, [streaming]);
 
   // 스포티파이 플레이어 초기화
   useEffect(() => {
-    if(!spotifyAccessToken) return;
+    if (!spotifyAccessToken) return;
 
     const script = document.createElement("script");
     script.src = "https://sdk.scdn.co/spotify-player.js";
@@ -120,11 +118,10 @@ export default function Player() {
           return;
         }
 
-        console.log(state);
-
         setPaused(state.paused);
-        setDuration(state.duration);
         setPosition(state.position);
+        setDuration(state.duration);
+        setLoading(state.loading);
       });
 
       player.connect();
@@ -138,32 +135,37 @@ export default function Player() {
   }, [spotifyAccessToken]);
 
   // 트랙 종료 판단 -> 다음 곡 재생 호출
-  useEffect(() => {
-    if (position === 0 && paused && !loading && currentPlaylist.length > 0) {
-      console.log("nextTrack");
+  // useEffect(() => {
+  //   if (position === 0 && paused && !loading && currentPlaylist.length > 0) {
+  //     console.log("nextTrack");
 
-      if (isListenTogetherConnected && listenTogetherId) {
-        trackEnded();
-      } else {
-        nextTrack();
-      }
-    }
-  }, [position, paused, loading]);
+  //     if (isListenTogetherConnected && listenTogetherId) {
+  //       trackEnded();
+  //     } else {
+  //       nextTrack();
+  //     }
+  //   }
+  // }, [position, paused, loading]);
 
   // 트랙 현재 시간 업데이트
   useEffect(() => {
-    if (!player || !timerRef) return;
-    if (!paused) {
+    if (!paused && !loading) {
       timerRef.current = setInterval(() => {
-        player.getCurrentState().then((state: any) => {
-          if (state) {
-            setPosition(state.position);
-            setPaused(state.paused);
-            setDuration(state.duration);
-            setLoading(state.loading);
+        const newPosition = position + 100;
+        setPosition(newPosition);
+
+        if (position >= duration - 1000) {
+          console.log("position: ", position);
+          console.log("duration: ", duration);
+          console.log("트랙 종료!");
+          setPosition(0);
+          if (isListenTogetherConnected && listenTogetherId) {
+            trackEnded();
+          } else {
+            nextTrack();
           }
-        });
-      }, 1000);
+        }
+      }, 100);
     } else {
       if (timerRef.current) {
         clearInterval(timerRef.current);
@@ -177,12 +179,12 @@ export default function Player() {
     };
   }, [
     currentPlaylist,
-    player,
     paused,
     timerRef,
     currentPlaylistIndex,
     position,
     duration,
+    loading,
   ]);
 
   // 트랙 위치 변경
@@ -205,9 +207,10 @@ export default function Player() {
       switch (action) {
         case "PLAY_TRACK":
           if (track) {
-            playTrack(track.uri, deviceId, position);
+            justPlayTrack(track, position);
+            setDuration(track.duration_ms);
           }
-          if (index) {
+          if (typeof index === "number") {
             setCurrentPlaylistIndex(index);
           }
           break;
@@ -316,7 +319,7 @@ export default function Player() {
             </div>
           </div>
           <div className="flex items-center">
-            {currentPlaylist[currentPlaylistIndex] ? (
+            {currentPlaylist.length > 0 && typeof currentPlaylistIndex === "number" ? (
               <div className="flex items-center">
                 <img
                   src={

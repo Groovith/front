@@ -27,6 +27,7 @@ import {
   Shuffle,
   SkipBack,
   SkipForward,
+  Trash2,
   UserPlus,
   X,
 } from "lucide-react";
@@ -73,6 +74,7 @@ export function ChatRoom() {
     currentPlaylist,
     currentPlaylistIndex,
     setRepeat,
+    setDuration,
     setIsListenTogetherConnected,
     setListenTogetherId,
     setListenTogetherSubscription,
@@ -82,6 +84,7 @@ export function ChatRoom() {
     setPosition,
     setPlayerResponseMessage,
   } = usePlayerStore();
+  const { removeFromCurrentPlaylist, justPlayTrack, playAtIndex } = usePlayer();
 
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const timerRef = useRef<number | null>();
@@ -214,13 +217,18 @@ export function ChatRoom() {
       setCurrentPlaylist(data.currentPlaylist);
       setCurrentPlaylistIndex(data.currentPlaylistIndex);
       setPaused(data.paused);
-      setPosition(data.position);
 
-      if (data.currentPlaylist.length > 0 && typeof data.currentPlaylistIndex === 'number') {
+      if (
+        data.currentPlaylist.length > 0 &&
+        typeof data.currentPlaylistIndex === "number"
+      ) {
         console.log("play start");
-        await playTrack(
-          data.currentPlaylist[data.currentPlaylistIndex].uri,
-          deviceId,
+        setDuration(
+          data.currentPlaylist[data.currentPlaylistIndex].duration_ms,
+        );
+        setPosition(data.position);
+        await justPlayTrack(
+          data.currentPlaylist[data.currentPlaylistIndex],
           data.position,
         );
       }
@@ -261,7 +269,7 @@ export function ChatRoom() {
 
   // 같이 듣기 연결 해제
   const disconnectListenTogether = async () => {
-    if (!(player instanceof Spotify.Player)) return
+    if (!(player instanceof Spotify.Player)) return;
 
     leavePlayer(chatRoomId!);
     if (chatRoomId) {
@@ -506,15 +514,20 @@ export function ChatRoom() {
                 chatRoomCurrentPlaylist.map((track, index) => (
                   <div
                     key={index}
-                    className={`flex h-fit w-full items-center justify-between border-b px-4 py-2 hover:bg-neutral-100 ${index === chatRoomCurrentPlaylistIndex ? "bg-neutral-100" : ""}`}
+                    className={`flex gap-4 h-fit w-full overflow-x-hidden items-center justify-between border-b px-4 py-2 hover:bg-neutral-100 ${index === chatRoomCurrentPlaylistIndex ? "bg-neutral-100" : ""}`}
                     onMouseEnter={() => setHoveredTrackIndex(index)}
                     onMouseLeave={() => setHoveredTrackIndex(null)}
                   >
                     <div className="flex w-full gap-4 overflow-hidden text-ellipsis whitespace-nowrap">
-                      <div className="relative rounded-sm">
+                      <div
+                        className="relative flex size-14 flex-none rounded-sm hover:cursor-pointer"
+                        onClick={() => {
+                          playAtIndex(index);
+                        }}
+                      >
                         <img
                           src={track.album.images[0].url}
-                          className="h-full max-h-14 rounded-sm"
+                          className="h-full rounded-sm object-cover"
                           alt="Album Art"
                         />
                         {index === chatRoomCurrentPlaylistIndex && (
@@ -524,7 +537,12 @@ export function ChatRoom() {
                         )}
                       </div>
                       <div className="flex w-full flex-col gap-0.5">
-                        <p className="overflow-hidden text-ellipsis whitespace-nowrap text-neutral-900">
+                        <p
+                          className="w-fit overflow-hidden text-ellipsis whitespace-nowrap text-neutral-900 hover:cursor-pointer"
+                          onClick={() => {
+                            playAtIndex(index);
+                          }}
+                        >
                           {track.name}
                         </p>
                         <p className="text-sm text-neutral-500">
@@ -532,11 +550,23 @@ export function ChatRoom() {
                         </p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-1 w-10">
                       {index === hoveredTrackIndex ? (
-                        <Button variant={"transparent"} className="p-0">
-                          <EllipsisVertical />
-                        </Button>
+                        <DropdownButton
+                          items={[
+                            {
+                              label: "현재 재생목록에서 제거",
+                              action: () => {
+                                removeFromCurrentPlaylist(index);
+                              },
+                              Icon: Trash2,
+                            },
+                          ]}
+                        >
+                          <Button variant={"ghost"} className="p-3 hover:bg-neutral-300 rounded-full">
+                            <EllipsisVertical />
+                          </Button>
+                        </DropdownButton>
                       ) : (
                         <p className="text-neutral-500">
                           {formatDuation(track.duration_ms)}

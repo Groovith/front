@@ -169,9 +169,17 @@ export function usePlayer() {
   const justPlayTrack = async (track: SpotifyTrack, position?: number) => {
     if (!(player instanceof Spotify.Player)) return;
     try {
-      await playTrack(track.uri, deviceId, position);
+      if (position) {
+        await playTrack(track.uri, deviceId, position);
+      } else {
+        await playTrack(track.uri, deviceId, 1);
+      }
       setTimeout(() => {
-        player.resume();
+        player.resume().then(() => {
+          if (typeof position === "number") {
+            player.seek(position);
+          }
+        });
       }, 500); // 잠시 후 메뉴얼 정지
     } catch (e) {
       console.error("justPlayTrack 에러: ", e);
@@ -205,6 +213,7 @@ export function usePlayer() {
       setPosition(0);
       setCurrentPlaylistIndex(0);
       setCurrentPlaylist([track]);
+      setDuration(track.duration_ms);
       setPaused(false);
       setLoading(true);
       try {
@@ -244,7 +253,7 @@ export function usePlayer() {
     if (force) {
       if (index >= 0 && index < currentPlaylist.length) {
         try {
-          await playTrack(currentPlaylist[index].uri, deviceId);
+          await justPlayTrack(currentPlaylist[index]);
           setCurrentPlaylistIndex(index);
         } catch (e) {
           console.log(e);
@@ -263,7 +272,7 @@ export function usePlayer() {
     } else {
       if (index >= 0 && index < currentPlaylist.length) {
         try {
-          await playTrack(currentPlaylist[index].uri, deviceId);
+          await justPlayTrack(currentPlaylist[index]);
           setCurrentPlaylistIndex(index);
         } catch (e) {
           console.log(e);
