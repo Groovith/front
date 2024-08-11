@@ -228,6 +228,8 @@ export function ChatRoom() {
       setTimeout(() => {
         if (data.paused) {
           player.pause();
+        } else {
+          player.resume();
         }
       }, 1000); // 잠시 후 메뉴얼 정지
     });
@@ -259,6 +261,8 @@ export function ChatRoom() {
 
   // 같이 듣기 연결 해제
   const disconnectListenTogether = async () => {
+    if (!(player instanceof Spotify.Player)) return
+
     leavePlayer(chatRoomId!);
     if (chatRoomId) {
       listenTogetherSubscription?.unsubscribe();

@@ -16,23 +16,16 @@ import { usePlayerStore } from "../stores/usePlayerStore";
 import { useChatRoomStore } from "../stores/useChatRoomStore";
 import {
   getSpotifyToken,
-  requestNextTrack,
-  requestPreviousTrack,
 } from "../utils/apis/serverAPI";
 import { playTrack } from "../utils/apis/spotifyAPI";
 
 export default function Player() {
   const {
-    initializePlayer,
     resumePlayer,
     pausePlayer,
     seek,
     previousTrack,
     nextTrack,
-    playNewTrack,
-    playAtIndex,
-    addToCurrentPlaylist,
-    removeFromCurrentPlaylist,
     trackEnded,
   } = usePlayer();
   const {
@@ -48,6 +41,8 @@ export default function Player() {
     setPaused,
     setDuration,
     setLoading,
+    setPlayer,
+    setDeviceId,
     currentPlaylist,
     currentPlaylistIndex,
     listenTogetherId,
@@ -60,6 +55,7 @@ export default function Player() {
     useChatRoomStore();
   const [newPosition, setNewPosition] = useState<number>();
   const timerRef = useRef<number>(0); // 플레이어 상태 불러오는 타이머
+  const [spotifyAccessToken, setSpotifyAccessToken] = useState<string>();
 
   // 유저 플레이백 큐 불러오기
   // const { data: userQueueData } = useQuery({
@@ -69,20 +65,77 @@ export default function Player() {
 
   // 스트리밍 서비스 확인 -> 새 토큰 불러오기 -> 플레이어 연결
   useEffect(() => {
-    const initializeSpotifyPlayer = async () => {
+    const updateSpotifyToken = async () => {
       try {
         const data = await getSpotifyToken();
         localStorage.setItem("spotifyAccessToken", data.spotifyAccessToken);
-        initializePlayer();
+        setSpotifyAccessToken(data.spotifyAccessToken);
+        // initializePlayer();
       } catch (e) {
         console.error("스포티파이 토큰 받기 에러", e);
       }
     };
 
     if (streaming === "SPOTIFY") {
-      initializeSpotifyPlayer();
+      updateSpotifyToken();
     }
+    
   }, [streaming]);
+
+  // 스포티파이 플레이어 초기화
+  useEffect(() => {
+    if(!spotifyAccessToken) return;
+
+    const script = document.createElement("script");
+    script.src = "https://sdk.scdn.co/spotify-player.js";
+    script.async = true;
+
+    document.body.appendChild(script);
+
+    window.onSpotifyWebPlaybackSDKReady = () => {
+      const token = localStorage.getItem("spotifyAccessToken");
+      if (!token) return;
+
+      const player = new window.Spotify.Player({
+        name: "Spotify Web Player",
+        getOAuthToken: (cb) => {
+          cb(token);
+        },
+        volume: 0.5,
+      });
+
+      setPlayer(player);
+
+      player.addListener("ready", ({ device_id }) => {
+        console.log("Ready with Device ID", device_id);
+        setDeviceId(device_id);
+      });
+
+      player.addListener("not_ready", ({ device_id }) => {
+        console.log("Device ID has gone offline", device_id);
+      });
+
+      player.addListener("player_state_changed", (state) => {
+        if (!state) {
+          return;
+        }
+
+        console.log(state);
+
+        setPaused(state.paused);
+        setDuration(state.duration);
+        setPosition(state.position);
+      });
+
+      player.connect();
+    };
+
+    return () => {
+      if (player) {
+        player.disconnect();
+      }
+    };
+  }, [spotifyAccessToken]);
 
   // 트랙 종료 판단 -> 다음 곡 재생 호출
   useEffect(() => {

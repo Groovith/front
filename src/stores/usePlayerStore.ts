@@ -6,9 +6,9 @@ import {
 import { StompSubscription } from "@stomp/stompjs";
 
 interface PlayerStoreType {
-  player: any;
+  player: Spotify.Player | null;
   deviceId: string;
-  setPlayer: (player: any) => void;
+  setPlayer: (player: Spotify.Player | null) => void;
   setDeviceId: (deviceId: string) => void;
   currentPlaylist: SpotifyTrack[];
   currentPlaylistIndex: number;
@@ -41,7 +41,7 @@ export const usePlayerStore = create<PlayerStoreType>((set) => ({
   // 플레이어 일반
   player: null,
   deviceId: "",
-  setPlayer: (player: {}) => set({ player }),
+  setPlayer: (player: Spotify.Player | null) => set({ player }),
   setDeviceId: (deviceId: string) => set({ deviceId }),
 
   // 현재 플레이리스트 정보

@@ -185,7 +185,7 @@ export const searchChatRooms = async (query: string) => {
 // 내 채팅방 목록 요청
 export const fetchChatRooms = async () => {
   const response = await api.get<{ chatRooms: ChatRoomDetailsType[] }>(
-    "/chatroom",
+    "/chatrooms/me",
   );
   return response.data;
 };
@@ -196,26 +196,26 @@ interface CreateChatRoomRequest {
 
 // 채팅방 생성
 export const createChatRoom = async (request: CreateChatRoomRequest) => {
-  const response = await api.post<{ chatRoomId: number }>("/chatroom", request);
+  const response = await api.post<{ chatRoomId: number }>("/chatrooms", request);
   return response.data;
 };
 
 // 채팅방 참가
 export const joinChatRoom = async (chatRoomId: number) => {
-  const response = await api.post(`/chatroom/${chatRoomId}`);
+  const response = await api.post(`/chatrooms/${chatRoomId}/members`);
   return response.data;
 };
 
 // 채팅방 나가기
 export const leaveChatRoom = async (chatRoomId: number) => {
-  const response = await api.put(`/chatroom/${chatRoomId}`);
+  const response = await api.put(`/chatrooms/${chatRoomId}/members`);
   return response.data;
 };
 
 // 채팅방 아이디로 채팅방 상세 정보 조회
 export const getChatRoomDetails = async (chatRoomId: string) => {
   const response = await api.get<ChatRoomDetailsType>(
-    `/chatroom/${chatRoomId}`,
+    `/chatrooms/${chatRoomId}`,
   );
   return response.data;
 };

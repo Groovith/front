@@ -20,7 +20,7 @@ export function SearchResults() {
   const location = useLocation();
   const [query, setQuery] = useState<string | null>(null);
   const navigate = useNavigate();
-  const { playNewTrack, addToCurrentPlaylist } = usePlayer();
+  const { playNewTrack, justPlayTrack, addToCurrentPlaylist } = usePlayer();
 
   useEffect(() => {
     const urlParams = new URLSearchParams(location.search);
