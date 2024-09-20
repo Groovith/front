@@ -1,7 +1,10 @@
 export interface UserDetailsType {
   id: number;
   username: string;
+  imageUrl: string;
   streaming: StreamingType;
+  followerCount: number;
+  followingCount: number;
 }
 
 export type StreamingType = "NONE" | "SPOTIFY";

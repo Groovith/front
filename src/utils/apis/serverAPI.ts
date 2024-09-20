@@ -101,7 +101,7 @@ export const signup = async (request: SignupRequest) => {
 
 // 로그인
 export const login = async (credentials: {
-  username: string;
+  email: string;
   password: string;
 }) => {
   const response = await axios.post(

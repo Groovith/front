@@ -5,28 +5,40 @@ import { SPOTIFY_AUTH_URL } from "../utils/config";
 import { disconnectSpotify } from "../utils/apis/serverAPI";
 import { useUser } from "../hooks/useUser";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { ChevronRight } from "lucide-react";
 
 export default function Setting() {
-  const { getStreaming, updateStreaming } = useUser();
-  const queryClient = useQueryClient();
+  // const { getStreaming, updateStreaming } = useUser();
+  // const queryClient = useQueryClient();
 
-  const {mutate} = useMutation({
-    mutationFn: disconnectSpotify,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["user"] });
-    },
-  })
+  // const { mutate } = useMutation({
+  //   mutationFn: disconnectSpotify,
+  //   onSuccess: () => {
+  //     queryClient.invalidateQueries({ queryKey: ["user"] });
+  //   },
+  // });
 
-  const handleDisconnectSpotify = async () => {
-    mutate();
-  };
+  // const handleDisconnectSpotify = async () => {
+  //   mutate();
+  // };
 
   return (
-    <div className="flex h-full w-full justify-center text-neutral-900 px-10">
+    <div className="flex h-full w-full justify-center px-10 text-neutral-900">
       <div className="flex h-full w-full max-w-screen-md flex-col gap-16 py-20">
         <h1 className="text-4xl font-bold">설정</h1>
-        {/* 스트리밍 서비스 */}
         <div>
+          <h2 className="mb-5 text-2xl font-bold">계정</h2>
+          <Button variant={"ghost"} className="flex w-full justify-between p-4">
+            <span>비밀번호 변경</span>
+            <ChevronRight />
+          </Button>
+          <Button variant={"ghost"} className="flex w-full justify-between p-4">
+            <span>회원 탈퇴</span>
+            <ChevronRight />
+          </Button>
+        </div>
+        {/* 스트리밍 서비스 */}
+        {/* <div>
           <h2 className="mb-3 text-2xl font-bold">스트리밍 서비스</h2>
           <p className="mb-8 text-neutral-700">
             음악 컨텐츠 스트리밍에 사용할 서비스를 선택하고 계정을 연결하세요.
@@ -62,7 +74,7 @@ export default function Setting() {
               </Button>
             </div>
           </div>
-        </div>
+        </div> */}
         {/* 계정 관련 */}
         {/* <div>
           <h2 className="mb-3 text-xl font-bold">계정</h2>

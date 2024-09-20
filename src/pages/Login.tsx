@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { login } from "../utils/apis/serverAPI";
 
 export default function Login() {
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
@@ -17,8 +17,11 @@ export default function Login() {
   const handleSubmit = async (e: any) => {
     e.preventDefault();
     try {
-      const response = await login({username: username, password: password});
-      localStorage.setItem("accessToken", response.headers['authorization'].replace("Bearer ", ""));
+      const response = await login({ email: email, password: password });
+      localStorage.setItem(
+        "accessToken",
+        response.headers["authorization"].replace("Bearer ", ""),
+      );
       navigate("/");
     } catch (e) {
       console.error(e);
@@ -28,17 +31,17 @@ export default function Login() {
   return (
     <div className="flex h-screen w-screen flex-col">
       <div className="flex h-full w-full items-center justify-center">
-        <div className="flex w-[400px] flex-col gap-y-14 rounded-xl border border-gray-300 p-10">
-          <h1 className="text-3xl font-bold">Groovith에 로그인하기</h1>
-          <form onSubmit={handleSubmit}>
+        <div className="flex w-[400px] flex-col rounded-xl border border-gray-300 p-10">
+          <h1 className="mb-14 text-3xl font-bold">Groovith에 로그인하기</h1>
+          <form onSubmit={handleSubmit} className="mb-6">
             <div className="mb-6 flex flex-col gap-3">
-              <label htmlFor="username">사용자이름</label>
+              <label htmlFor="username">이메일</label>
               <input
                 id="username"
                 type="text"
                 required
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 className="h-8 w-full rounded-lg border px-3 py-5"
               />
             </div>
@@ -53,9 +56,13 @@ export default function Login() {
                 className="h-8 w-full rounded-lg border px-3 py-5"
               />
             </div>
-
             <Button className="w-full">로그인</Button>
           </form>
+          <div className="mb-14 w-full flex justify-start">
+            <button className="text-sm text-neutral-600 underline">
+              비밀번호 찾기
+            </button>
+          </div>
           <div className="flex items-center gap-4">
             <p>아직 계정이 없으신가요?</p>
             <Button
