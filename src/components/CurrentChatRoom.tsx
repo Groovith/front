@@ -13,7 +13,7 @@ import {
 import { useChatRoomStore } from "../stores/useChatRoomStore";
 import { usePlayerStore } from "../stores/usePlayerStore";
 import { Button } from "./Button";
-import { usePlayer } from "../hooks/usePlayer";
+import { usePlayer } from "../hooks/useSpotifyPlayer";
 import { formatDuation } from "../utils/formatDuration";
 import { useState } from "react";
 import DropdownButton from "./DropdownButton";

@@ -39,7 +39,7 @@ import { useChatRoomStore } from "../stores/useChatRoomStore";
 import { formatDateTime } from "../utils/formatDateTime";
 import { formatDuation } from "../utils/formatDuration";
 import { usePlayerStore } from "../stores/usePlayerStore";
-import { usePlayer } from "../hooks/usePlayer";
+import { usePlayer } from "../hooks/useSpotifyPlayer";
 import { playTrack } from "../utils/apis/spotifyAPI";
 
 export function ChatRoom() {

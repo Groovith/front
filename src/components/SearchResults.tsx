@@ -13,7 +13,7 @@ import {
 import defaultUserImage from "../assets/default-user-image.png";
 import defaultChatRoomImage from "../assets/default-image-mountain.png";
 import DropdownButton from "./DropdownButton";
-import { usePlayer } from "../hooks/usePlayer";
+import { usePlayer } from "../hooks/useSpotifyPlayer";
 
 export function SearchResults() {
   const queryClient = useQueryClient();
@@ -127,7 +127,9 @@ export function SearchResults() {
                   items={[
                     {
                       label: "현재 재생목록에 추가",
-                      action: () => {addToCurrentPlaylist(track)},
+                      action: () => {
+                        addToCurrentPlaylist(track);
+                      },
                       Icon: ListPlus,
                     },
                   ]}

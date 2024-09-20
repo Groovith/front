@@ -1,21 +1,10 @@
 import { usePlayerStore } from "../stores/usePlayerStore";
 import {
-  PlayerDetailsDto,
   PlayerRequestDto,
   SpotifyTrack,
 } from "../utils/types";
 import { addItemToPlaybackQueue, playTrack } from "../utils/apis/spotifyAPI";
 import { useQueryClient } from "@tanstack/react-query";
-import {
-  requestAddToCurrentPlaylist,
-  requestNextTrack,
-  requestPlayAtIndex,
-  requestPlayNewTrack,
-  requestPreviousTrack,
-  requestRemoveFromCurrentPlaylist,
-  requestSeek,
-  requestTogglePlay,
-} from "../utils/apis/serverAPI";
 import { useStompStore } from "../stores/useStompStore";
 
 export function usePlayer() {
@@ -496,7 +485,6 @@ export function usePlayer() {
     previousTrack,
     addToCurrentPlaylist,
     removeFromCurrentPlaylist,
-    //togglePlay,
     seek,
     addToPlaybackQueue,
     trackEnded,
