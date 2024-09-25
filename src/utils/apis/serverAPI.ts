@@ -7,6 +7,7 @@ import {
   SpotifyTrack,
   UserDetailsType,
 } from "../types";
+import ResponseDto from "./response.dto";
 
 /**
  * Axios 설정
@@ -91,11 +92,36 @@ export const validateToken = async () => {
 interface SignupRequest {
   username: string;
   password: string;
+  email: string;
+}
+
+// 이메일 중복 체크
+export const checkEmail = async (request: {email:string}) => {
+  const response = await axios.post<ResponseDto>(serverURL + "/auth/check-email", request);
+  return response.data;
+}
+
+// 이메일 인증번호 요청
+export const requestEmailCertification = async (request: {email: string}) => {
+  const response = await axios.post<ResponseDto>(serverURL + "/auth/email-certification", request);
+  return response.data;
+}
+
+// 이메일 인증번호 확인
+export const checkEmailCertification = async (request: {email: string, certificationNumber: string}) => {
+  const response = await axios.post<ResponseDto>(serverURL + "/auth/check-certification", request);
+  return response.data;
+}
+
+// 유저네임 중복 확인
+export const checkUsername = async (request: {username: string}) => {
+  const response = await axios.post<ResponseDto>(serverURL + "/auth/check-username", request);
+  return response.data;
 }
 
 // 회원가입
 export const signup = async (request: SignupRequest) => {
-  const response = await axios.post("http://localhost:8080/api/join", request);
+  const response = await axios.post(serverURL + "/join", request);
   return response.data;
 };
 

@@ -19,11 +19,7 @@ export default function Chat() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newChatRoomName, setNewChatRoomName] = useState("");
   const { stompClient } = useStompStore();
-  const {
-    chatRoomList,
-    currentChatRoomId,
-    setNewMessage,
-  } = useChatRoomStore();
+  const { chatRoomList, currentChatRoomId, setNewMessage } = useChatRoomStore();
 
   // 새 채팅방 생성 Mutation
   const { mutate: createChatRoomMutate } = useMutation({
@@ -78,7 +74,7 @@ export default function Chat() {
     <div className="flex h-full w-full">
       {/* 채팅방 생성 모달 */}
       {isModalOpen && (
-        <Modal>
+        <Modal onClose={() => setIsModalOpen(false)} closeOnOutsideClick={true}>
           <div className="mb-10 flex items-center justify-between">
             <h1 className="text-2xl font-bold">새 채팅방 생성</h1>
             <Button variant={"ghost"} onClick={() => setIsModalOpen(false)}>
@@ -104,7 +100,7 @@ export default function Chat() {
       )}
       <div className="flex h-full w-[300px] flex-none flex-col border-r py-10">
         <div className="mb-10 flex w-full items-center justify-between px-5">
-          <h1 className="text-xl font-bold pl-1">채팅방</h1>
+          <h1 className="pl-1 text-xl font-bold">채팅방</h1>
           <div className="flex gap-1">
             <Button variant={"transparent"} className="p-0">
               <SearchIcon />
@@ -159,7 +155,7 @@ export default function Chat() {
                 >
                   <Button
                     variant={"transparent"}
-                    className="opacity-0 group-hover:opacity-100 p-0"
+                    className="p-0 opacity-0 group-hover:opacity-100"
                   >
                     <EllipsisVertical />
                   </Button>
