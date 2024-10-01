@@ -1,6 +1,5 @@
 import { useState, useRef } from "react";
 import {
-  api,
   checkEmail,
   checkEmailCertification,
   checkUsername,
@@ -229,6 +228,7 @@ export default function Signup() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 onBlur={handleCheckEmail} // 이메일 입력 후 focus가 해제되면 중복 확인
+                placeholder="example@email.com"
                 className="h-8 w-full rounded-lg border px-3 py-5"
               />
               {emailError && (
@@ -250,12 +250,13 @@ export default function Signup() {
               <label htmlFor="emailCertification">이메일 인증번호</label>
               <input
                 id="emailCertification"
-                type="text"
+                type="password"
                 required
                 value={emailCertification}
                 onChange={(e) => setEmailCertification(e.target.value)}
                 onBlur={handleEmailCertificationBlur} // 포커스 해제 시 인증번호 확인
-                className="h-8 w-full rounded-lg border px-3 py-5"
+                placeholder="··········"
+                className="h-8 w-full rounded-lg border px-3 py-5 placeholder:text-xl"
               />
             </div>
             {certificationCheckMessage && (
@@ -274,7 +275,7 @@ export default function Signup() {
                 required
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                placeholder="@"
+                placeholder="username"
                 className="h-8 w-full rounded-lg border px-3 py-5"
                 onBlur={handleCheckUsername}
               />
@@ -316,7 +317,8 @@ export default function Signup() {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="h-8 w-full rounded-lg border px-3 py-5"
+                placeholder="··········"
+                className="h-8 w-full rounded-lg border px-3 py-5 placeholder:text-xl"
               />
             </div>
             <div className="mb-6 flex flex-col gap-3">
@@ -328,7 +330,8 @@ export default function Signup() {
                 required
                 value={passwordVerify}
                 onChange={(e) => setPasswordVerify(e.target.value)}
-                className="h-8 w-full rounded-lg border px-3 py-5"
+                placeholder="··········"
+                className="h-8 w-full rounded-lg border px-3 py-5 placeholder:text-xl"
               />
               {isPasswordMatch ? (
                 <p className="text-sm text-green-500">

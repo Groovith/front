@@ -8,6 +8,7 @@ import Setting from "./pages/Setting";
 import User from "./pages/User";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Callback } from "./pages/Callback";
+import ResetPassword from "./pages/ResetPassword";
 
 const queryClient = new QueryClient();
 
@@ -24,6 +25,7 @@ function App() {
             <Route path="/setting" element={<Setting />} />
           </Route>
           <Route path="/login" element={<Login />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/callback" element={<Callback />} />
         </Routes>

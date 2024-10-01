@@ -42,6 +42,7 @@ export default function Login() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                placeholder="example@email.com"
                 className="h-8 w-full rounded-lg border px-3 py-5"
               />
             </div>
@@ -52,14 +53,15 @@ export default function Login() {
                 type="password"
                 required
                 value={password}
+                placeholder="··········"
                 onChange={(e) => setPassword(e.target.value)}
-                className="h-8 w-full rounded-lg border px-3 py-5"
+                className="h-8 w-full rounded-lg border px-3 py-5 placeholder:text-xl"
               />
             </div>
             <Button className="w-full">로그인</Button>
           </form>
           <div className="mb-14 w-full flex justify-start">
-            <button className="text-sm text-neutral-600 underline">
+            <button className="text-sm text-neutral-600 underline" onClick={() => navigate("/reset-password")}>
               비밀번호 찾기
             </button>
           </div>
