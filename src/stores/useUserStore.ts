@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { StreamingType } from "../utils/types";
+import { StreamingType } from "../types/types";
 
 interface UserStoreType {
   userId: number | null;

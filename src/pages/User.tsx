@@ -4,7 +4,7 @@ import { Button } from "../components/Button";
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { getUserDetailsByUsername } from "../utils/apis/serverAPI";
-import { UserDetailsType } from "../utils/types";
+import { UserDetailsType } from "../types/types";
 import { useUser } from "../hooks/useUser";
 import Loading from "./Loading";
 import DropdownButton from "../components/DropdownButton";

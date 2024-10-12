@@ -56,12 +56,6 @@ export default function Player2() {
   const [spotifyAccessToken, setSpotifyAccessToken] = useState<string>();
   const { justPlayTrack } = usePlayer();
 
-  // 유저 플레이백 큐 불러오기
-  // const { data: userQueueData } = useQuery({
-  //   queryKey: ["userQueue"],
-  //   queryFn: getUserQueue,
-  // });
-
   // 스트리밍 서비스 확인 -> 새 토큰 불러오기 -> 플레이어 연결
   useEffect(() => {
     const updateSpotifyToken = async () => {

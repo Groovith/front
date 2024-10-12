@@ -1,18 +1,18 @@
 import { create } from "zustand";
 import {
   PlayerResponseDto,
-  SpotifyTrack,
-} from "../utils/types";
+} from "../types/types";
 import { StompSubscription } from "@stomp/stompjs";
+import { YouTubeEvent } from "react-youtube";
 
 interface PlayerStoreType {
-  player: Spotify.Player | null;
+  player: React.MutableRefObject<YouTubeEvent | null> | null;
   deviceId: string;
-  setPlayer: (player: Spotify.Player | null) => void;
+  setPlayer: (player: React.MutableRefObject<YouTubeEvent | null> | null) => void;
   setDeviceId: (deviceId: string) => void;
-  currentPlaylist: SpotifyTrack[];
+  currentPlaylist: string[];
   currentPlaylistIndex: number;
-  setCurrentPlaylist: (playlist: SpotifyTrack[]) => void;
+  setCurrentPlaylist: (playlist: string[]) => void;
   setCurrentPlaylistIndex: (index: number) => void;
   decreaseCurrentPlaylistIndex: (amount: number) => void;
   paused: boolean;
@@ -41,13 +41,13 @@ export const usePlayerStore = create<PlayerStoreType>((set) => ({
   // 플레이어 일반
   player: null,
   deviceId: "",
-  setPlayer: (player: Spotify.Player | null) => set({ player }),
+  setPlayer: (player: React.MutableRefObject<YouTubeEvent | null> | null) => set({ player }),
   setDeviceId: (deviceId: string) => set({ deviceId }),
 
   // 현재 플레이리스트 정보
   currentPlaylist: [],
   currentPlaylistIndex: 0,
-  setCurrentPlaylist: (currentPlaylist: any[]) => set({ currentPlaylist }),
+  setCurrentPlaylist: (currentPlaylist: string[]) => set({ currentPlaylist }),
   setCurrentPlaylistIndex: (currentPlaylistIndex: number) =>
     set({ currentPlaylistIndex }),
   decreaseCurrentPlaylistIndex: (amount) =>

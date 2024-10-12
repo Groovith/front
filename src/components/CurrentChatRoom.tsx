@@ -1,8 +1,9 @@
 import {
   AudioLines,
-  CirclePlus,
   EllipsisVertical,
   Headphones,
+  ListMusic,
+  ListPlus,
   Pause,
   Play,
   Repeat,
@@ -13,10 +14,11 @@ import {
 import { useChatRoomStore } from "../stores/useChatRoomStore";
 import { usePlayerStore } from "../stores/usePlayerStore";
 import { Button } from "./Button";
-import { usePlayer } from "../hooks/useSpotifyPlayer";
+import { usePlayer } from "../hooks/usePlayer";
 import { formatDuation } from "../utils/formatDuration";
 import { useState } from "react";
 import DropdownButton from "./DropdownButton";
+import CurrentPlaylist from "./CurrentPlaylist";
 
 export default function CurrentChatRoom() {
   const { isCurrentChatRoomOpen } = useChatRoomStore();
@@ -26,6 +28,7 @@ export default function CurrentChatRoom() {
     pausePlayer,
     playAtIndex,
     removeFromCurrentPlaylist,
+    addToCurrentPlaylist,
   } = usePlayer();
   const {
     duration,
@@ -35,9 +38,6 @@ export default function CurrentChatRoom() {
     currentPlaylist,
     currentPlaylistIndex,
   } = usePlayerStore();
-  const [hoveredTrackIndex, setHoveredTrackIndex] = useState<number | null>(
-    null,
-  );
   const [newPosition, setNewPosition] = useState<number>();
 
   // 트랙 위치 변경
@@ -78,18 +78,13 @@ export default function CurrentChatRoom() {
                 </Button>
               </div>
               <div className="flex max-w-[300px] flex-none flex-col gap-4 overflow-hidden text-ellipsis whitespace-nowrap">
-                <img
-                  src={
-                    currentPlaylist[currentPlaylistIndex].album.images[0].url
-                  }
-                  className="w-full rounded-lg"
-                />
+                <img className="w-full rounded-lg" />
                 <div className="flex flex-col gap-1">
                   <p className="overflow-hidden text-ellipsis text-2xl font-semibold text-neutral-900">
-                    {currentPlaylist[currentPlaylistIndex].name}
+                    {currentPlaylist[currentPlaylistIndex]}
                   </p>
                   <p className="text-lg text-neutral-500">
-                    {currentPlaylist[currentPlaylistIndex].artists[0].name}
+                    {currentPlaylist[currentPlaylistIndex]}
                   </p>
                 </div>
                 <div className="relative flex items-center justify-between gap-3">
@@ -156,76 +151,13 @@ export default function CurrentChatRoom() {
           )}
         </div>
         {/*현재 플레이리스트*/}
-        <div className="flex size-full flex-1 flex-col overflow-y-auto">
-          {currentPlaylist &&
-            currentPlaylist.map((track, index) => (
-              <div
-                key={index}
-                className={`flex h-[65px] w-full flex-none items-center justify-between border-b px-4 py-2 hover:bg-neutral-100 ${index === currentPlaylistIndex ? "bg-neutral-100" : ""}`}
-                onMouseEnter={() => setHoveredTrackIndex(index)}
-                onMouseLeave={() => setHoveredTrackIndex(null)}
-              >
-                <div className="flex w-full gap-4 overflow-hidden text-ellipsis whitespace-nowrap">
-                  <div
-                    className="relative flex size-14 flex-none rounded-sm hover:cursor-pointer"
-                    onClick={() => playAtIndex(index)}
-                  >
-                    <img
-                      src={track.album.images[0].url}
-                      className="h-full rounded-sm object-cover"
-                      alt="Album Art"
-                    />
-                    {index === -1 && (
-                      <div className="absolute inset-0 flex items-center justify-center rounded-sm bg-black bg-opacity-50">
-                        <AudioLines className="text-white" />
-                      </div>
-                    )}
-                  </div>
-                  <div className="flex w-full flex-col gap-0.5 overflow-hidden text-ellipsis whitespace-nowrap">
-                    <p
-                      className="w-fit overflow-hidden text-ellipsis whitespace-nowrap text-neutral-900 hover:cursor-pointer"
-                      onClick={() => playAtIndex(index)}
-                    >
-                      {track.name}
-                    </p>
-                    <p className="text-sm text-neutral-500">
-                      {track.artists[0].name}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex w-10 items-center justify-center gap-1">
-                  {index === hoveredTrackIndex ? (
-                    <DropdownButton
-                      items={[
-                        {
-                          label: "현재 재생목록에서 삭제",
-                          action: () => {
-                            removeFromCurrentPlaylist(index);
-                          },
-                        },
-                      ]}
-                    >
-                      <Button
-                        variant={"ghost"}
-                        className="rounded-full p-3 hover:bg-neutral-300"
-                      >
-                        <EllipsisVertical />
-                      </Button>
-                    </DropdownButton>
-                  ) : (
-                    <p className="text-neutral-500">
-                      {formatDuation(track.duration_ms)}
-                    </p>
-                  )}
-                </div>
-              </div>
-            ))}
-          <div className="flex h-fit w-full items-center justify-center py-10">
-            <Button variant={"transparent"}>
-              <CirclePlus />
-            </Button>
-          </div>
-        </div>
+        <CurrentPlaylist
+          playlist={currentPlaylist} // playlist 전달
+          currentPlaylistIndex={currentPlaylistIndex} // 현재 재생 중인 인덱스 전달
+          onPlayAtIndex={playAtIndex} // 재생 함수 전달
+          onRemoveFromPlaylist={removeFromCurrentPlaylist} // 삭제 함수 전달
+          addToCurrentPlaylist={addToCurrentPlaylist}
+        />
       </div>
     </div>
   );

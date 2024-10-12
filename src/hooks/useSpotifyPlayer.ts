@@ -2,7 +2,7 @@ import { usePlayerStore } from "../stores/usePlayerStore";
 import {
   PlayerRequestDto,
   SpotifyTrack,
-} from "../utils/types";
+} from "../types/types";
 import { addItemToPlaybackQueue, playTrack } from "../utils/apis/spotifyAPI";
 import { useQueryClient } from "@tanstack/react-query";
 import { useStompStore } from "../stores/useStompStore";
@@ -180,7 +180,7 @@ export function usePlayer() {
     if (force) {
       setPosition(0);
       setCurrentPlaylistIndex(0);
-      setCurrentPlaylist([track]);
+      //setCurrentPlaylist([track]);
       setPaused(false);
       setLoading(true);
       try {
@@ -201,7 +201,7 @@ export function usePlayer() {
     } else {
       setPosition(0);
       setCurrentPlaylistIndex(0);
-      setCurrentPlaylist([track]);
+      //setCurrentPlaylist([track]);
       setDuration(track.duration_ms);
       setPaused(false);
       setLoading(true);
@@ -242,7 +242,7 @@ export function usePlayer() {
     if (force) {
       if (index >= 0 && index < currentPlaylist.length) {
         try {
-          await justPlayTrack(currentPlaylist[index]);
+          //await justPlayTrack(currentPlaylist[index]);
           setCurrentPlaylistIndex(index);
         } catch (e) {
           console.log(e);
@@ -261,7 +261,7 @@ export function usePlayer() {
     } else {
       if (index >= 0 && index < currentPlaylist.length) {
         try {
-          await justPlayTrack(currentPlaylist[index]);
+          //await justPlayTrack(currentPlaylist[index]);
           setCurrentPlaylistIndex(index);
         } catch (e) {
           console.log(e);
@@ -372,7 +372,7 @@ export function usePlayer() {
   const addToCurrentPlaylist = async (track: SpotifyTrack, force?: boolean) => {
     if (force) {
       const updatedCurrentPlaylist = [...currentPlaylist, track];
-      setCurrentPlaylist(updatedCurrentPlaylist);
+      //setCurrentPlaylist(updatedCurrentPlaylist);
       return;
     }
 
@@ -384,7 +384,7 @@ export function usePlayer() {
       sendPlayerMessage(listenTogetherId, requestDto);
     } else {
       const updatedCurrentPlaylist = [...currentPlaylist, track];
-      setCurrentPlaylist(updatedCurrentPlaylist);
+      //setCurrentPlaylist(updatedCurrentPlaylist);
       // 실행 중인 곡이 없을 때 첫번째 곡을 재생
       if (!currentPlaylist[currentPlaylistIndex]) {
         setCurrentPlaylistIndex(0);

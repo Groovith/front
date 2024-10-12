@@ -10,20 +10,30 @@ import {
 } from "lucide-react";
 import { formatDuation } from "../utils/formatDuration";
 import { useChatRoomStore } from "../stores/useChatRoomStore";
-import YouTube, {
-  YouTubeEvent,
-  YouTubeProps,
-} from "react-youtube";
+import YouTube, { YouTubeEvent, YouTubeProps } from "react-youtube";
 import { MoonLoader } from "react-spinners";
+import { usePlayerStore } from "../stores/usePlayerStore";
+import { usePlayer } from "../hooks/usePlayer";
+import CurrentTrackInfo from "../components/player/CurrentTrackInfo";
 
 export default function Player() {
-  const [currentTrackId, setCurrentTrackId] = useState("");
-  const [currentTrack, setCurrentTrack] = useState();
-  const [loading, setLoading] = useState(false);
-  const [duration, setDuration] = useState(0);
-  const [position, setPosition] = useState(0);
+  const {
+    currentPlaylist,
+    currentPlaylistIndex,
+    player,
+    duration,
+    position,
+    loading,
+    paused,
+    setPaused,
+    setPlayer,
+    setDuration,
+    setPosition,
+    setLoading,
+  } = usePlayerStore();
+  const { resumePlayer, pausePlayer, seek, nextTrack, previousTrack } =
+    usePlayer();
   const [newPosition, setNewPosition] = useState(0);
-  const [paused, setPaused] = useState(true);
   const { isCurrentChatRoomOpen, toggleCurrentChatRoomOpen } =
     useChatRoomStore();
   const playerRef = useRef<YouTubeEvent | null>(null);
@@ -45,8 +55,9 @@ export default function Player() {
   // 플레이어 준비
   const onPlayerReady: YouTubeProps["onReady"] = (event: YouTubeEvent<any>) => {
     playerRef.current = event;
+    setPlayer(playerRef);
     console.log("Player Ready: ", playerRef.current);
-    setDuration(playerRef.current!.target.getDuration());
+    setDuration(player!.current!.target.getDuration());
   };
 
   // 플레이어 상태 변화 시 이벤트
@@ -71,30 +82,17 @@ export default function Player() {
       case YouTube.PlayerState.ENDED:
         console.log("Ended...");
         setLoading(false);
-        setPaused(true);
-        playerRef.current!.target.stopVideo();
+        nextTrack();
         break;
     }
-    setPosition(playerRef.current!.target.getCurrentTime());
+    setPosition(player!.current!.target.getCurrentTime());
     console.log(position);
-  };
-
-  // 재생
-  const play = () => {
-    if (!playerRef.current) return;
-    playerRef.current.target.playVideo();
-  };
-
-  // 일시정지
-  const pause = () => {
-    if (!playerRef.current) return;
-    playerRef.current.target.pauseVideo();
   };
 
   // 트랙 위치 변경
   const handleSeek = () => {
     if (!newPosition) return;
-    playerRef.current!.target.seekTo(newPosition);
+    seek(newPosition);
   };
 
   // 트랙 현재 시간 업데이트
@@ -116,7 +114,7 @@ export default function Player() {
   return (
     <div className="flex h-[80px] w-full justify-between border-t">
       <>
-        {duration > 0 ? (
+        {currentPlaylist[currentPlaylistIndex] ? (
           <input
             className="absolute z-10 h-1 w-full cursor-pointer appearance-none bg-neutral-200 accent-[#FF6735] outline-none disabled:accent-gray-200"
             type="range"
@@ -135,7 +133,7 @@ export default function Player() {
           />
         ) : (
           <input
-            className="absolute z-10 h-1 w-full cursor-pointer appearance-none bg-neutral-200 accent-[#FF6735] outline-none disabled:accent-gray-200"
+            className="absolute z-10 h-1 w-full cursor-pointer appearance-none bg-neutral-200 accent-neutral-500 outline-none disabled:accent-gray-200"
             type="range"
             min="0"
             max="100"
@@ -144,8 +142,12 @@ export default function Player() {
           />
         )}
         <div className="ml-6 flex items-center">
-          <div className="flex items-center justify-between w-[140px]">
-            <Button variant={"transparent"} className="text-neutral-600">
+          <div className="flex w-[140px] items-center justify-between">
+            <Button
+              variant={"transparent"}
+              className="text-neutral-600"
+              onClick={previousTrack}
+            >
               <SkipBack />
             </Button>
             {loading ? (
@@ -154,7 +156,7 @@ export default function Player() {
               <Button
                 variant={"transparent"}
                 className="text-neutral-600"
-                onClick={play}
+                onClick={resumePlayer}
                 disabled={loading}
               >
                 <Play />
@@ -163,13 +165,17 @@ export default function Player() {
               <Button
                 variant={"transparent"}
                 className="text-neutral-600"
-                onClick={pause}
+                onClick={pausePlayer}
                 disabled={loading}
               >
                 <Pause />
               </Button>
             )}
-            <Button variant={"transparent"} className="text-neutral-600">
+            <Button
+              variant={"transparent"}
+              className="text-neutral-600"
+              onClick={nextTrack}
+            >
               <SkipForward />
             </Button>
           </div>
@@ -180,7 +186,11 @@ export default function Player() {
           </div>
         </div>
         <div className="flex items-center">
-          <p className="text-sm text-neutral-400">재생 중인 곡이 없습니다</p>
+          {currentPlaylist[currentPlaylistIndex] ? (
+            <CurrentTrackInfo imgUrl="" trackName="곡 이름" artistName="아티스트" />
+          ) : (
+            <p className="text-sm text-neutral-400">재생 중인 곡이 없습니다</p>
+          )}
         </div>
         <div className="mr-6 flex items-center">
           {isCurrentChatRoomOpen ? (
@@ -195,7 +205,7 @@ export default function Player() {
         </div>
       </>
       <YouTube
-        videoId={"NM4e606yFJg"}
+        videoId={currentPlaylist[currentPlaylistIndex]}
         opts={opts}
         onReady={onPlayerReady}
         onStateChange={onPlayerStateChange}

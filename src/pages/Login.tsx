@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Button } from "../components/Button";
 import { useNavigate } from "react-router-dom";
 import { login } from "../utils/apis/serverAPI";
+import { toast, Toaster } from "sonner";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -23,13 +24,16 @@ export default function Login() {
         response.headers["authorization"].replace("Bearer ", ""),
       );
       navigate("/");
-    } catch (e) {
-      console.error(e);
+    } catch (e : any) {
+      if (e.response.status === 401) {
+        toast.error("이메일 또는 비밀번호가 맞지 않습니다.");
+      }
     }
   };
 
   return (
     <div className="flex h-screen w-screen flex-col">
+      <Toaster position="bottom-center" richColors />
       <div className="flex h-full w-full items-center justify-center">
         <div className="flex w-[400px] flex-col rounded-xl border border-gray-300 p-10">
           <h1 className="mb-14 text-3xl font-bold">Groovith에 로그인하기</h1>
@@ -76,14 +80,6 @@ export default function Login() {
             </Button>
           </div>
         </div>
-      </div>
-      <div className="fixed bottom-5 flex w-full justify-center space-x-4 text-sm text-gray-500">
-        <a>© 2024 Groovith</a>
-        <a>소개</a>
-        <a>약관</a>
-        <a>개인정보처리방침</a>
-        <a>쿠키 정책</a>
-        <a>문제 신고</a>
       </div>
     </div>
   );

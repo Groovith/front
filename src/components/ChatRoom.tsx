@@ -5,7 +5,7 @@ import {
   PlayerDetailsDto,
   PlayerResponseDto,
   SpotifyTrack,
-} from "../utils/types";
+} from "../types/types";
 import {
   getChatRoomMessages,
   getPlayer,

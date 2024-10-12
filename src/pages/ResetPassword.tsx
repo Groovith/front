@@ -52,10 +52,7 @@ export default function ResetPassword() {
   return (
     <div className="flex h-screen w-screen items-center justify-center text-neutral-900">
       <div className="flex w-fit flex-col items-center justify-center rounded-xl border border-gray-300 p-10">
-        <h1 className="mb-4 text-3xl font-bold">에구머니나!</h1>
-        <h2 className="mb-8 text-xl font-bold text-neutral-700">
-          비밀번호를 잊어버리셨나요?
-        </h2>
+        <h1 className="mb-4 text-3xl font-bold">비밀번호 찾기</h1>
         <p className="mb-8 text-neutral-700">
           아래에 가입한 이메일을 입력해 주세요. <br />
           해당 이메일을 통해 비밀번호 변경 링크가 전송됩니다.

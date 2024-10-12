@@ -1,6 +1,6 @@
 import axios from "axios";
 import { getSpotifyToken } from "./serverAPI";
-import { SpotifySearchResponse, SpotifyTrack } from "../types";
+import { SpotifySearchResponse, SpotifyTrack } from "../../types/types";
 
 /**
  * Spotify API 통신용 Axios 인스턴스와 API 호출 함수들.

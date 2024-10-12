@@ -1,5 +1,5 @@
 import { useUserStore } from "../stores/useUserStore";
-import { StreamingType, UserDetailsType } from "../utils/types";
+import { StreamingType, UserDetailsType } from "../types/types";
 
 /**
  * 현재 로그인된 유저 관련 정보와 상호작용하는 커스텀 훅

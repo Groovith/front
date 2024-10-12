@@ -359,14 +359,6 @@ export default function Signup() {
           </div>
         </div>
       </div>
-      <div className="fixed bottom-5 flex w-full justify-center space-x-4 text-sm text-gray-500">
-        <a>© 2024 Groovith</a>
-        <a>소개</a>
-        <a>약관</a>
-        <a>개인정보처리방침</a>
-        <a>쿠키 정책</a>
-        <a>문제 신고</a>
-      </div>
     </div>
   );
 }

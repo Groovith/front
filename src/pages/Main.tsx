@@ -9,7 +9,7 @@ import {
   ChatRoomDetailsType,
   MessageType,
   UserDetailsType,
-} from "../utils/types";
+} from "../types/types";
 import { Client } from "@stomp/stompjs";
 import { useStompStore } from "../stores/useStompStore";
 import { useChatRoomStore } from "../stores/useChatRoomStore";

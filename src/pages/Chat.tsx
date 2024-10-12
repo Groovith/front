@@ -10,7 +10,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { ChatRoom } from "../components/ChatRoom";
 import { useChatRoomStore } from "../stores/useChatRoomStore";
 import { useStompStore } from "../stores/useStompStore";
-import { MessageType } from "../utils/types";
+import { MessageType } from "../types/types";
 
 export default function Chat() {
   const { chatRoomId } = useParams();

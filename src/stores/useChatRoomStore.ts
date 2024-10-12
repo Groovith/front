@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { ChatRoomDetailsType, MessageType } from "../utils/types";
+import { ChatRoomDetailsType, MessageType } from "../types/types";
 
 interface useChatRoomStoreType {
   chatRoomList: ChatRoomDetailsType[];

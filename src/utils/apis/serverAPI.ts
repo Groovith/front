@@ -6,7 +6,7 @@ import {
   PlayerRequestDto,
   SpotifyTrack,
   UserDetailsType,
-} from "../types";
+} from "../../types/types";
 import ResponseDto from "./response.dto";
 
 /**
