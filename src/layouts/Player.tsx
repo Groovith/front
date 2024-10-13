@@ -8,7 +8,7 @@ import {
   SkipBack,
   SkipForward,
 } from "lucide-react";
-import { formatDuation } from "../utils/formatDuration";
+import { formatDuration } from "../utils/formatDuration";
 import { useChatRoomStore } from "../stores/useChatRoomStore";
 import YouTube, { YouTubeEvent, YouTubeProps } from "react-youtube";
 import { MoonLoader } from "react-spinners";
@@ -57,7 +57,7 @@ export default function Player() {
     playerRef.current = event;
     setPlayer(playerRef);
     console.log("Player Ready: ", playerRef.current);
-    setDuration(player!.current!.target.getDuration());
+    setDuration(player?.current?.target.getDuration());
   };
 
   // 플레이어 상태 변화 시 이벤트
@@ -86,7 +86,6 @@ export default function Player() {
         break;
     }
     setPosition(player!.current!.target.getCurrentTime());
-    console.log(position);
   };
 
   // 트랙 위치 변경
@@ -180,14 +179,14 @@ export default function Player() {
             </Button>
           </div>
           <div className="ml-2 flex items-center gap-1 text-sm text-neutral-400">
-            <p>{formatDuation(position)}</p>
+            <p>{formatDuration(position)}</p>
             <p>/</p>
-            <p>{formatDuation(duration)}</p>
+            <p>{formatDuration(duration)}</p>
           </div>
         </div>
         <div className="flex items-center">
           {currentPlaylist[currentPlaylistIndex] ? (
-            <CurrentTrackInfo imgUrl="" trackName="곡 이름" artistName="아티스트" />
+            <CurrentTrackInfo imgUrl={`https://img.youtube.com/vi/${currentPlaylist[currentPlaylistIndex]}/default.jpg`} trackName="곡 이름" artistName="아티스트" />
           ) : (
             <p className="text-sm text-neutral-400">재생 중인 곡이 없습니다</p>
           )}

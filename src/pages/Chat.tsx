@@ -3,7 +3,6 @@ import { Button } from "../components/Button";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createChatRoom, leaveChatRoom } from "../utils/apis/serverAPI";
 import { useState } from "react";
-import defaultChatRoomImage from "../assets/default-image-mountain.png";
 import { Modal } from "../components/Modal";
 import DropdownButton from "../components/DropdownButton";
 import { useNavigate, useParams } from "react-router-dom";
@@ -137,7 +136,7 @@ export default function Chat() {
                   }}
                 >
                   <img
-                    src={defaultChatRoomImage}
+                    src={chatRoom.imageUrl}
                     className="size-12 rounded-full"
                   />
                   <div className="flex flex-col">

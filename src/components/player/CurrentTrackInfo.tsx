@@ -9,7 +9,7 @@ export default function CurrentTrackInfo({imgUrl, trackName, artistName} : Curre
     <div className="flex items-center">
       <img
         src={imgUrl}
-        className="mr-3 size-12 rounded-sm"
+        className="mr-3 size-12 rounded-md object-contain"
       />
       <div className="flex flex-col">
         <p className="text-neutral-900">

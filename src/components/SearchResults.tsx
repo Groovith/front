@@ -1,10 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { spotifySearch } from "../utils/apis/spotifyAPI";
-import { formatDuation } from "../utils/formatDuration";
 import { Button } from "./Button";
-import { EllipsisVertical, ListPlus, UserPlus } from "lucide-react";
+import { EllipsisVertical, UserPlus } from "lucide-react";
 import {
   joinChatRoom,
   searchChatRooms,
@@ -13,14 +11,12 @@ import {
 import defaultUserImage from "../assets/default-user-image.png";
 import defaultChatRoomImage from "../assets/default-image-mountain.png";
 import DropdownButton from "./DropdownButton";
-import { usePlayer } from "../hooks/useSpotifyPlayer";
 
 export function SearchResults() {
   const queryClient = useQueryClient();
   const location = useLocation();
   const [query, setQuery] = useState<string | null>(null);
   const navigate = useNavigate();
-  const { playNewTrack, justPlayTrack, addToCurrentPlaylist } = usePlayer();
 
   useEffect(() => {
     const urlParams = new URLSearchParams(location.search);
@@ -31,21 +27,19 @@ export function SearchResults() {
   }, [location.search]);
 
   // 트랙 검색
-  const {
-    data: spotifyData,
-    error: spotifyError,
-    isLoading: spotifyLoading,
-  } = useQuery({
-    queryKey: ["spotifyData", query],
-    queryFn: () => spotifySearch(query || ""),
-    enabled: !!query,
-  });
+  // const {
+  //   data: spotifyData,
+  //   error: spotifyError,
+  //   isLoading: spotifyLoading,
+  // } = useQuery({
+  //   queryKey: ["spotifyData", query],
+  //   queryFn: () => spotifySearch(query || ""),
+  //   enabled: !!query,
+  // });
 
   // 유저 검색
   const {
     data: userData,
-    error: userError,
-    isLoading: userLoading,
   } = useQuery({
     queryKey: ["searchUsers", query],
     queryFn: () => searchUsers(query || ""),
@@ -55,8 +49,6 @@ export function SearchResults() {
   // 채팅방 검색
   const {
     data: chatRoomData,
-    error: chatRoomError,
-    isLoading: chatRoomLoading,
   } = useQuery({
     queryKey: ["searchChatRooms", query],
     queryFn: () => searchChatRooms(query || ""),
@@ -66,7 +58,7 @@ export function SearchResults() {
   // 채팅방 참가 요청
   const { mutate } = useMutation({
     mutationFn: joinChatRoom,
-    onSuccess: (data, variables) => {
+    onSuccess: (variables) => {
       queryClient.invalidateQueries({ queryKey: ["chatRooms"] });
       navigate(`/chat/${variables}`);
     },
@@ -91,7 +83,7 @@ export function SearchResults() {
     <div className="flex flex-col gap-10 pb-20">
       <div className="flex flex-col">
         <h1 className="mb-4 px-3 text-2xl font-bold text-neutral-900">노래</h1>
-        <div className="flex flex-col">
+        {/* <div className="flex flex-col">
           {spotifyData?.tracks.items && spotifyData.tracks.items.length > 0 ? (
             spotifyData.tracks.items.map((track) => (
               <div
@@ -100,7 +92,7 @@ export function SearchResults() {
               >
                 <div
                   className="flex items-center gap-3 hover:cursor-pointer"
-                  onClick={() => playNewTrack(track)}
+                  // onClick={() => playNewTrack(track)}
                 >
                   <img
                     src={track.album.images[0].url}
@@ -118,7 +110,7 @@ export function SearchResults() {
                       </p>
                       <p>·</p>
                       <p className="text-sm text-neutral-500">
-                        {formatDuation(track.duration_ms)}
+                        {formatDuration(track.duration_ms)}
                       </p>
                     </div>
                   </div>
@@ -128,7 +120,7 @@ export function SearchResults() {
                     {
                       label: "현재 재생목록에 추가",
                       action: () => {
-                        addToCurrentPlaylist(track);
+                        // addToCurrentPlaylist(track);
                       },
                       Icon: ListPlus,
                     },
@@ -148,7 +140,7 @@ export function SearchResults() {
               "{query}"로 검색한 노래 결과가 없습니다
             </p>
           )}
-        </div>
+        </div> */}
       </div>
       <div className="flex flex-col">
         <h1 className="mb-4 px-3 text-2xl font-bold text-neutral-900">

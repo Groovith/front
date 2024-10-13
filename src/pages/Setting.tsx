@@ -1,10 +1,4 @@
-import spotifyLogo from "../assets/Spotify_Primary_Logo_RGB_Green.png";
-import appleMusicLogo from "../assets/Apple_Music_Icon_RGB_lg_073120.svg";
 import { Button } from "../components/Button";
-import { SPOTIFY_AUTH_URL } from "../utils/config";
-import { disconnectSpotify } from "../utils/apis/serverAPI";
-import { useUser } from "../hooks/useUser";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ChevronRight } from "lucide-react";
 
 export default function Setting() {

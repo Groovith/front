@@ -1,5 +1,4 @@
 import { EllipsisVertical, UserPlus } from "lucide-react";
-import defaultUserImage from "../assets/default-user-image.png";
 import { Button } from "../components/Button";
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";

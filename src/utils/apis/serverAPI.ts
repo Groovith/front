@@ -248,7 +248,7 @@ export const getChatRoomDetails = async (chatRoomId: string) => {
 
 // 채팅방 메시지 불러오기
 export const getChatRoomMessages = async (chatRoomId: string) => {
-  const response = await api.get<{ data: MessageType[] }>(
+  const response = await api.get<{ messages: MessageType[] }>(
     `/chat/${chatRoomId}`,
   );
   return response.data;

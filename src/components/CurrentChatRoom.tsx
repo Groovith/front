@@ -1,9 +1,6 @@
 import {
-  AudioLines,
   EllipsisVertical,
   Headphones,
-  ListMusic,
-  ListPlus,
   Pause,
   Play,
   Repeat,
@@ -15,9 +12,8 @@ import { useChatRoomStore } from "../stores/useChatRoomStore";
 import { usePlayerStore } from "../stores/usePlayerStore";
 import { Button } from "./Button";
 import { usePlayer } from "../hooks/usePlayer";
-import { formatDuation } from "../utils/formatDuration";
+import { formatDuration } from "../utils/formatDuration";
 import { useState } from "react";
-import DropdownButton from "./DropdownButton";
 import CurrentPlaylist from "./CurrentPlaylist";
 
 export default function CurrentChatRoom() {
@@ -78,7 +74,10 @@ export default function CurrentChatRoom() {
                 </Button>
               </div>
               <div className="flex max-w-[300px] flex-none flex-col gap-4 overflow-hidden text-ellipsis whitespace-nowrap">
-                <img className="w-full rounded-lg" />
+                <img
+                  className="w-full rounded-lg"
+                  src={`https://img.youtube.com/vi/${currentPlaylist[currentPlaylistIndex]}/default.jpg`}
+                />
                 <div className="flex flex-col gap-1">
                   <p className="overflow-hidden text-ellipsis text-2xl font-semibold text-neutral-900">
                     {currentPlaylist[currentPlaylistIndex]}
@@ -89,7 +88,7 @@ export default function CurrentChatRoom() {
                 </div>
                 <div className="relative flex items-center justify-between gap-3">
                   <p className="text-sm text-neutral-400">
-                    {formatDuation(position)}
+                    {formatDuration(position)}
                   </p>
                   <input
                     className="h-0.5 w-full cursor-pointer appearance-none bg-neutral-200 accent-[#FF6735] outline-none disabled:accent-gray-200"
@@ -108,7 +107,7 @@ export default function CurrentChatRoom() {
                     }}
                   />
                   <p className="text-sm text-neutral-400">
-                    {formatDuation(duration)}
+                    {formatDuration(duration)}
                   </p>
                 </div>
                 <div className="flex w-full justify-between">

@@ -8,7 +8,7 @@ interface ModalProps {
 
 export function Modal({ children, closeOnOutsideClick = true, onClose }: ModalProps) {
   // 바깥 영역 클릭 처리 함수
-  const handleOutsideClick = (e: MouseEvent<HTMLDivElement>) => {
+  const handleOutsideClick = () => {
     if (closeOnOutsideClick) {
       onClose();
     }

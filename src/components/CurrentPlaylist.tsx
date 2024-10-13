@@ -5,10 +5,10 @@ import {
   ListPlus,
   X,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "./Button";
 import DropdownButton from "./DropdownButton";
-import { formatDuation } from "../utils/formatDuration";
+import { formatDuration } from "../utils/formatDuration";
 import { Modal } from "./Modal";
 import getVideoId from "get-video-id";
 import { toast, Toaster } from "sonner";
@@ -47,6 +47,12 @@ export default function CurrentPlaylist({
     }
   };
 
+  useEffect(() => {
+    if (addTrackModalVisible) {
+      document.getElementById('youtube-url-input')?.focus();
+    }
+  }, [addTrackModalVisible]);
+
   return (
     <div className="flex size-full flex-1 flex-col overflow-y-auto">
       <Toaster richColors position="bottom-center" />
@@ -71,6 +77,7 @@ export default function CurrentPlaylist({
             </p>
             <div className="flex flex-col gap-5">
               <input
+                id="youtube-url-input"
                 type="text"
                 className="rounded-xl border p-3"
                 placeholder="https://..."
@@ -112,7 +119,8 @@ export default function CurrentPlaylist({
                 onClick={() => onPlayAtIndex(index)}
               >
                 <img
-                  className="h-full rounded-sm object-cover"
+                  src={`https://img.youtube.com/vi/${track}/default.jpg`}
+                  className="h-full rounded-md object-contain"
                   alt="Album Art"
                 />
                 {index === -1 && (
@@ -154,7 +162,7 @@ export default function CurrentPlaylist({
                 </DropdownButton>
               ) : (
                 <p className="text-neutral-500">
-                  {formatDuation(0)}
+                  {formatDuration(0)}
                 </p>
               )}
             </div>

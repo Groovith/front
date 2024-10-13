@@ -1,19 +1,14 @@
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
 import {
-  MessageType,
   PlayerDetailsDto,
   PlayerResponseDto,
   SpotifyTrack,
 } from "../types/types";
 import {
-  getChatRoomMessages,
   getPlayer,
-  joinPlayer,
   leavePlayer,
 } from "../utils/apis/serverAPI";
-import defaultChatRoomImage from "../assets/default-image-mountain.png";
-import defaultUserImage from "../assets/default-user-image.png";
 import { Button } from "./Button";
 import {
   AudioLines,
@@ -31,23 +26,21 @@ import {
   UserPlus,
   X,
 } from "lucide-react";
-import Loading from "../pages/Loading";
 import DropdownButton from "./DropdownButton";
 import React, { useEffect, useRef, useState } from "react";
 import { useStompStore } from "../stores/useStompStore";
 import { useChatRoomStore } from "../stores/useChatRoomStore";
 import { formatDateTime } from "../utils/formatDateTime";
-import { formatDuation } from "../utils/formatDuration";
+import { formatDuration } from "../utils/formatDuration";
 import { usePlayerStore } from "../stores/usePlayerStore";
-import { usePlayer } from "../hooks/useSpotifyPlayer";
-import { playTrack } from "../utils/apis/spotifyAPI";
+import { usePlayer } from "../hooks/usePlayer";
 
 export function ChatRoom() {
   const { chatRoomId } = useParams(); // 현재 주소 파라미터에서. "/chat/:chatRoomId".
   const [message, setMessage] = useState(""); // 입력창 메시지
   const [chatRoomPosition, setChatRoomPosition] = useState<number>(0);
   const [chatRoomPaused, setChatRoomPaused] = useState<boolean>(true);
-  const [chatRoomRepeat, setChatRoomRepeat] = useState<boolean>(false);
+  // const [chatRoomRepeat, setChatRoomRepeat] = useState<boolean>(false);
   const [chatRoomCurrentPlaylist, setChatRoomCurrentPlaylist] = useState<
     SpotifyTrack[]
   >([]);
@@ -60,7 +53,6 @@ export function ChatRoom() {
     getChatRoomById,
     currentChatRoomMessages,
     setCurrentChatRoomId,
-    setCurrentChatRoomMessages,
     newMessage,
     addToCurrentChatRoomMessages,
   } = useChatRoomStore();
@@ -69,22 +61,12 @@ export function ChatRoom() {
     listenTogetherId,
     listenTogetherSubscription,
     player,
-    paused,
-    deviceId,
-    currentPlaylist,
-    currentPlaylistIndex,
-    setRepeat,
-    setDuration,
     setIsListenTogetherConnected,
     setListenTogetherId,
     setListenTogetherSubscription,
-    setCurrentPlaylist,
-    setCurrentPlaylistIndex,
-    setPaused,
-    setPosition,
     setPlayerResponseMessage,
   } = usePlayerStore();
-  const { removeFromCurrentPlaylist, justPlayTrack, playAtIndex } = usePlayer();
+  const { removeFromCurrentPlaylist, playAtIndex } = usePlayer();
 
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const timerRef = useRef<number | null>();
@@ -117,17 +99,18 @@ export function ChatRoom() {
   }, [newMessage]);
 
   // 채팅방 메시지 불러오기
-  const { isLoading: isMessagesLoading } = useQuery<{
-    data: MessageType[];
-  }>({
-    queryKey: ["messages", chatRoomId],
-    queryFn: () =>
-      getChatRoomMessages(chatRoomId as string).then((data) => {
-        setCurrentChatRoomMessages(data.data);
-        return data;
-      }),
-    enabled: !!chatRoomId,
-  });
+  // const { isLoading: isMessagesLoading } = useQuery<{
+  //   data: MessageType[];
+  // }>({
+  //   queryKey: ["messages", chatRoomId],
+  //   queryFn: () =>
+  //     getChatRoomMessages(chatRoomId as string).then((data) => {
+  //       console.log(data.messages);
+  //       setCurrentChatRoomMessages(data.messages);
+  //       return data;
+  //     }),
+  //   enabled: !!chatRoomId,
+  // });
 
   // 채팅방 플레이어 정보 불러오기
   useQuery<PlayerDetailsDto>({
@@ -137,7 +120,7 @@ export function ChatRoom() {
         setChatRoomCurrentPlaylistIndex(data.currentPlaylistIndex);
         setChatRoomCurrentPlaylist(data.currentPlaylist);
         setChatRoomPaused(data.paused);
-        setChatRoomRepeat(data.repeat);
+        //setChatRoomRepeat(data.repeat);
         setChatRoomPosition(data.position);
         return data;
       }),
@@ -182,7 +165,7 @@ export function ChatRoom() {
         setChatRoomCurrentPlaylistIndex(playerMessage.currentPlaylistIndex);
         setChatRoomCurrentPlaylist(playerMessage.currentPlaylist);
         setChatRoomPaused(playerMessage.paused);
-        setChatRoomRepeat(playerMessage.repeat);
+        //setChatRoomRepeat(playerMessage.repeat);
         setChatRoomPosition(playerMessage.position);
       }
     };
@@ -212,35 +195,35 @@ export function ChatRoom() {
     }
 
     // 채팅방 참가 및 초기화
-    joinPlayer(chatRoomId).then(async (data) => {
-      console.log(data);
-      setCurrentPlaylist(data.currentPlaylist);
-      setCurrentPlaylistIndex(data.currentPlaylistIndex);
-      setPaused(data.paused);
+    // joinPlayer(chatRoomId).then(async (data) => {
+    //   console.log(data);
+    //   //setCurrentPlaylist(data.currentPlaylist);
+    //   setCurrentPlaylistIndex(data.currentPlaylistIndex);
+    //   setPaused(data.paused);
 
-      if (
-        data.currentPlaylist.length > 0 &&
-        typeof data.currentPlaylistIndex === "number"
-      ) {
-        console.log("play start");
-        setDuration(
-          data.currentPlaylist[data.currentPlaylistIndex].duration_ms,
-        );
-        setPosition(data.position);
-        await justPlayTrack(
-          data.currentPlaylist[data.currentPlaylistIndex],
-          data.position,
-        );
-      }
-      // 일정 시간 후에 플레이어를 정지시키기 위해 setTimeout 사용
-      setTimeout(() => {
-        if (data.paused) {
-          player.pause();
-        } else {
-          player.resume();
-        }
-      }, 1000); // 잠시 후 메뉴얼 정지
-    });
+    //   if (
+    //     data.currentPlaylist.length > 0 &&
+    //     typeof data.currentPlaylistIndex === "number"
+    //   ) {
+    //     console.log("play start");
+    //     setDuration(
+    //       data.currentPlaylist[data.currentPlaylistIndex].duration_ms,
+    //     );
+    //     setPosition(data.position);
+    //     await justPlayTrack(
+    //       data.currentPlaylist[data.currentPlaylistIndex],
+    //       data.position,
+    //     );
+    //   }
+    //   // 일정 시간 후에 플레이어를 정지시키기 위해 setTimeout 사용
+    //   // setTimeout(() => {
+    //   //   if (data.paused) {
+    //   //     player.pause();
+    //   //   } else {
+    //   //     player.resume();
+    //   //   }
+    //   // }, 1000); // 잠시 후 메뉴얼 정지
+    // });
 
     // STOMP 커스텀 헤더
     const headers = { Authorization: `Bearer ${accessToken}` };
@@ -314,9 +297,9 @@ export function ChatRoom() {
     }
   }, [currentChatRoomMessages]);
 
-  if (isMessagesLoading) {
-    return <Loading />;
-  }
+  // if (isMessagesLoading) {
+  //   return <Loading />;
+  // }
 
   return (
     <>
@@ -330,7 +313,7 @@ export function ChatRoom() {
             <div className="flex h-[100px] items-center justify-between border-b px-8">
               <div className="flex items-center gap-5">
                 <img
-                  src={defaultChatRoomImage}
+                  src={chatRoomDetails.imageUrl}
                   className="size-14 rounded-full"
                 ></img>
                 <h1>{chatRoomDetails?.name}</h1>
@@ -355,7 +338,7 @@ export function ChatRoom() {
               {currentChatRoomMessages &&
                 currentChatRoomMessages.map((message) => (
                   <div key={message.messageId} className="flex gap-3">
-                    <img src={defaultUserImage} className="size-10" />
+                    <img src={message.imageUrl} className="size-10 rounded-full" />
                     <div className="flex flex-col gap-1">
                       <div className="flex items-center gap-2">
                         <p>{message.username}</p>
@@ -444,7 +427,7 @@ export function ChatRoom() {
                     </div>
                     <div className="relative flex items-center justify-between gap-3">
                       <p className="text-sm text-neutral-400">
-                        {formatDuation(chatRoomPosition)}
+                        {formatDuration(chatRoomPosition)}
                       </p>
                       <input
                         className="h-0.5 w-full cursor-pointer appearance-none bg-neutral-200 accent-[#FF6735] outline-none disabled:accent-gray-200"
@@ -461,7 +444,7 @@ export function ChatRoom() {
                         }}
                       />
                       <p className="text-sm text-neutral-400">
-                        {formatDuation(
+                        {formatDuration(
                           chatRoomCurrentPlaylist[chatRoomCurrentPlaylistIndex]
                             .duration_ms,
                         )}
@@ -569,7 +552,7 @@ export function ChatRoom() {
                         </DropdownButton>
                       ) : (
                         <p className="text-neutral-500">
-                          {formatDuation(track.duration_ms)}
+                          {formatDuration(track.duration_ms)}
                         </p>
                       )}
                     </div>

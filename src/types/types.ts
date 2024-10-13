@@ -10,6 +10,7 @@ export interface UserDetailsType {
 export type StreamingType = "NONE" | "SPOTIFY";
 
 export interface ChatRoomDetailsType {
+  imageUrl: string;
   chatRoomId: number;
   name: string;
   totalUsers: number;
@@ -24,6 +25,7 @@ export interface ChatRoomDetailsType {
 }
 
 export interface MessageType {
+  imageUrl: string;
   messageId: number;
   chatRoomId: number;
   content: string;

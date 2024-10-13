@@ -2,7 +2,7 @@ const LEADING_ZERO_FORMATTER = new Intl.NumberFormat(undefined, {
   minimumIntegerDigits: 2,
 });
 
-export function formatDuation(duration: number) {
+export function formatDuration(duration: number) {
   // 밀리세컨드를 초로 변환
   const totalSeconds = Math.floor(duration);
   const hours = Math.floor(totalSeconds / 60 / 60);
