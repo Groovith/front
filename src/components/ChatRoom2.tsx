@@ -1,17 +1,18 @@
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
 import {
+  MessageType,
   PlayerDetailsDto,
   PlayerResponseDto,
   SpotifyTrack,
 } from "../types/types";
 import {
+  getChatRoomMessages,
   getPlayer,
   leavePlayer,
 } from "../utils/apis/serverAPI";
 import { Button } from "./Button";
 import {
-  AudioLines,
   EllipsisVertical,
   Headphones,
   Menu,
@@ -22,7 +23,6 @@ import {
   Shuffle,
   SkipBack,
   SkipForward,
-  Trash2,
   UserPlus,
   X,
 } from "lucide-react";
@@ -33,20 +33,21 @@ import { useChatRoomStore } from "../stores/useChatRoomStore";
 import { formatDateTime } from "../utils/formatDateTime";
 import { formatDuration } from "../utils/formatDuration";
 import { usePlayerStore } from "../stores/usePlayerStore";
-import { usePlayer } from "../hooks/usePlayer";
+import ChatRoomPlaylist from "./chatroom/ChatRoomPlaylist";
 
 export function ChatRoom() {
   const { chatRoomId } = useParams(); // 현재 주소 파라미터에서. "/chat/:chatRoomId".
   const [message, setMessage] = useState(""); // 입력창 메시지
+  const [loading, setLoading] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+  const observer = useRef<IntersectionObserver | null>(null);
   const [chatRoomPosition, setChatRoomPosition] = useState<number>(0);
   const [chatRoomPaused, setChatRoomPaused] = useState<boolean>(true);
-  // const [chatRoomRepeat, setChatRoomRepeat] = useState<boolean>(false);
   const [chatRoomCurrentPlaylist, setChatRoomCurrentPlaylist] = useState<
     SpotifyTrack[]
   >([]);
   const [chatRoomCurrentPlaylistIndex, setChatRoomCurrentPlaylistIndex] =
     useState<number>(-1);
-  const [hoveredTrackIndex, setHoveredTrackIndex] = useState<number | null>();
 
   const { stompClient } = useStompStore();
   const {
@@ -55,6 +56,7 @@ export function ChatRoom() {
     setCurrentChatRoomId,
     newMessage,
     addToCurrentChatRoomMessages,
+    setCurrentChatRoomMessages,
   } = useChatRoomStore();
   const {
     isListenTogetherConnected,
@@ -66,12 +68,11 @@ export function ChatRoom() {
     setListenTogetherSubscription,
     setPlayerResponseMessage,
   } = usePlayerStore();
-  const { removeFromCurrentPlaylist, playAtIndex } = usePlayer();
 
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const timerRef = useRef<number | null>();
 
-  // 현재 채팅방 정보를 가져옴
+  // 현재 채팅방 Id를 가져옴
   const chatRoomDetails = getChatRoomById(Number(chatRoomId));
 
   // 현재 채팅방 아이디 업데이트
@@ -99,18 +100,41 @@ export function ChatRoom() {
   }, [newMessage]);
 
   // 채팅방 메시지 불러오기
-  // const { isLoading: isMessagesLoading } = useQuery<{
-  //   data: MessageType[];
-  // }>({
-  //   queryKey: ["messages", chatRoomId],
-  //   queryFn: () =>
-  //     getChatRoomMessages(chatRoomId as string).then((data) => {
-  //       console.log(data.messages);
-  //       setCurrentChatRoomMessages(data.messages);
-  //       return data;
-  //     }),
-  //   enabled: !!chatRoomId,
-  // });
+  // 메시지 불러오기 함수
+  const fetchMessages = async (
+    chatRoomId: number,
+    lastMessageId: number | null,
+  ) => {
+    setLoading(true);
+    try {
+      const response = await axios.get<MessageType>(
+        `/api/chat/${chatRoomId}`,
+        {
+          params: {
+            lastMessageId: lastMessageId,
+          },
+        },
+      );
+
+      const newMessages = response.data.messages;
+      if (newMessages.length === 0) {
+        setHasMore(false);
+      } else {
+        setMessages((prevMessages) => [...prevMessages, ...newMessages]);
+        const newLastMessageId = newMessages[newMessages.length - 1].messageId;
+        setLastMessageId(newLastMessageId);
+      }
+    } catch (error) {
+      console.error("Failed to fetch messages", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 첫 렌더링 시 메시지 가져오기
+  useEffect(() => {
+    fetchMessages(chatRoomId, null); // 첫 메시지 불러올 때 lastMessageId는 null
+  }, [chatRoomId]);
 
   // 채팅방 플레이어 정보 불러오기
   useQuery<PlayerDetailsDto>({
@@ -338,7 +362,10 @@ export function ChatRoom() {
               {currentChatRoomMessages &&
                 currentChatRoomMessages.map((message) => (
                   <div key={message.messageId} className="flex gap-3">
-                    <img src={message.imageUrl} className="size-10 rounded-full" />
+                    <img
+                      src={message.imageUrl}
+                      className="size-10 rounded-full"
+                    />
                     <div className="flex flex-col gap-1">
                       <div className="flex items-center gap-2">
                         <p>{message.username}</p>
@@ -492,73 +519,7 @@ export function ChatRoom() {
               )}
             </div>
             {/*현재 플레이리스트*/}
-            <div className="flex size-full flex-1 flex-col">
-              {chatRoomCurrentPlaylist &&
-                chatRoomCurrentPlaylist.map((track, index) => (
-                  <div
-                    key={index}
-                    className={`flex gap-4 h-fit w-full overflow-x-hidden items-center justify-between border-b px-4 py-2 hover:bg-neutral-100 ${index === chatRoomCurrentPlaylistIndex ? "bg-neutral-100" : ""}`}
-                    onMouseEnter={() => setHoveredTrackIndex(index)}
-                    onMouseLeave={() => setHoveredTrackIndex(null)}
-                  >
-                    <div className="flex w-full gap-4 overflow-hidden text-ellipsis whitespace-nowrap">
-                      <div
-                        className="relative flex size-14 flex-none rounded-sm hover:cursor-pointer"
-                        onClick={() => {
-                          playAtIndex(index);
-                        }}
-                      >
-                        <img
-                          src={track.album.images[0].url}
-                          className="h-full rounded-sm object-cover"
-                          alt="Album Art"
-                        />
-                        {index === chatRoomCurrentPlaylistIndex && (
-                          <div className="absolute inset-0 flex items-center justify-center rounded-sm bg-black bg-opacity-50">
-                            <AudioLines className="text-white" />
-                          </div>
-                        )}
-                      </div>
-                      <div className="flex w-full flex-col gap-0.5">
-                        <p
-                          className="w-fit overflow-hidden text-ellipsis whitespace-nowrap text-neutral-900 hover:cursor-pointer"
-                          onClick={() => {
-                            playAtIndex(index);
-                          }}
-                        >
-                          {track.name}
-                        </p>
-                        <p className="text-sm text-neutral-500">
-                          {track.artists[0].name}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-1 w-10">
-                      {index === hoveredTrackIndex ? (
-                        <DropdownButton
-                          items={[
-                            {
-                              label: "현재 재생목록에서 제거",
-                              action: () => {
-                                removeFromCurrentPlaylist(index);
-                              },
-                              Icon: Trash2,
-                            },
-                          ]}
-                        >
-                          <Button variant={"ghost"} className="p-3 hover:bg-neutral-300 rounded-full">
-                            <EllipsisVertical />
-                          </Button>
-                        </DropdownButton>
-                      ) : (
-                        <p className="text-neutral-500">
-                          {formatDuration(track.duration_ms)}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                ))}
-            </div>
+            <ChatRoomPlaylist currentPlaylistIndex={0} playlist={[]} />
           </div>
         </div>
       )}

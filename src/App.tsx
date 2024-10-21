@@ -9,6 +9,7 @@ import User from "./pages/User";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Callback } from "./pages/Callback";
 import ResetPassword from "./pages/ResetPassword";
+import ChatRoomPage from "./pages/ChatRoomPage";
 
 const queryClient = new QueryClient();
 
@@ -20,7 +21,7 @@ function App() {
           <Route path="/" element={<Main />}>
             <Route path="/search" element={<Search />} />
             <Route path="/chat" element={<Chat />} />
-            <Route path="/chat/:chatRoomId" element={<Chat />} />
+            <Route path="/chat/:chatRoomId" element={<ChatRoomPage />} />
             <Route path="/user/:username" element={<User />} />
             <Route path="/setting" element={<Setting />} />
           </Route>

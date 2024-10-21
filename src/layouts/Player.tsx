@@ -115,7 +115,7 @@ export default function Player() {
       <>
         {currentPlaylist[currentPlaylistIndex] ? (
           <input
-            className="absolute z-10 h-1 w-full cursor-pointer appearance-none bg-neutral-200 accent-[#FF6735] outline-none disabled:accent-gray-200"
+            className="absolute z-50 h-1 w-full cursor-pointer appearance-none bg-neutral-200 accent-[#FF6735] outline-none disabled:accent-gray-200"
             type="range"
             min="0"
             max={duration}
@@ -132,7 +132,7 @@ export default function Player() {
           />
         ) : (
           <input
-            className="absolute z-10 h-1 w-full cursor-pointer appearance-none bg-neutral-200 accent-neutral-500 outline-none disabled:accent-gray-200"
+            className="absolute z-50 h-1 w-full cursor-pointer appearance-none bg-neutral-200 accent-neutral-500 outline-none disabled:accent-gray-200"
             type="range"
             min="0"
             max="100"
@@ -178,7 +178,7 @@ export default function Player() {
               <SkipForward />
             </Button>
           </div>
-          <div className="ml-2 flex items-center gap-1 text-sm text-neutral-400">
+          <div className="ml-2 hidden md:flex items-center gap-1 text-sm text-neutral-400">
             <p>{formatDuration(position)}</p>
             <p>/</p>
             <p>{formatDuration(duration)}</p>

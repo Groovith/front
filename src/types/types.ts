@@ -33,8 +33,6 @@ export interface MessageType {
   username: string;
   createdAt: string;
   type: "CHAT" | "JOIN" | "LEAVE" | "PLAYER";
-  command?: "PLAY" | "TOGGLE";
-  track?: string;
 }
 
 // 스포티파이 관련 타입

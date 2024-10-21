@@ -228,13 +228,13 @@ export const createChatRoom = async (request: CreateChatRoomRequest) => {
 
 // 채팅방 참가
 export const joinChatRoom = async (chatRoomId: number) => {
-  const response = await api.post(`/chatrooms/${chatRoomId}/members`);
+  const response = await api.post(`/chatrooms/${chatRoomId}/enter`);
   return response.data;
 };
 
 // 채팅방 나가기
 export const leaveChatRoom = async (chatRoomId: number) => {
-  const response = await api.put(`/chatrooms/${chatRoomId}/members`);
+  const response = await api.put(`/chatrooms/${chatRoomId}/leave`);
   return response.data;
 };
 
@@ -247,9 +247,13 @@ export const getChatRoomDetails = async (chatRoomId: string) => {
 };
 
 // 채팅방 메시지 불러오기
-export const getChatRoomMessages = async (chatRoomId: string) => {
+export const getChatRoomMessages = async (chatRoomId: string, lastMessageId: number | null) => {
   const response = await api.get<{ messages: MessageType[] }>(
-    `/chat/${chatRoomId}`,
+    `/chat/${chatRoomId}`, {
+      params: {
+        lastMessageId: lastMessageId,
+      },
+    },
   );
   return response.data;
 };

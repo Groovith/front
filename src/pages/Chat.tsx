@@ -1,58 +1,40 @@
-import { EllipsisVertical, LogOut, Plus, SearchIcon, X } from "lucide-react";
-import { Button } from "../components/Button";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createChatRoom, leaveChatRoom } from "../utils/apis/serverAPI";
 import { useState } from "react";
+import ChatHeader from "../components/chat/ChatHeader";
 import { Modal } from "../components/Modal";
-import DropdownButton from "../components/DropdownButton";
-import { useNavigate, useParams } from "react-router-dom";
-import { ChatRoom } from "../components/ChatRoom";
-import { useChatRoomStore } from "../stores/useChatRoomStore";
-import { useStompStore } from "../stores/useStompStore";
-import { MessageType } from "../types/types";
+import { Button } from "../components/Button";
+import { useNavigate } from "react-router-dom";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  createChatRoom,
+  fetchChatRooms,
+  leaveChatRoom,
+} from "../utils/apis/serverAPI";
+import { ChatRoomDetailsType } from "../types/types";
+import Loading from "./Loading";
+import ChatRoomListItem from "../components/chat/ChatRoomListItem";
 
 export default function Chat() {
-  const { chatRoomId } = useParams();
   const queryClient = useQueryClient();
-  const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [chatRoomList, setChatRoomList] = useState<ChatRoomDetailsType[]>([]);
   const [newChatRoomName, setNewChatRoomName] = useState("");
-  const { stompClient } = useStompStore();
-  const { chatRoomList, currentChatRoomId, setNewMessage } = useChatRoomStore();
+  const navigate = useNavigate();
 
-  // 새 채팅방 생성 Mutation
+  const { isLoading } = useQuery<{
+    chatRooms: ChatRoomDetailsType[];
+  }>({
+    queryKey: ["chatRooms"],
+    queryFn: () =>
+      fetchChatRooms().then((data) => {
+        setChatRoomList(data.chatRooms);
+        return data;
+      }),
+  });
+
   const { mutate: createChatRoomMutate } = useMutation({
     mutationFn: createChatRoom,
     onSuccess: (data) => {
-      // 새 채팅방 구독 -> 모듈화 필요
-      const accessToken = localStorage.getItem("accessToken");
-      if (!accessToken) {
-        return;
-      }
-      const headers = { Authorization: `Bearer ${accessToken}` };
-      const callback = function (message: any) {
-        if (message.body) {
-          const chatMessage: MessageType = JSON.parse(message.body);
-          setNewMessage(chatMessage);
-        }
-      };
-
-      stompClient?.subscribe(
-        `/sub/api/chat/${data.chatRoomId}`,
-        callback,
-        headers,
-      );
-
-      queryClient.invalidateQueries({ queryKey: ["chatRooms"] });
-    },
-  });
-
-  // 채팅방 나가기 Mutation
-  const { mutate: leaveChatRoomMutate } = useMutation({
-    mutationFn: leaveChatRoom,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["chatRooms"] });
-      navigate("/chat");
+      navigate(`/chat/${data.chatRoomId}`);
     },
   });
 
@@ -69,16 +51,51 @@ export default function Chat() {
     navigate(`/chat/${chatRoomId}`);
   };
 
+  // 채팅방 나가기 Mutation
+  const { mutate: leaveChatRoomMutate } = useMutation({
+    mutationFn: leaveChatRoom,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["chatRooms"] });
+      navigate("/chat");
+    },
+  });
+
+  if (isLoading) {
+    return <Loading />;
+  }
+
   return (
-    <div className="flex h-full w-full">
-      {/* 채팅방 생성 모달 */}
+    <>
+      <div className="flex size-full justify-center px-10 py-16">
+        <div className="flex size-full max-w-screen-sm flex-col gap-5">
+          <ChatHeader setIsModalOpen={setIsModalOpen} />
+
+          {chatRoomList && chatRoomList.length === 0 && (
+            <div className="flex h-full w-full items-center justify-center">
+              <p className="text-sm text-neutral-400">
+                아직 참여한 채팅이 없어요
+              </p>
+            </div>
+          )}
+
+          {chatRoomList && chatRoomList.length > 0 && (
+            <ul className="flex flex-col">
+              {chatRoomList.map((chatRoom) => (
+                <ChatRoomListItem
+                  chatRoom={chatRoom}
+                  handleChatRoomClick={handleChatRoomClick}
+                  leaveChatRoomMutate={leaveChatRoomMutate}
+                />
+              ))}
+            </ul>
+          )}
+        </div>
+      </div>
+
       {isModalOpen && (
         <Modal onClose={() => setIsModalOpen(false)} closeOnOutsideClick={true}>
           <div className="mb-10 flex items-center justify-between">
             <h1 className="text-2xl font-bold">새 채팅방 생성</h1>
-            <Button variant={"ghost"} onClick={() => setIsModalOpen(false)}>
-              <X />
-            </Button>
           </div>
           <input
             type="text"
@@ -87,103 +104,20 @@ export default function Chat() {
             value={newChatRoomName}
             onChange={(e) => setNewChatRoomName(e.target.value)}
           />
-          <div className="flex justify-end">
+          <div className="flex justify-end gap-4">
             <Button
-              onClick={handleCreateNewChatRoom}
-              className="w-full rounded-full px-5"
+              variant={"ghost"}
+              onClick={() => setIsModalOpen(false)}
+              className="w-full border px-5"
             >
+              취소
+            </Button>
+            <Button onClick={handleCreateNewChatRoom} className="w-full px-5">
               만들기
             </Button>
           </div>
         </Modal>
       )}
-      <div className="flex h-full w-[300px] flex-none flex-col border-r py-10">
-        <div className="mb-10 flex w-full items-center justify-between px-5">
-          <h1 className="pl-1 text-xl font-bold">채팅방</h1>
-          <div className="flex gap-1">
-            <Button variant={"transparent"} className="p-0">
-              <SearchIcon />
-            </Button>
-            <Button
-              variant={"transparent"}
-              className="p-1"
-              onClick={() => {
-                setIsModalOpen(true);
-              }}
-            >
-              <Plus />
-            </Button>
-          </div>
-        </div>
-        {chatRoomList && chatRoomList.length === 0 && (
-          <div className="flex h-full w-full items-center justify-center">
-            <p className="text-sm text-neutral-400">
-              아직 참여한 채팅이 없어요
-            </p>
-          </div>
-        )}
-        {chatRoomList && chatRoomList.length > 0 && (
-          <ul className="flex flex-col">
-            {chatRoomList.map((chatRoom) => (
-              <li
-                key={chatRoom.chatRoomId}
-                className={`group flex w-full items-center justify-between px-5 py-4 text-left hover:bg-neutral-100 ${chatRoom.chatRoomId === currentChatRoomId ? "bg-neutral-50" : ""}`}
-              >
-                <div
-                  className="flex items-center gap-3 hover:cursor-pointer"
-                  onClick={() => {
-                    handleChatRoomClick(chatRoom.chatRoomId);
-                  }}
-                >
-                  <img
-                    src={chatRoom.imageUrl}
-                    className="size-12 rounded-full"
-                  />
-                  <div className="flex flex-col">
-                    <h2 className="text-neutral-900">{chatRoom.name}</h2>
-                  </div>
-                </div>
-                <DropdownButton
-                  items={[
-                    {
-                      label: "채팅방 나가기",
-                      action: () => leaveChatRoomMutate(chatRoom.chatRoomId),
-                      Icon: LogOut,
-                    },
-                  ]}
-                >
-                  <Button
-                    variant={"transparent"}
-                    className="p-0 opacity-0 group-hover:opacity-100"
-                  >
-                    <EllipsisVertical />
-                  </Button>
-                </DropdownButton>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
-      {chatRoomId ? (
-        <ChatRoom />
-      ) : (
-        <div className="flex h-full w-full flex-col items-center justify-center">
-          <h1 className="mb-4 text-4xl font-extrabold leading-none tracking-tight text-neutral-900">
-            내 음악 채팅
-          </h1>
-          <p className="mb-6 text-center text-neutral-400">
-            새로운 채팅을 만들고 친구를 초대해 음악을 같이 들어보세요.
-          </p>
-          <Button
-            className="rounded-full px-5"
-            onClick={() => {
-              setIsModalOpen(true);
-            }}
-          >
-            채팅 만들기 ♫
-          </Button>
-        </div>
-      )}
-    </div>
+    </>
   );
 }

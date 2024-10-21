@@ -51,7 +51,7 @@ export default function Sidebar() {
   };
 
   return (
-    <div className="flex h-full w-[80px] flex-none flex-col items-center justify-start gap-y-10 border-r border-gray-200 pt-8">
+    <div className="hidden h-full w-[80px] flex-none flex-col items-center justify-start gap-y-10 border-r border-gray-200 pt-8 md:flex">
       {/* 로고 버튼 */}
       <div>
         <Button variant={"ghost"}>

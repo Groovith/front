@@ -14,6 +14,8 @@ import { Client } from "@stomp/stompjs";
 import { useStompStore } from "../stores/useStompStore";
 import { useChatRoomStore } from "../stores/useChatRoomStore";
 import CurrentChatRoom from "../components/CurrentChatRoom";
+import { Toaster } from "sonner";
+import BottomNavigation from "../layouts/BottomNavigation";
 
 export default function Main() {
   const navigate = useNavigate();
@@ -111,15 +113,19 @@ export default function Main() {
   }
 
   return (
-    <div className="flex h-screen w-screen flex-col">
-      <div className="flex h-full overflow-hidden">
-        <Sidebar />
-        <div className="relative flex h-full w-full">
-          <CurrentChatRoom />
-          <Outlet />
+    <>
+      <Toaster position="bottom-center" richColors />
+      <div className="flex h-screen w-screen flex-col text-neutral-900">
+        <div className="flex h-full overflow-hidden">
+          <Sidebar />
+          <div className="relative flex h-full w-full">
+            <CurrentChatRoom />
+            <Outlet />
+          </div>
         </div>
+        <Player />
+        <BottomNavigation />
       </div>
-      <Player />
-    </div>
+    </>
   );
 }

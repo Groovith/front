@@ -6,29 +6,26 @@ import {
   X,
 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { Button } from "./Button";
-import DropdownButton from "./DropdownButton";
-import { formatDuration } from "../utils/formatDuration";
-import { Modal } from "./Modal";
+import { Button } from "../Button";
+import DropdownButton from "../DropdownButton";
+import { formatDuration } from "../../utils/formatDuration";
+import { Modal } from "../Modal";
 import getVideoId from "get-video-id";
-import { toast, Toaster } from "sonner";
+import { toast } from "sonner";
+import { usePlayer } from "../../hooks/usePlayer";
 
 // CurrentPlaylist 컴포넌트에 필요한 props 정의
-interface CurrentPlaylistProps {
+interface ChatRoomPlaylistProps {
   playlist: Array<string>; // playlist 데이터 타입을 정의할 수 있습니다.
   currentPlaylistIndex: number;
-  onPlayAtIndex: (index: number) => void;
-  onRemoveFromPlaylist: (index: number) => void;
-  addToCurrentPlaylist: (videoId: string) => void;
 }
 
-export default function CurrentPlaylist({
+export default function ChatRoomPlaylist({
   playlist,
   currentPlaylistIndex,
-  onPlayAtIndex,
-  onRemoveFromPlaylist,
-  addToCurrentPlaylist,
-}: CurrentPlaylistProps) {
+}: ChatRoomPlaylistProps) {
+  const { playAtIndex, removeFromCurrentPlaylist, addToCurrentPlaylist } =
+    usePlayer();
   const [hoveredTrackIndex, setHoveredTrackIndex] = useState<number | null>(
     null,
   );
@@ -49,13 +46,12 @@ export default function CurrentPlaylist({
 
   useEffect(() => {
     if (addTrackModalVisible) {
-      document.getElementById('youtube-url-input')?.focus();
+      document.getElementById("youtube-url-input")?.focus();
     }
   }, [addTrackModalVisible]);
 
   return (
     <div className="flex size-full flex-1 flex-col overflow-y-auto">
-      <Toaster richColors position="bottom-center" />
       {addTrackModalVisible && (
         <Modal
           onClose={() => setAddTrackModalVisible(false)}
@@ -116,7 +112,7 @@ export default function CurrentPlaylist({
             <div className="flex w-full gap-4 overflow-hidden text-ellipsis whitespace-nowrap">
               <div
                 className="relative flex size-14 flex-none rounded-sm hover:cursor-pointer"
-                onClick={() => onPlayAtIndex(index)}
+                onClick={() => playAtIndex(index)}
               >
                 <img
                   src={`https://img.youtube.com/vi/${track}/default.jpg`}
@@ -132,13 +128,11 @@ export default function CurrentPlaylist({
               <div className="flex w-full flex-col gap-0.5 overflow-hidden text-ellipsis whitespace-nowrap">
                 <p
                   className="w-fit overflow-hidden text-ellipsis whitespace-nowrap text-neutral-900 hover:cursor-pointer"
-                  onClick={() => onPlayAtIndex(index)}
+                  onClick={() => playAtIndex(index)}
                 >
                   {track}
                 </p>
-                <p className="text-sm text-neutral-500">
-                  {"Artist"}
-                </p>
+                <p className="text-sm text-neutral-500">{"Artist"}</p>
               </div>
             </div>
             <div className="flex w-10 items-center justify-center gap-1">
@@ -148,7 +142,7 @@ export default function CurrentPlaylist({
                     {
                       label: "현재 재생목록에서 삭제",
                       action: () => {
-                        onRemoveFromPlaylist(index);
+                        removeFromCurrentPlaylist(index);
                       },
                     },
                   ]}
@@ -161,9 +155,7 @@ export default function CurrentPlaylist({
                   </Button>
                 </DropdownButton>
               ) : (
-                <p className="text-neutral-500">
-                  {formatDuration(0)}
-                </p>
+                <p className="text-neutral-500">{formatDuration(0)}</p>
               )}
             </div>
           </div>

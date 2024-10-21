@@ -20,7 +20,7 @@ export function Modal({ children, closeOnOutsideClick = true, onClose }: ModalPr
   };
 
   return (
-    <div className="fixed inset-0 z-20 overflow-y-auto" onClick={handleOutsideClick}>
+    <div className="fixed inset-0 z-20 overflow-y-auto p-10" onClick={handleOutsideClick}>
       <div className="flex min-h-screen items-center justify-center">
         <div className="fixed inset-0 bg-neutral-950/50"></div>
         <div 

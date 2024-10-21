@@ -15,7 +15,7 @@ export const buttonStyles = cva(["transition-colors"], {
       ],
     },
     size: {
-      default: ["rounded-2xl", "p-2.5"],
+      default: ["rounded-full", "p-2.5"],
     },
   },
   defaultVariants: {
