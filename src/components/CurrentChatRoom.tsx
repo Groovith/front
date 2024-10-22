@@ -44,7 +44,7 @@ export default function CurrentChatRoom() {
       <div className="flex size-full max-w-[500px] flex-col">
         <ChatRoomTrackInfo track={undefined} position={0} paused={false} />
         <ChatRoomPlaylist
-          playlist={currentPlaylist} // playlist 전달
+          currentPlaylist={currentPlaylist} // playlist 전달
           currentPlaylistIndex={currentPlaylistIndex} // 현재 재생 중인 인덱스 전달
         />
       </div>

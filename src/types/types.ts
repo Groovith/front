@@ -1,3 +1,5 @@
+import { Track } from "./track.type";
+
 export interface UserDetailsType {
   id: number;
   username: string;
@@ -129,14 +131,14 @@ export type PlayerActionResponseType =
   | "PAUSE"
   | "RESUME"
   | "SEEK"
-  | "UPDATE"
+  | "UPDATE";
 
 export interface PlayerDetailsDto {
   _id: string;
   chatRoomId: number;
   userCount: number;
   currentPlaylistIndex: number;
-  currentPlaylist: SpotifyTrack[];
+  currentPlaylist: Track[];
   paused: boolean;
   repeat: boolean;
   position: number;

@@ -8,8 +8,8 @@ export default function ChatRoomPage() {
   return (
     <div className="flex size-full">
       <ChatRoom chatRoomId={chatRoomId} />
-      <div className="hidden md:flex max-w-[400px] w-full">
-        <ChatRoomPlayer />
+      <div className="hidden w-full max-w-[400px] md:flex">
+        <ChatRoomPlayer currentPlaylist={[]} currentPlaylistIndex={0} />
       </div>
     </div>
   );

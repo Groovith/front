@@ -13,15 +13,16 @@ import { Modal } from "../Modal";
 import getVideoId from "get-video-id";
 import { toast } from "sonner";
 import { usePlayer } from "../../hooks/usePlayer";
+import { Track } from "../../types/track.type";
 
 // CurrentPlaylist 컴포넌트에 필요한 props 정의
 interface ChatRoomPlaylistProps {
-  playlist: Array<string>; // playlist 데이터 타입을 정의할 수 있습니다.
+  currentPlaylist: Track[]; // playlist 데이터 타입을 정의할 수 있습니다.
   currentPlaylistIndex: number;
 }
 
 export default function ChatRoomPlaylist({
-  playlist,
+  currentPlaylist,
   currentPlaylistIndex,
 }: ChatRoomPlaylistProps) {
   const { playAtIndex, removeFromCurrentPlaylist, addToCurrentPlaylist } =
@@ -99,8 +100,8 @@ export default function ChatRoomPlaylist({
           </Button>
         </div>
       </div>
-      {playlist &&
-        playlist.map((track, index) => (
+      {currentPlaylist &&
+        currentPlaylist.map((track, index) => (
           <div
             key={index}
             className={`flex h-[65px] w-full flex-none items-center justify-between border-b px-4 py-2 hover:bg-neutral-100 ${
@@ -130,7 +131,7 @@ export default function ChatRoomPlaylist({
                   className="w-fit overflow-hidden text-ellipsis whitespace-nowrap text-neutral-900 hover:cursor-pointer"
                   onClick={() => playAtIndex(index)}
                 >
-                  {track}
+                  {track.title}
                 </p>
                 <p className="text-sm text-neutral-500">{"Artist"}</p>
               </div>
