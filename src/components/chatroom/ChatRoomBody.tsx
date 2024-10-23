@@ -1,53 +1,153 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { MessageType } from "../../types/types";
-import { formatDateTime } from "../../utils/formatDateTime";
 import ChatRoomTrackInfoMini from "./ChatRoomTrackInfoMini";
 import ChatRoomPlaylistOverlay from "./ChatRoomPlaylistOverlay";
+import { useStompStore } from "../../stores/useStompStore";
+import ChatMessageItem from "./ChatMessageItem";
+import { useInView } from "react-intersection-observer";
+import { getChatRoomMessages } from "../../utils/apis/serverAPI";
+import { Button } from "../Button";
+import { ChevronDown } from "lucide-react";
+import { toast } from "sonner";
 
 interface ChatRoomBodyProps {
-  chatRoomMessages: MessageType[];
+  chatRoomId: number | null | undefined;
 }
 
-export default function ChatRoomBody({ chatRoomMessages }: ChatRoomBodyProps) {
+export default function ChatRoomBody({ chatRoomId }: ChatRoomBodyProps) {
+  const [messages, setMessages] = useState<MessageType[]>([]);
+  const [lastMessageId, setLastMessageId] = useState<number | null>(null);
+  const [hasMoreMessage, setHasMoreMessage] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [showPlaylist, setShowPlaylist] = useState(false); // 재생목록 표시 여부 상태
+  const [newMessageAlert, setNewMessageAlert] = useState(false);
   const togglePlaylist = () => setShowPlaylist(!showPlaylist); // 토글 함수
+  const { stompClient } = useStompStore();
   const chatContainerRef = useRef<HTMLDivElement>(null);
+  const { ref: topRef, inView: topInView } = useInView();
+  const { ref: bottomRef, inView: bottomInView } = useInView();
+  const messageContainerRef = useRef<HTMLUListElement>(null);
+
+  useEffect(() => {
+    if (chatRoomId && topInView && hasMoreMessage && !loading) {
+      getMoreMessages(chatRoomId, lastMessageId);
+    }
+  }, [chatRoomId, topInView, hasMoreMessage]);
+
+  const getMoreMessages = async (
+    chatRoomId: number,
+    lastMessageId: number | null,
+  ) => {
+    setLoading(true);
+    try {
+      const response = await getChatRoomMessages(chatRoomId, lastMessageId);
+
+      if (response.length < 20) {
+        setHasMoreMessage(false);
+      } else if (response.length < 1) {
+        return;
+      }
+
+      setLastMessageId(response[response.length - 1].messageId);
+      setMessages((prevMessages) => [...response.reverse(), ...prevMessages]);
+    } catch (e) {
+      toast.error("메시지를 불러오는 중 문제가 발생하였습니다.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 채팅방 메시지 구독하기
+  useEffect(() => {
+    const accessToken = localStorage.getItem("accessToken");
+    if (!stompClient || !chatRoomId || !accessToken) return;
+
+    const headers = { Authorization: `Bearer ${accessToken}` };
+
+    const callbackMessages = function (message: any) {
+      if (message.body) {
+        const chatMessage: MessageType = JSON.parse(message.body);
+        setMessages((prevMessages) => [...prevMessages, chatMessage]);
+        setNewMessageAlert(true);
+      }
+    };
+
+    stompClient.subscribe(
+      `/sub/api/chat/${chatRoomId}`,
+      callbackMessages,
+      headers,
+    );
+
+    // 컴포넌트 언마운트 시 구독 해제
+    return () => {
+      stompClient.unsubscribe(`/sub/api/chat/${chatRoomId}`);
+    };
+  }, [stompClient, chatRoomId]);
+
+  // 새 메시지 수신 시 스크롤 내리기 (화면 아래로 내린 상태에서만)
+  useEffect(() => {
+    if (messageContainerRef.current && bottomInView) {
+      scrollToBottom();
+    }
+  }, [messages, bottomInView]);
+
+  const scrollToBottom = () => {
+    if (messageContainerRef.current) {
+      messageContainerRef.current.scrollTop =
+        messageContainerRef.current.scrollHeight;
+    }
+  };
+
+  // 새 메시지 알림 끄기
+  useEffect(() => {
+    if (bottomInView) setNewMessageAlert(false);
+  }, [newMessageAlert, bottomInView]);
+
   return (
     <div
-      className="relative flex h-full flex-col gap-5 overflow-auto bg-neutral-100"
+      className="relative flex h-full flex-col gap-5 overflow-hidden bg-neutral-100"
       ref={chatContainerRef}
     >
       <ChatRoomTrackInfoMini
-          track={{
-            videoId: "a",
-            imageUrl:
-              "https://lh3.googleusercontent.com/fzTTy3sCa32fBVqafRTKZn_z70NXVxC0jj05kIMgHIOyN4d0I5AudOYuTE4ov7cLiwN5wOpOS8OwZjBuuQ=w544-h544-l90-rj",
-            title: "APT.",
-            duration: 0,
-            artist: "Rose",
-          }}
-          togglePlaylist={togglePlaylist}
-        />
-      <ul className="flex flex-col gap-4 pt-24 md:py-5 px-5">
-        {chatRoomMessages &&
-          chatRoomMessages.map((message) => (
-            <li key={message.messageId} className="flex gap-3">
-              <img src={message.imageUrl} className="size-10 rounded-full" />
-              <div className="flex flex-col gap-1">
-                <div className="flex items-center gap-2">
-                  <p>{message.username}</p>
-                  <p className="text-sm text-neutral-400">
-                    {formatDateTime(message.createdAt)}
-                  </p>
-                </div>
-                <p className="flex w-fit justify-start rounded-lg bg-white px-3 py-2 shadow-lg">
-                  {message.content}
-                </p>
-              </div>
-            </li>
-          ))}
-      </ul>
-      <ChatRoomPlaylistOverlay show={showPlaylist} togglePlaylist={togglePlaylist} height={chatContainerRef.current?.clientHeight} />
+        track={{
+          videoId: "a",
+          imageUrl:
+            "https://lh3.googleusercontent.com/fzTTy3sCa32fBVqafRTKZn_z70NXVxC0jj05kIMgHIOyN4d0I5AudOYuTE4ov7cLiwN5wOpOS8OwZjBuuQ=w544-h544-l90-rj",
+          title: "APT.",
+          duration: 0,
+          artist: "Rose",
+        }}
+        togglePlaylist={togglePlaylist}
+      />
+      {chatRoomId && (
+        <>
+          <ul
+            ref={messageContainerRef}
+            className="flex flex-col gap-4 overflow-y-scroll px-5 pb-5 pt-24 md:py-5"
+          >
+            <div ref={topRef}></div>
+            {messages.map((message) => (
+              <ChatMessageItem message={message} key={message.messageId} />
+            ))}
+            <div ref={bottomRef}></div>
+          </ul>
+        </>
+      )}
+      {newMessageAlert && (
+        <div className="absolute bottom-2 flex w-full items-center justify-center">
+          <Button
+            className="bg-white text-neutral-900 shadow-xl"
+            onClick={scrollToBottom}
+          >
+            <ChevronDown />
+          </Button>
+        </div>
+      )}
+      <ChatRoomPlaylistOverlay
+        show={showPlaylist}
+        togglePlaylist={togglePlaylist}
+        height={chatContainerRef.current?.clientHeight}
+      />
     </div>
   );
 }

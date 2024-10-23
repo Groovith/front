@@ -4,7 +4,7 @@ import { Button } from "../Button";
 import { useStompStore } from "../../stores/useStompStore";
 
 interface ChatRoomInputProps {
-  chatRoomId: string | undefined;
+  chatRoomId: number | null | undefined;
 }
 
 export default function ChatRoomInput({ chatRoomId }: ChatRoomInputProps) {

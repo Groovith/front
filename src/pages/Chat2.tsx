@@ -9,7 +9,7 @@ import { useChatRoomStore } from "../stores/useChatRoomStore";
 import { useStompStore } from "../stores/useStompStore";
 import { MessageType } from "../types/types";
 import ChatRoomListItem from "../components/chat/ChatRoomListItem";
-import ChatRoom from "../components/chatroom/ChatRoom";
+import ChatRoom from "../components/chatroom/ChatRoomMain";
 
 export default function Chat() {
   const { chatRoomId } = useParams();

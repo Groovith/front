@@ -134,7 +134,7 @@ export type PlayerActionResponseType =
   | "UPDATE";
 
 export interface PlayerDetailsDto {
-  _id: string;
+  id: string;
   chatRoomId: number;
   userCount: number;
   currentPlaylistIndex: number;
@@ -143,7 +143,6 @@ export interface PlayerDetailsDto {
   repeat: boolean;
   position: number;
   duration: number;
-  action: PlayerActionRequestType;
 }
 
 export interface PlayerRequestDto {
@@ -156,8 +155,8 @@ export interface PlayerRequestDto {
 
 export interface PlayerResponseDto {
   action: PlayerActionResponseType;
-  track?: SpotifyTrack;
+  track?: Track;
   position?: number;
-  currentPlaylist?: SpotifyTrack[];
+  currentPlaylist?: Track[];
   index?: number;
 }

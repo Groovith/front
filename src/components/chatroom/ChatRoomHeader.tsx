@@ -7,7 +7,7 @@ import { toast, Toaster } from "sonner";
 import { useNavigate } from "react-router-dom";
 
 interface ChatRoomHeaderProps {
-  chatRoomDetails: ChatRoomDetailsType;
+  chatRoomDetails: ChatRoomDetailsType | null;
 }
 
 export default function ChatRoomHeader({
@@ -25,35 +25,47 @@ export default function ChatRoomHeader({
 
   return (
     <div className="flex h-[80px] items-center justify-between border-b px-2">
-      <div className="flex items-center">
-        <Button variant={"ghost"} className="p-2 mr-2" onClick={() => navigate("/chat")}>
-          <ArrowLeft />
-        </Button>
-        <img
-          src={chatRoomDetails.imageUrl}
-          className="mr-5 size-12 rounded-full"
-        ></img>
-        <h1>{chatRoomDetails?.name}</h1>
-      </div>
-      <div className="flex">
-        <Button variant={"ghost"}>
-          <UserPlus />
-        </Button>
-        <DropdownButton
-          items={[
-            {
-              label: "채팅방 나가기",
-              action: () => {
-                handleLeaveChatRoom(chatRoomDetails.chatRoomId);
-              },
-            },
-          ]}
-        >
-          <Button variant={"ghost"}>
-            <Menu />
-          </Button>
-        </DropdownButton>
-      </div>
+      {chatRoomDetails ? (
+        <>
+          <div className="flex items-center">
+            <Button
+              variant={"ghost"}
+              className="mr-2 p-2"
+              onClick={() => navigate("/chat")}
+            >
+              <ArrowLeft />
+            </Button>
+            <img
+              src={chatRoomDetails.imageUrl}
+              className="mr-5 size-12 rounded-full"
+            ></img>
+            <h1>{chatRoomDetails?.name}</h1>
+          </div>
+          <div className="flex">
+            <Button variant={"ghost"}>
+              <UserPlus />
+            </Button>
+            <DropdownButton
+              items={[
+                {
+                  label: "채팅방 나가기",
+                  action: () => {
+                    handleLeaveChatRoom(chatRoomDetails.chatRoomId);
+                  },
+                },
+              ]}
+            >
+              <Button variant={"ghost"}>
+                <Menu />
+              </Button>
+            </DropdownButton>
+          </div>
+        </>
+      ) : (
+        <span className="flex h-full w-full items-center justify-start text-sm text-neutral-400 px-5">
+          참여 중인 채팅방이 없습니다.
+        </span>
+      )}
     </div>
   );
 }

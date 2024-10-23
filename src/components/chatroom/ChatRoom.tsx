@@ -1,24 +1,34 @@
-import ChatRoomHeader from "./ChatRoomHeader";
+import ChatRoomMain from "./ChatRoomMain";
+import ChatRoomPlayer from "./ChatRoomPlayer";
 import { useEffect, useState } from "react";
-import { ChatRoomDetailsType, MessageType } from "../../types/types";
-import { getChatRoomDetails } from "../../utils/apis/serverAPI";
-import { toast } from "sonner";
-import ChatRoomBody from "./ChatRoomBody";
-import ChatRoomInput from "./ChatRoomInput";
+import {
+  ChatRoomDetailsType,
+  PlayerDetailsDto,
+} from "../../types/types";
 import { useStompStore } from "../../stores/useStompStore";
+import { getChatRoomDetails, getPlayer } from "../../utils/apis/serverAPI";
+import { toast } from "sonner";
 
 interface ChatRoomProps {
-  chatRoomId: string | undefined;
+  chatRoomId: number | null | undefined;
 }
 
+// chatRoomId 여부에 따라 채팅방 | 로컬 여부 판단
+// 로컬의 경우 null의 chatRoomDetails와 playerDetails 전달
+// chatRoomId로 데이터 불러오고 STOMP Client 연결 (채팅 + 플레이어) -> chatRoomId가 바뀔 때마다
+
 export default function ChatRoom({ chatRoomId }: ChatRoomProps) {
-  const { stompClient } = useStompStore();
   const [chatRoomDetails, setChatRoomDetails] =
-    useState<ChatRoomDetailsType | null>();
-  const [chatRoomMessages, setChatRoomMessages] = useState<MessageType[]>([]);
+    useState<ChatRoomDetailsType | null>(null);
+  const [playerDetails, setPlayerDetails] = useState<PlayerDetailsDto | null>(
+    null,
+  );
+  const { stompClient } = useStompStore();
 
   useEffect(() => {
+    if (!chatRoomId) return;
     handleGetChatRoomDetails();
+    handleGetPlayerDetails();
   }, [chatRoomId]);
 
   // 채팅방 정보 조회
@@ -34,39 +44,51 @@ export default function ChatRoom({ chatRoomId }: ChatRoomProps) {
     }
   };
 
-  // 채팅방 구독하기
+  // 채팅방 플레이어 정보 조회
+  const handleGetPlayerDetails = async () => {
+    if (!chatRoomId) return;
+
+    try {
+      const response = await getPlayer(chatRoomId);
+      setPlayerDetails(response);
+    } catch (e) {
+      console.error("플레이어 정보 조회 중 에러: ", e);
+      toast.error("플레이어 정보를 불러오는 중 문제가 발생하였습니다.");
+    }
+  };
+
+  // 채팅방 플레이어 구독하기
   useEffect(() => {
     const accessToken = localStorage.getItem("accessToken");
     if (!stompClient || !chatRoomId || !accessToken) return;
 
     const headers = { Authorization: `Bearer ${accessToken}` };
-    const callback = function (message: any) {
+
+    const callbackPlayer = function (message: any) {
       if (message.body) {
-        const chatMessage: MessageType = JSON.parse(message.body);
-        setChatRoomMessages((prevMessages) => [...prevMessages, chatMessage]);
+        const playerMessage: PlayerDetailsDto = JSON.parse(message.body);
+        setPlayerDetails(playerMessage);
       }
     };
-    stompClient.subscribe(`/sub/api/chat/${chatRoomId}`, callback, headers);
+
+    stompClient.subscribe(
+      `/sub/api/chatrooms/${chatRoomId}/player`,
+      callbackPlayer,
+      headers,
+    );
 
     // 컴포넌트 언마운트 시 구독 해제
     return () => {
-      stompClient.unsubscribe(`/sub/api/chat/${chatRoomId}`);
+      stompClient.unsubscribe(`/sub/api/chatrooms/${chatRoomId}/player`);
     };
   }, [stompClient, chatRoomId]);
 
-  if (!chatRoomDetails) {
-    return (
-      <div className="flex h-full w-full items-center justify-center text-sm text-neutral-400">
-        잘못된 접근입니다.
-      </div>
-    );
-  }
-
   return (
-    <div className="flex size-full flex-col border-r">
-      <ChatRoomHeader chatRoomDetails={chatRoomDetails} />
-      <ChatRoomBody chatRoomMessages={chatRoomMessages} />
-      <ChatRoomInput chatRoomId={chatRoomId} />
+    <div className="flex size-full">
+      <ChatRoomMain chatRoomId={chatRoomId} chatRoomDetails={chatRoomDetails} />
+      <div className="hidden w-full max-w-[400px] md:flex">
+        <ChatRoomPlayer playerDetails={playerDetails} />
+      </div>
     </div>
   );
 }

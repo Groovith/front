@@ -82,6 +82,7 @@ export default function Chat() {
             <ul className="flex flex-col">
               {chatRoomList.map((chatRoom) => (
                 <ChatRoomListItem
+                  key={chatRoom.chatRoomId}
                   chatRoom={chatRoom}
                   handleChatRoomClick={handleChatRoomClick}
                   leaveChatRoomMutate={leaveChatRoomMutate}

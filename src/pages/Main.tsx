@@ -13,7 +13,7 @@ import {
 import { Client } from "@stomp/stompjs";
 import { useStompStore } from "../stores/useStompStore";
 import { useChatRoomStore } from "../stores/useChatRoomStore";
-import CurrentChatRoom from "../components/CurrentChatRoom";
+import CurrentChatRoom from "../layouts/CurrentChatRoom";
 import { Toaster } from "sonner";
 import BottomNavigation from "../layouts/BottomNavigation";
 

@@ -8,6 +8,7 @@ import {
   UserDetailsType,
 } from "../../types/types";
 import ResponseDto from "./response.dto";
+import { useInfiniteQuery } from "@tanstack/react-query";
 
 /**
  * Axios 설정
@@ -96,28 +97,43 @@ interface SignupRequest {
 }
 
 // 이메일 중복 체크
-export const checkEmail = async (request: {email:string}) => {
-  const response = await axios.post<ResponseDto>(serverURL + "/auth/check-email", request);
+export const checkEmail = async (request: { email: string }) => {
+  const response = await axios.post<ResponseDto>(
+    serverURL + "/auth/check-email",
+    request,
+  );
   return response.data;
-}
+};
 
 // 이메일 인증번호 요청
-export const requestEmailCertification = async (request: {email: string}) => {
-  const response = await axios.post<ResponseDto>(serverURL + "/auth/email-certification", request);
+export const requestEmailCertification = async (request: { email: string }) => {
+  const response = await axios.post<ResponseDto>(
+    serverURL + "/auth/email-certification",
+    request,
+  );
   return response.data;
-}
+};
 
 // 이메일 인증번호 확인
-export const checkEmailCertification = async (request: {email: string, certificationNumber: string}) => {
-  const response = await axios.post<ResponseDto>(serverURL + "/auth/check-certification", request);
+export const checkEmailCertification = async (request: {
+  email: string;
+  certificationNumber: string;
+}) => {
+  const response = await axios.post<ResponseDto>(
+    serverURL + "/auth/check-certification",
+    request,
+  );
   return response.data;
-}
+};
 
 // 유저네임 중복 확인
-export const checkUsername = async (request: {username: string}) => {
-  const response = await axios.post<ResponseDto>(serverURL + "/auth/check-username", request);
+export const checkUsername = async (request: { username: string }) => {
+  const response = await axios.post<ResponseDto>(
+    serverURL + "/auth/check-username",
+    request,
+  );
   return response.data;
-}
+};
 
 // 회원가입
 export const signup = async (request: SignupRequest) => {
@@ -222,7 +238,10 @@ interface CreateChatRoomRequest {
 
 // 채팅방 생성
 export const createChatRoom = async (request: CreateChatRoomRequest) => {
-  const response = await api.post<{ chatRoomId: number }>("/chatrooms", request);
+  const response = await api.post<{ chatRoomId: number }>(
+    "/chatrooms",
+    request,
+  );
   return response.data;
 };
 
@@ -239,7 +258,7 @@ export const leaveChatRoom = async (chatRoomId: number) => {
 };
 
 // 채팅방 아이디로 채팅방 상세 정보 조회
-export const getChatRoomDetails = async (chatRoomId: string) => {
+export const getChatRoomDetails = async (chatRoomId: number) => {
   const response = await api.get<ChatRoomDetailsType>(
     `/chatrooms/${chatRoomId}`,
   );
@@ -247,21 +266,42 @@ export const getChatRoomDetails = async (chatRoomId: string) => {
 };
 
 // 채팅방 메시지 불러오기
-export const getChatRoomMessages = async (chatRoomId: string, lastMessageId: number | null) => {
+export const getChatRoomMessages = async (
+  chatRoomId: number,
+  lastMessageId?: number | null,
+) => {
   const response = await api.get<{ messages: MessageType[] }>(
-    `/chat/${chatRoomId}`, {
+    `/chat/${chatRoomId}`,
+    {
       params: {
         lastMessageId: lastMessageId,
       },
     },
   );
-  return response.data;
+  return response.data.messages;
 };
+
+// export const useGetChatRoomMessage = (chatRoomId: number) => {
+//   return useInfiniteQuery({
+//     queryKey: ["chatRoomMessages", chatRoomId],
+//     queryFn: ({ pageParam = null }) => {
+//       return getChatRoomMessages(chatRoomId, pageParam);
+//     },
+//     getNextPageParam: (last: MessageType[]) => {
+//       if (last.length >= 20) {
+//         return last[last.length - 1].messageId;
+//       }
+//       return undefined;
+//     },
+//     initialPageParam: null,
+//     refetchOnWindowFocus: false,
+//   });
+// };
 
 // ------------------ 같이 듣기 ----------------------
 
 // 채팅방 플레이어 정보 불러오기
-export const getPlayer = async (chatRoomId: string) => {
+export const getPlayer = async (chatRoomId: number) => {
   const response = await api.get<PlayerDetailsDto>(
     `/chatrooms/${chatRoomId}/player`,
   );
@@ -270,7 +310,9 @@ export const getPlayer = async (chatRoomId: string) => {
 
 // 같이 듣기 참가
 export const joinPlayer = async (chatRoomId: string) => {
-  const response = await api.patch<PlayerDetailsDto>(`/chatrooms/${chatRoomId}/player/join`);
+  const response = await api.patch<PlayerDetailsDto>(
+    `/chatrooms/${chatRoomId}/player/join`,
+  );
   return response.data;
 };
 
@@ -283,7 +325,7 @@ export const leavePlayer = async (chatRoomId: string) => {
 // 토글 재생
 export const requestTogglePlay = async (
   chatRoomId: string | number,
-  playerRequestDto: PlayerRequestDto
+  playerRequestDto: PlayerRequestDto,
 ) => {
   const response: AxiosResponse<void> = await api.patch(
     `/chatrooms/${chatRoomId}/player/toggle`,

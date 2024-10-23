@@ -2,9 +2,9 @@ import { useChatRoomStore } from "../stores/useChatRoomStore";
 import { usePlayerStore } from "../stores/usePlayerStore";
 import { usePlayer } from "../hooks/usePlayer";
 import { useState } from "react";
-import ChatRoomPlaylist from "./chatroom/ChatRoomPlaylist";
-import ChatRoom from "./chatroom/ChatRoom";
-import ChatRoomTrackInfo from "./chatroom/ChatRoomTrackInfo";
+import ChatRoomPlaylist from "../components/chatroom/ChatRoomPlaylist";
+import ChatRoom from "../components/chatroom/ChatRoomMain";
+import ChatRoomTrackInfo from "../components/chatroom/ChatRoomTrackInfo";
 
 export default function CurrentChatRoom() {
   const { isCurrentChatRoomOpen } = useChatRoomStore();
