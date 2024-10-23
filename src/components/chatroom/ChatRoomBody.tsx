@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { MessageType } from "../../types/types";
+import { MessageType, PlayerDetailsDto } from "../../types/types";
 import ChatRoomTrackInfoMini from "./ChatRoomTrackInfoMini";
 import ChatRoomPlaylistOverlay from "./ChatRoomPlaylistOverlay";
 import { useStompStore } from "../../stores/useStompStore";
@@ -9,12 +9,18 @@ import { getChatRoomMessages } from "../../utils/apis/serverAPI";
 import { Button } from "../Button";
 import { ChevronDown } from "lucide-react";
 import { toast } from "sonner";
+import { usePlayerStore } from "../../stores/usePlayerStore";
 
 interface ChatRoomBodyProps {
   chatRoomId: number | null | undefined;
+  playerDetails: PlayerDetailsDto | null;
 }
 
-export default function ChatRoomBody({ chatRoomId }: ChatRoomBodyProps) {
+export default function ChatRoomBody({
+  chatRoomId,
+  playerDetails,
+}: ChatRoomBodyProps) {
+  const { currentPlaylist, currentPlaylistIndex } = usePlayerStore();
   const [messages, setMessages] = useState<MessageType[]>([]);
   const [lastMessageId, setLastMessageId] = useState<number | null>(null);
   const [hasMoreMessage, setHasMoreMessage] = useState(true);
@@ -109,14 +115,11 @@ export default function ChatRoomBody({ chatRoomId }: ChatRoomBodyProps) {
       ref={chatContainerRef}
     >
       <ChatRoomTrackInfoMini
-        track={{
-          videoId: "a",
-          imageUrl:
-            "https://lh3.googleusercontent.com/fzTTy3sCa32fBVqafRTKZn_z70NXVxC0jj05kIMgHIOyN4d0I5AudOYuTE4ov7cLiwN5wOpOS8OwZjBuuQ=w544-h544-l90-rj",
-          title: "APT.",
-          duration: 0,
-          artist: "Rose",
-        }}
+        track={
+          playerDetails
+            ? playerDetails.currentPlaylist[playerDetails.currentPlaylistIndex]
+            : currentPlaylist[currentPlaylistIndex]
+        }
         togglePlaylist={togglePlaylist}
       />
       {chatRoomId && (
@@ -144,6 +147,8 @@ export default function ChatRoomBody({ chatRoomId }: ChatRoomBodyProps) {
         </div>
       )}
       <ChatRoomPlaylistOverlay
+        currentPlaylist={playerDetails ? playerDetails.currentPlaylist : currentPlaylist}
+        currentPlaylistIndex={playerDetails? playerDetails.currentPlaylistIndex : currentPlaylistIndex}
         show={showPlaylist}
         togglePlaylist={togglePlaylist}
         height={chatContainerRef.current?.clientHeight}

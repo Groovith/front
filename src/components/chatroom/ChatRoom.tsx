@@ -85,7 +85,7 @@ export default function ChatRoom({ chatRoomId }: ChatRoomProps) {
 
   return (
     <div className="flex size-full">
-      <ChatRoomMain chatRoomId={chatRoomId} chatRoomDetails={chatRoomDetails} />
+      <ChatRoomMain chatRoomId={chatRoomId} chatRoomDetails={chatRoomDetails} playerDetails={playerDetails} />
       <div className="hidden w-full max-w-[400px] md:flex">
         <ChatRoomPlayer playerDetails={playerDetails} />
       </div>

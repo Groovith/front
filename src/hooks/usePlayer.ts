@@ -1,4 +1,6 @@
+import { toast } from "sonner";
 import { usePlayerStore } from "../stores/usePlayerStore";
+import { getTrackInfo } from "../utils/apis/serverAPI";
 
 export function usePlayer() {
   const {
@@ -77,9 +79,14 @@ export function usePlayer() {
     }
   };
 
-  const addToCurrentPlaylist = (videoId: string): void => {
-    const updatedCurrentPlaylist = [...currentPlaylist, videoId];
-    setCurrentPlaylist(updatedCurrentPlaylist);
+  const addToCurrentPlaylist = async (videoId: string) => {
+    try {
+      const response = await getTrackInfo(videoId);
+      const updatedCurrentPlaylist = [...currentPlaylist, response];
+      setCurrentPlaylist(updatedCurrentPlaylist);
+    } catch (e) {
+      toast.error("음악 추가 중 문제가 발생하였습니다.")
+    }
     return;
   };
 

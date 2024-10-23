@@ -9,6 +9,7 @@ import {
 } from "../../types/types";
 import ResponseDto from "./response.dto";
 import { useInfiniteQuery } from "@tanstack/react-query";
+import { Track } from "../../types/track.type";
 
 /**
  * Axios 설정
@@ -407,5 +408,15 @@ export const requestRemoveFromCurrentPlaylist = async (
   const response: AxiosResponse<void> = await api.delete(
     `/chatrooms/${chatRoomId}/player/current-playlist/${index}`,
   );
+  return response.data;
+};
+
+// 음악 정보 불러오기
+export const getTrackInfo = async (videoId: string) => {
+  const response: AxiosResponse<Track> = await api.get<Track>("/video", {
+    params: {
+      videoId, // 쿼리 파라미터로 전달
+    },
+  });
   return response.data;
 };

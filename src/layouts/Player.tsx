@@ -15,6 +15,7 @@ import { MoonLoader } from "react-spinners";
 import { usePlayerStore } from "../stores/usePlayerStore";
 import { usePlayer } from "../hooks/usePlayer";
 import CurrentTrackInfo from "../components/player/CurrentTrackInfo";
+import { formatDurationSec } from "../utils/formatDurationSec";
 
 export default function Player() {
   const {
@@ -57,7 +58,7 @@ export default function Player() {
     playerRef.current = event;
     setPlayer(playerRef);
     console.log("Player Ready: ", playerRef.current);
-    setDuration(player?.current?.target.getDuration());
+    setDuration(player!.current!.target.getDuration());
   };
 
   // 플레이어 상태 변화 시 이벤트
@@ -85,6 +86,7 @@ export default function Player() {
         nextTrack();
         break;
     }
+    setDuration(player!.current!.target.getDuration());
     setPosition(player!.current!.target.getCurrentTime());
   };
 
@@ -110,12 +112,16 @@ export default function Player() {
     };
   }, [paused, loading, position]);
 
+  useEffect(() => {
+    console.log(currentPlaylistIndex)
+  }, [currentPlaylistIndex])
+
   return (
     <div className="flex h-[80px] w-full justify-between border-t">
       <>
         {currentPlaylist[currentPlaylistIndex] ? (
           <input
-            className="absolute z-50 h-1 w-full cursor-pointer appearance-none bg-neutral-200 accent-[#FF6735] outline-none disabled:accent-gray-200"
+            className="absolute z-40 h-1 w-full cursor-pointer appearance-none bg-neutral-200 accent-[#FF6735] outline-none disabled:accent-gray-200"
             type="range"
             min="0"
             max={duration}
@@ -132,7 +138,7 @@ export default function Player() {
           />
         ) : (
           <input
-            className="absolute z-50 h-1 w-full cursor-pointer appearance-none bg-neutral-200 accent-neutral-500 outline-none disabled:accent-gray-200"
+            className="absolute z-40 h-1 w-full cursor-pointer appearance-none bg-neutral-200 accent-neutral-500 outline-none disabled:accent-gray-200"
             type="range"
             min="0"
             max="100"
@@ -178,15 +184,27 @@ export default function Player() {
               <SkipForward />
             </Button>
           </div>
-          <div className="ml-2 hidden md:flex items-center gap-1 text-sm text-neutral-400">
-            <p>{formatDuration(position)}</p>
-            <p>/</p>
-            <p>{formatDuration(duration)}</p>
-          </div>
-        </div>
-        <div className="flex items-center">
           {currentPlaylist[currentPlaylistIndex] ? (
-            <CurrentTrackInfo imgUrl={`https://img.youtube.com/vi/${currentPlaylist[currentPlaylistIndex]}/default.jpg`} trackName="곡 이름" artistName="아티스트" />
+            <div className="ml-2 hidden items-center gap-1 text-sm text-neutral-400 md:flex">
+              <p>{formatDurationSec(position)}</p>
+              <p>/</p>
+              <p>{formatDurationSec(duration)}</p>
+            </div>
+          ) : (
+            <div className="ml-2 hidden items-center gap-1 text-sm text-neutral-400 md:flex">
+              <p>{formatDuration(0)}</p>
+              <p>/</p>
+              <p>{formatDuration(0)}</p>
+            </div>
+          )}
+        </div>
+        <div className="flex items-center truncate">
+          {currentPlaylist[currentPlaylistIndex] ? (
+            <CurrentTrackInfo
+              imgUrl={currentPlaylist[currentPlaylistIndex].imageUrl}
+              trackName={currentPlaylist[currentPlaylistIndex].title}
+              artistName={currentPlaylist[currentPlaylistIndex].artist}
+            />
           ) : (
             <p className="text-sm text-neutral-400">재생 중인 곡이 없습니다</p>
           )}
@@ -203,13 +221,15 @@ export default function Player() {
           )}
         </div>
       </>
-      <YouTube
-        videoId={currentPlaylist[currentPlaylistIndex]}
-        opts={opts}
-        onReady={onPlayerReady}
-        onStateChange={onPlayerStateChange}
-        className={"absolute"}
-      />
+      {currentPlaylist[currentPlaylistIndex] && (
+        <YouTube
+          videoId={currentPlaylist[currentPlaylistIndex].videoId}
+          opts={opts}
+          onReady={onPlayerReady}
+          onStateChange={onPlayerStateChange}
+          className={"absolute"}
+        />
+      )}
     </div>
   );
 }

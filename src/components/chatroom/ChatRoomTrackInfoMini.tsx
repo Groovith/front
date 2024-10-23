@@ -34,7 +34,7 @@ export default function ChatRoomTrackInfoMini({
           </div>
         ) : (
           <h1 className="ml-2 flex h-16 items-center truncate text-white">
-            곡이 없습니다.
+            재생 중인 곡이 없습니다.
           </h1>
         )}
 

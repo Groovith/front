@@ -21,6 +21,7 @@ export default function ChatRoomTrackInfo({
   position,
   paused,
 }: ChatRoomTrackInfoProps) {
+  
   if (!track) {
     return (
       <div className="flex size-full flex-1 items-center justify-center border-b text-sm text-neutral-400">
@@ -30,11 +31,11 @@ export default function ChatRoomTrackInfo({
   }
 
   return (
-    <div className="flex size-full flex-1 flex-col items-center border-b p-5">
-      <div className="flex max-w-[300px] flex-none flex-col gap-4 overflow-hidden text-ellipsis whitespace-nowrap">
-        <img src={track.imageUrl} className="w-full rounded-lg" />
+    <div className="flex size-full flex-1 flex-col items-center justify-center border-b p-5">
+      <div className="flex max-w-[300px] flex-none flex-col gap-5 truncate">
+        <img src={track.imageUrl} className="w-full rounded-lg object-cover" />
         <div className="flex flex-col gap-1">
-          <p className="overflow-hidden text-ellipsis text-2xl font-semibold text-neutral-900">
+          <p className="truncate text-2xl font-semibold text-neutral-900">
             {track.title}
           </p>
           <p className="text-lg text-neutral-500">{track.artist}</p>

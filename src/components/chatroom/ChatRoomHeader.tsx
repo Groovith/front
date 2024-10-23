@@ -3,7 +3,7 @@ import { ChatRoomDetailsType } from "../../types/types";
 import { Button } from "../Button";
 import DropdownButton from "../DropdownButton";
 import { leaveChatRoom } from "../../utils/apis/serverAPI";
-import { toast, Toaster } from "sonner";
+import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 
 interface ChatRoomHeaderProps {
