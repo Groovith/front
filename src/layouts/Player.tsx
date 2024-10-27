@@ -26,11 +26,16 @@ export default function Player() {
     position,
     loading,
     paused,
+    playerResponseMessage,
+    playerDetails,
     setPaused,
     setPlayer,
     setDuration,
     setPosition,
     setLoading,
+    setCurrentPlaylist,
+    setCurrentPlaylistIndex,
+    setPlayerDetails,
   } = usePlayerStore();
   const { resumePlayer, pausePlayer, seek, nextTrack, previousTrack } =
     usePlayer();
@@ -58,8 +63,24 @@ export default function Player() {
     playerRef.current = event;
     setPlayer(playerRef);
     console.log("Player Ready: ", playerRef.current);
-    setDuration(player!.current!.target.getDuration());
+    setDuration(player?.current!.target.getDuration());
   };
+
+  useEffect(() => {
+    if (player?.current && playerDetails) {
+      setTimeout(() => {
+        player.current?.target.seekTo(playerDetails.position);
+      }, 1000);
+
+      if (playerDetails.paused) {
+        setTimeout(() => {
+          player.current?.target.pauseVideo();
+        }, 1000);
+      }
+
+      setPlayerDetails(null);
+    }
+  }, [player, playerDetails]);
 
   // 플레이어 상태 변화 시 이벤트
   const onPlayerStateChange: YouTubeProps["onStateChange"] = (
@@ -90,6 +111,43 @@ export default function Player() {
     setPosition(player!.current!.target.getCurrentTime());
   };
 
+  // 새 플레이어 메시지 수신 시 업데이트
+  useEffect(() => {
+    if (!playerResponseMessage) return;
+
+    console.log(playerResponseMessage);
+
+    const { action, position, currentPlaylist, index } = playerResponseMessage;
+
+    if (action) {
+      switch (action) {
+        case "PLAY_TRACK":
+          if (index == null || !player?.current) return;
+          setCurrentPlaylistIndex(index);
+          break;
+        case "PAUSE":
+          if (!position || !player?.current) return;
+          player.current.target.seekTo(position);
+          player.current.target.pauseVideo();
+          break;
+        case "RESUME":
+          if (!position || !player?.current) return;
+          player.current.target.seekTo(position);
+          player.current.target.playVideo();
+          break;
+        case "SEEK":
+          if (!position || !player?.current) return;
+          player.current.target.seekTo(position);
+          break;
+        case "UPDATE":
+          if (!currentPlaylist || !index) break;
+          setCurrentPlaylist(currentPlaylist);
+          setCurrentPlaylistIndex(index);
+          break;
+      }
+    }
+  }, [playerResponseMessage]);
+
   // 트랙 위치 변경
   const handleSeek = () => {
     if (!newPosition) return;
@@ -98,7 +156,7 @@ export default function Player() {
 
   // 트랙 현재 시간 업데이트
   useEffect(() => {
-    if (!paused && !loading) {
+    if (!paused && !loading && position) {
       timerRef.current = setInterval(() => {
         const newPosition = position + 1;
         setPosition(newPosition);
@@ -111,10 +169,6 @@ export default function Player() {
       }
     };
   }, [paused, loading, position]);
-
-  useEffect(() => {
-    console.log(currentPlaylistIndex)
-  }, [currentPlaylistIndex])
 
   return (
     <div className="flex h-[80px] w-full justify-between border-t">

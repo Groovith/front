@@ -26,7 +26,10 @@ export default function ChatRoom({ chatRoomId }: ChatRoomProps) {
   const { stompClient } = useStompStore();
 
   useEffect(() => {
-    if (!chatRoomId) return;
+    if (!chatRoomId) {
+      setChatRoomDetails(null);
+      return;
+    }
     handleGetChatRoomDetails();
     handleGetPlayerDetails();
   }, [chatRoomId]);
@@ -82,6 +85,12 @@ export default function ChatRoom({ chatRoomId }: ChatRoomProps) {
       stompClient.unsubscribe(`/sub/api/chatrooms/${chatRoomId}/player`);
     };
   }, [stompClient, chatRoomId]);
+
+  useEffect(() => {
+    if (playerDetails) {
+      console.log(playerDetails.position);
+    }
+  }, [playerDetails])
 
   return (
     <div className="flex size-full">

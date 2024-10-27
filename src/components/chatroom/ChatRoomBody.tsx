@@ -50,12 +50,14 @@ export default function ChatRoomBody({
 
       if (response.length < 20) {
         setHasMoreMessage(false);
-      } else if (response.length < 1) {
+      } else if (response.length == 0) {
         return;
       }
 
-      setLastMessageId(response[response.length - 1].messageId);
-      setMessages((prevMessages) => [...response.reverse(), ...prevMessages]);
+      if (response.length > 0) {
+        setLastMessageId(response[response.length - 1].messageId);
+        setMessages((prevMessages) => [...response.reverse(), ...prevMessages]);
+      }
     } catch (e) {
       toast.error("메시지를 불러오는 중 문제가 발생하였습니다.");
     } finally {
@@ -147,8 +149,14 @@ export default function ChatRoomBody({
         </div>
       )}
       <ChatRoomPlaylistOverlay
-        currentPlaylist={playerDetails ? playerDetails.currentPlaylist : currentPlaylist}
-        currentPlaylistIndex={playerDetails? playerDetails.currentPlaylistIndex : currentPlaylistIndex}
+        currentPlaylist={
+          playerDetails ? playerDetails.currentPlaylist : currentPlaylist
+        }
+        currentPlaylistIndex={
+          playerDetails
+            ? playerDetails.currentPlaylistIndex
+            : currentPlaylistIndex
+        }
         show={showPlaylist}
         togglePlaylist={togglePlaylist}
         height={chatContainerRef.current?.clientHeight}

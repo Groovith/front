@@ -33,7 +33,7 @@ export default function ChatRoomInput({ chatRoomId }: ChatRoomInputProps) {
   };
 
   return (
-    <div className="flex h-[100px] items-center justify-between border-t px-4">
+    <div className="flex h-[90px] items-center justify-between border-t px-4">
       <form
         className="flex w-full justify-between gap-2"
         onSubmit={(e) => handleSendMessage(e)}
@@ -44,8 +44,9 @@ export default function ChatRoomInput({ chatRoomId }: ChatRoomInputProps) {
           placeholder="메시지를 입력하세요..."
           value={message}
           onChange={(e) => setMessage(e.target.value)}
+          disabled={chatRoomId === null}
         />
-        <Button variant="ghost">
+        <Button variant="ghost" disabled={chatRoomId === null}>
           <SendHorizonal />
         </Button>
       </form>

@@ -8,7 +8,6 @@ import {
   UserDetailsType,
 } from "../../types/types";
 import ResponseDto from "./response.dto";
-import { useInfiniteQuery } from "@tanstack/react-query";
 import { Track } from "../../types/track.type";
 
 /**
@@ -235,7 +234,12 @@ export const fetchChatRooms = async () => {
 
 interface CreateChatRoomRequest {
   name: string;
+  status: ChatRoomVisibilityType;
+  permission: ChatRoomPlayerPermissionType;
 }
+
+export type ChatRoomVisibilityType = "PUBLIC" | "PRIVATE";
+export type ChatRoomPlayerPermissionType = "MASTER" | "EVERYONE";
 
 // 채팅방 생성
 export const createChatRoom = async (request: CreateChatRoomRequest) => {
@@ -248,7 +252,7 @@ export const createChatRoom = async (request: CreateChatRoomRequest) => {
 
 // 채팅방 참가
 export const joinChatRoom = async (chatRoomId: number) => {
-  const response = await api.post(`/chatrooms/${chatRoomId}/enter`);
+  const response = await api.put(`/chatrooms/${chatRoomId}/enter`);
   return response.data;
 };
 
@@ -310,7 +314,7 @@ export const getPlayer = async (chatRoomId: number) => {
 };
 
 // 같이 듣기 참가
-export const joinPlayer = async (chatRoomId: string) => {
+export const joinPlayer = async (chatRoomId: number) => {
   const response = await api.patch<PlayerDetailsDto>(
     `/chatrooms/${chatRoomId}/player/join`,
   );
@@ -318,7 +322,7 @@ export const joinPlayer = async (chatRoomId: string) => {
 };
 
 // 같이 듣기 나가기
-export const leavePlayer = async (chatRoomId: string) => {
+export const leavePlayer = async (chatRoomId: number) => {
   const response = await api.patch(`/chatrooms/${chatRoomId}/player/leave`);
   return response.data;
 };

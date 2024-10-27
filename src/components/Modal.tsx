@@ -25,10 +25,10 @@ export function Modal({
 
   return (
     <div
-      className="fixed flex inset-0 min-h-screen z-50 overflow-y-auto"
+      className="fixed inset-0 z-50 flex min-h-screen items-center justify-center overflow-y-auto"
       onClick={handleOutsideClick}
     >
-      <div className="fixed flex inset-0 min-h-screen items-center justify-center p-10">
+      <div className="fixed inset-0 flex min-h-screen w-full items-center justify-center p-10">
         <div className="fixed inset-0 min-h-screen bg-neutral-950/50"></div>
         <div
           className="relative flex w-full max-w-md rounded-3xl bg-white p-10 shadow-xl"

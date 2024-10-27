@@ -219,35 +219,35 @@ export function ChatRoom() {
     }
 
     // 채팅방 참가 및 초기화
-    // joinPlayer(chatRoomId).then(async (data) => {
-    //   console.log(data);
-    //   //setCurrentPlaylist(data.currentPlaylist);
-    //   setCurrentPlaylistIndex(data.currentPlaylistIndex);
-    //   setPaused(data.paused);
+    joinPlayer(chatRoomId).then(async (data) => {
+      console.log(data);
+      //setCurrentPlaylist(data.currentPlaylist);
+      setCurrentPlaylistIndex(data.currentPlaylistIndex);
+      setPaused(data.paused);
 
-    //   if (
-    //     data.currentPlaylist.length > 0 &&
-    //     typeof data.currentPlaylistIndex === "number"
-    //   ) {
-    //     console.log("play start");
-    //     setDuration(
-    //       data.currentPlaylist[data.currentPlaylistIndex].duration_ms,
-    //     );
-    //     setPosition(data.position);
-    //     await justPlayTrack(
-    //       data.currentPlaylist[data.currentPlaylistIndex],
-    //       data.position,
-    //     );
-    //   }
-    //   // 일정 시간 후에 플레이어를 정지시키기 위해 setTimeout 사용
-    //   // setTimeout(() => {
-    //   //   if (data.paused) {
-    //   //     player.pause();
-    //   //   } else {
-    //   //     player.resume();
-    //   //   }
-    //   // }, 1000); // 잠시 후 메뉴얼 정지
-    // });
+      if (
+        data.currentPlaylist.length > 0 &&
+        typeof data.currentPlaylistIndex === "number"
+      ) {
+        console.log("play start");
+        setDuration(
+          data.currentPlaylist[data.currentPlaylistIndex].duration_ms,
+        );
+        setPosition(data.position);
+        await justPlayTrack(
+          data.currentPlaylist[data.currentPlaylistIndex],
+          data.position,
+        );
+      }
+      // 일정 시간 후에 플레이어를 정지시키기 위해 setTimeout 사용
+      // setTimeout(() => {
+      //   if (data.paused) {
+      //     player.pause();
+      //   } else {
+      //     player.resume();
+      //   }
+      // }, 1000); // 잠시 후 메뉴얼 정지
+    });
 
     // STOMP 커스텀 헤더
     const headers = { Authorization: `Bearer ${accessToken}` };

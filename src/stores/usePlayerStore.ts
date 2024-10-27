@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { PlayerResponseDto } from "../types/types";
+import { PlayerDetailsDto, PlayerResponseDto } from "../types/types";
 import { StompSubscription } from "@stomp/stompjs";
 import { YouTubeEvent } from "react-youtube";
 import { Track } from "../types/track.type";
@@ -28,7 +28,7 @@ interface PlayerStoreType {
   listenTogetherId: number | null;
   listenTogetherSubscription: StompSubscription | null;
   setIsListenTogetherConnected: (isListenTogetherConnected: boolean) => void;
-  setListenTogetherId: (listenTogetherId: number) => void;
+  setListenTogetherId: (listenTogetherId: number | null) => void;
   setListenTogetherSubscription: (
     listenTogetherSubscription: StompSubscription,
   ) => void;
@@ -36,6 +36,8 @@ interface PlayerStoreType {
   setLoading: (loading: boolean) => void;
   playerResponseMessage: PlayerResponseDto | null;
   setPlayerResponseMessage: (playerResponseMessage: PlayerResponseDto) => void;
+  playerDetails: PlayerDetailsDto | null;
+  setPlayerDetails: (playerDetails: PlayerDetailsDto | null) => void;
 }
 
 export const usePlayerStore = create<PlayerStoreType>((set) => ({
@@ -75,11 +77,15 @@ export const usePlayerStore = create<PlayerStoreType>((set) => ({
   listenTogetherSubscription: null,
   setIsListenTogetherConnected: (isListenTogetherConnected: boolean) =>
     set({ isListenTogetherConnected }),
-  setListenTogetherId: (listenTogetherId: number) => set({ listenTogetherId }),
+  setListenTogetherId: (listenTogetherId: number | null) =>
+    set({ listenTogetherId }),
   setListenTogetherSubscription: (
     listenTogetherSubscription: StompSubscription,
   ) => set({ listenTogetherSubscription }),
   playerResponseMessage: null,
   setPlayerResponseMessage: (playerResponseMessage: PlayerResponseDto) =>
     set({ playerResponseMessage }),
+  playerDetails: null,
+  setPlayerDetails: (playerDetails: PlayerDetailsDto | null) =>
+    set({ playerDetails }),
 }));
