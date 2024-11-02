@@ -72,8 +72,8 @@ export function SearchResults() {
   if (!query) {
     return (
       <div className="flex h-full w-full items-center justify-center">
-        <p className="text-neutral-500">
-          검색어를 입력하여 원하는 컨텐츠를 찾아보세요
+        <p className="text-neutral-400">
+          검색어를 입력하여 원하는 컨텐츠를 찾아보세요.
         </p>
       </div>
     );

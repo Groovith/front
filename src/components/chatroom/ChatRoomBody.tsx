@@ -128,7 +128,7 @@ export default function ChatRoomBody({
         <>
           <ul
             ref={messageContainerRef}
-            className="flex flex-col gap-4 overflow-y-scroll px-5 pb-5 pt-24 md:py-5"
+            className="flex flex-col gap-4 h-full overflow-y-scroll px-5 pb-5 pt-24 md:py-5"
           >
             <div ref={topRef}></div>
             {messages.map((message) => (
