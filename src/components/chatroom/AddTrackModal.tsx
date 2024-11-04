@@ -1,4 +1,3 @@
-import { X } from "lucide-react";
 import { Button } from "../Button";
 import { Modal } from "../Modal";
 import { useState } from "react";
