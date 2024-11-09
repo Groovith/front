@@ -87,6 +87,10 @@ export default function Player() {
     event: YouTubeEvent<any>,
   ) => {
     switch (event.data) {
+      case YouTube.PlayerState.UNSTARTED:
+        console.log("Unstarted...");
+        setLoading(false);
+        break;
       case YouTube.PlayerState.BUFFERING:
         console.log("Buffering...");
         setLoading(true);
@@ -106,6 +110,11 @@ export default function Player() {
         setLoading(false);
         nextTrack();
         break;
+      case YouTube.PlayerState.CUED:
+        console.log("Cued...");
+        setLoading(false);
+        setPaused(true);
+        break;
     }
     setDuration(player!.current!.target.getDuration());
     setPosition(player!.current!.target.getCurrentTime());
@@ -117,12 +126,13 @@ export default function Player() {
 
     console.log(playerResponseMessage);
 
-    const { action, position, currentPlaylist, index } = playerResponseMessage;
+    const { action, position, currentPlaylist : newCurrentPlaylist, index } = playerResponseMessage;
 
     if (action) {
       switch (action) {
         case "PLAY_TRACK":
           if (index == null || !player?.current) return;
+          player.current.target.cueVideoById(currentPlaylist[index].videoId);
           setCurrentPlaylistIndex(index);
           break;
         case "PAUSE":
@@ -140,8 +150,8 @@ export default function Player() {
           player.current.target.seekTo(position);
           break;
         case "UPDATE":
-          if (!currentPlaylist || !index) break;
-          setCurrentPlaylist(currentPlaylist);
+          if (!newCurrentPlaylist || !index) break;
+          setCurrentPlaylist(newCurrentPlaylist);
           setCurrentPlaylistIndex(index);
           break;
       }
@@ -275,15 +285,22 @@ export default function Player() {
           )}
         </div>
       </>
-      {currentPlaylist[currentPlaylistIndex] && (
+      {/* {currentPlaylist[currentPlaylistIndex] && (
         <YouTube
-          videoId={currentPlaylist[currentPlaylistIndex].videoId}
+          // videoId={currentPlaylist[currentPlaylistIndex].videoId}
           opts={opts}
           onReady={onPlayerReady}
           onStateChange={onPlayerStateChange}
           className={"absolute"}
         />
-      )}
+      )} */}
+      <YouTube
+          // videoId={currentPlaylist[currentPlaylistIndex].videoId}
+          opts={opts}
+          onReady={onPlayerReady}
+          onStateChange={onPlayerStateChange}
+          className={"absolute"}
+        />
     </div>
   );
 }

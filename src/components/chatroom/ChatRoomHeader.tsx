@@ -28,6 +28,7 @@ export default function ChatRoomHeader({
 }: ChatRoomHeaderProps) {
   const { stopPlayer } = usePlayer();
   const {
+    player,
     listenTogetherId,
     listenTogetherSubscription,
     setListenTogetherId,
@@ -72,11 +73,28 @@ export default function ChatRoomHeader({
       const response = await joinPlayer(chatRoomDetails.chatRoomId);
       setPlayerDetails(response);
       console.log(response);
-      
+
       setRepeat(response.repeat);
       setCurrentPlaylist(response.currentPlaylist);
       setCurrentPlaylistIndex(response.currentPlaylistIndex);
-      
+
+      const videoId =
+        response.currentPlaylist[response.currentPlaylistIndex].videoId;
+      const position = response.position;
+      const paused = response.paused;
+
+      if (!player?.current) return;
+      if (paused) {
+        player.current.target.cueVideoById({
+          videoId: videoId,
+          startSeconds: position,
+        });
+      } else {
+        player.current.target.loadVideoById({
+          videoId: videoId,
+          startSeconds: position,
+        });
+      }
     } catch (e) {
       toast.error("같이 듣기 참가 중 문제가 발생하였습니다.");
     }

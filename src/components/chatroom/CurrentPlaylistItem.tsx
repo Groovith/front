@@ -1,9 +1,9 @@
 import { AudioLines, EllipsisVertical } from "lucide-react";
 import { usePlayer } from "../../hooks/usePlayer";
 import { Track } from "../../types/track.type";
-import { formatDuration } from "../../utils/formatDuration";
 import { Button } from "../Button";
 import DropdownButton from "../DropdownButton";
+import { formatDurationSec } from "../../utils/formatDurationSec";
 
 interface CurrentPlaylistItemProps {
   track: Track;
@@ -76,7 +76,7 @@ export default function CurrentPlaylistItem({
             </Button>
           </DropdownButton>
         ) : (
-          <p className="text-neutral-500">{formatDuration(track.duration)}</p>
+          <p className="text-neutral-500">{formatDurationSec(track.duration)}</p>
         )}
       </div>
       <div className="flex w-10 items-center justify-center gap-1 md:hidden">
