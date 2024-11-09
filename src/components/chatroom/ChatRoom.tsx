@@ -88,7 +88,7 @@ export default function ChatRoom({ chatRoomId }: ChatRoomProps) {
 
   useEffect(() => {
     if (playerDetails) {
-      console.log(playerDetails.position);
+      console.log(playerDetails);
     }
   }, [playerDetails])
 

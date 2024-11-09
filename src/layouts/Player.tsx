@@ -126,31 +126,42 @@ export default function Player() {
 
     console.log(playerResponseMessage);
 
-    const { action, position, currentPlaylist : newCurrentPlaylist, index } = playerResponseMessage;
+    const {
+      action,
+      position,
+      currentPlaylist: newCurrentPlaylist,
+      index,
+      videoId,
+    } = playerResponseMessage;
 
     if (action) {
       switch (action) {
         case "PLAY_TRACK":
-          if (index == null || !player?.current) return;
-          player.current.target.cueVideoById(currentPlaylist[index].videoId);
+          if (
+            typeof index === "undefined" ||
+            !player?.current ||
+            typeof videoId === "undefined"
+          )
+            return;
+          player.current.target.loadVideoById({ videoId: videoId });
           setCurrentPlaylistIndex(index);
           break;
         case "PAUSE":
-          if (!position || !player?.current) return;
-          player.current.target.seekTo(position);
+          if (!player?.current) return;
+          //player.current.target.seekTo(position);
           player.current.target.pauseVideo();
           break;
         case "RESUME":
-          if (!position || !player?.current) return;
-          player.current.target.seekTo(position);
+          if (!player?.current) return;
+          //player.current.target.seekTo(position);
           player.current.target.playVideo();
           break;
         case "SEEK":
-          if (!position || !player?.current) return;
+          if (typeof position === "undefined" || !player?.current) return;
           player.current.target.seekTo(position);
           break;
         case "UPDATE":
-          if (!newCurrentPlaylist || !index) break;
+          if (!newCurrentPlaylist || typeof index === "undefined") break;
           setCurrentPlaylist(newCurrentPlaylist);
           setCurrentPlaylistIndex(index);
           break;
@@ -196,6 +207,7 @@ export default function Player() {
               setPosition(Number(e.target.value));
             }}
             onMouseUp={handleSeek}
+            onTouchEnd={handleSeek}
             style={{
               background: `linear-gradient(to right, #FF6735 ${(position / duration) * 100}%, #E5E7EB ${(position / duration) * 100}%)`,
             }}
@@ -285,22 +297,12 @@ export default function Player() {
           )}
         </div>
       </>
-      {/* {currentPlaylist[currentPlaylistIndex] && (
-        <YouTube
-          // videoId={currentPlaylist[currentPlaylistIndex].videoId}
-          opts={opts}
-          onReady={onPlayerReady}
-          onStateChange={onPlayerStateChange}
-          className={"absolute"}
-        />
-      )} */}
       <YouTube
-          // videoId={currentPlaylist[currentPlaylistIndex].videoId}
-          opts={opts}
-          onReady={onPlayerReady}
-          onStateChange={onPlayerStateChange}
-          className={"absolute"}
-        />
+        opts={opts}
+        onReady={onPlayerReady}
+        onStateChange={onPlayerStateChange}
+        className={"absolute"}
+      />
     </div>
   );
 }

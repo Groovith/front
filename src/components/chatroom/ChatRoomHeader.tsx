@@ -1,7 +1,6 @@
 import { ArrowLeft, Headphones, Menu, Unplug, UserPlus } from "lucide-react";
 import {
   ChatRoomDetailsType,
-  PlayerDetailsDto,
   PlayerResponseDto,
 } from "../../types/types";
 import { Button } from "../Button";
@@ -17,7 +16,6 @@ import { usePlayerStore } from "../../stores/usePlayerStore";
 import { useStompStore } from "../../stores/useStompStore";
 import { usePlayer } from "../../hooks/usePlayer";
 import { useChatRoomStore } from "../../stores/useChatRoomStore";
-import { useEffect, useState } from "react";
 
 interface ChatRoomHeaderProps {
   chatRoomDetails: ChatRoomDetailsType | null;

@@ -9,14 +9,10 @@ interface ChatRoomPlayerProps {
 
 export default function ChatRoomPlayer({ playerDetails }: ChatRoomPlayerProps) {
   if (!playerDetails) {
-    const { currentPlaylist, currentPlaylistIndex, position, paused } = usePlayerStore();
+    const { currentPlaylist, currentPlaylistIndex } = usePlayerStore();
     return (
       <div className="flex size-full flex-col">
-        <ChatRoomTrackInfo
-          track={currentPlaylist[currentPlaylistIndex]}
-          position={position}
-          paused={paused}
-        />
+        <ChatRoomTrackInfo track={currentPlaylist[currentPlaylistIndex]} />
         <ChatRoomPlaylist
           currentPlaylist={currentPlaylist}
           currentPlaylistIndex={currentPlaylistIndex}
@@ -31,12 +27,10 @@ export default function ChatRoomPlayer({ playerDetails }: ChatRoomPlayerProps) {
         track={
           playerDetails.currentPlaylist[playerDetails.currentPlaylistIndex]
         }
-        position={0}
-        paused={false}
       />
       <ChatRoomPlaylist
         currentPlaylist={playerDetails.currentPlaylist}
-        currentPlaylistIndex={0}
+        currentPlaylistIndex={playerDetails.currentPlaylistIndex}
       />
     </div>
   );

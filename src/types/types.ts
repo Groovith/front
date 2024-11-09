@@ -159,4 +159,5 @@ export interface PlayerResponseDto {
   position?: number;
   currentPlaylist?: Track[];
   index?: number;
+  videoId?: string;
 }

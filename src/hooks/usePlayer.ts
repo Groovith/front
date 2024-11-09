@@ -83,6 +83,7 @@ export function usePlayer() {
     if (index >= 0 && index < currentPlaylist.length) {
       try {
         setCurrentPlaylistIndex(index);
+        player?.current?.target.loadVideoById({videoId: currentPlaylist[index].videoId});
       } catch (e) {
         console.log(e);
       }
