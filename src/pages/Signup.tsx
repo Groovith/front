@@ -164,8 +164,26 @@ export default function Signup() {
     await handleCheckEmailCertification();
   };
 
+  // 사용자 이름 규칙 확인 함수
+  const validateUsername = (username: string): string | null => {
+    const usernameRegex = /^(?!.*[_.]{2})[a-z0-9._]{2,30}$/;
+    if (
+      !usernameRegex.test(username) ||
+      username.startsWith("_") ||
+      username.startsWith(".") ||
+      username.endsWith("_") ||
+      username.endsWith(".")
+    ) {
+      return "사용자 이름은 2자 이상, 30자 이하의 영문 소문자, 숫자, 밑줄, 마침표만 허용하며, 시작과 끝에 밑줄이나 마침표를 사용할 수 없습니다.";
+    }
+    return null;
+  };
+
   // 사용자 이름 사용 가능 여부 체크
   const handleCheckUsername = async () => {
+    const usernameErrorMessage = validateUsername(username);
+    setUsernameCheckMessage(usernameErrorMessage);
+    
     if (username) {
       try {
         const response = await checkUsername({ username });

@@ -15,6 +15,7 @@
     "@types/sockjs-client": "^1.5.4",
     "@types/spotify-web-playback-sdk": "^0.1.19",
     "axios": "^1.7.2",
+    "browser-image-compression": "^2.0.2",
     "class-variance-authority": "^0.7.0",
     "get-video-id": "^4.1.7",
     "lucide-react": "^0.411.0",

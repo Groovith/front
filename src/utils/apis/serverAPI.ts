@@ -192,6 +192,20 @@ export const getUserDetailsByUsername = async (username: string) => {
   return response.data;
 };
 
+// 유저 프로필 사진 변경
+export const uploadProfileImage = async (file: File) => {
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const response = await api.put("/upload/user", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+
+  return response.data;
+};
+
 interface SporifyTokenResponse {
   message: string;
   spotifyAccessToken: string;
