@@ -146,11 +146,32 @@ export const login = async (credentials: {
   email: string;
   password: string;
 }) => {
+  const response = await axios.post(serverURL + "/login", credentials, {
+    withCredentials: true,
+  });
+  return response;
+};
+
+// 비밀번호 재설정 이메일 요청
+export const requestPasswordReset = async (email: string) => {
   const response = await axios.post(
-    "http://localhost:8080/api/login",
-    credentials,
-    { withCredentials: true },
+    serverURL + "/auth/request-password-reset",
+    { email: email },
   );
+  return response;
+};
+
+// 비밀번호 재설정 요청
+export const resetPassword = async (
+  email: string,
+  code: string,
+  password: string,
+) => {
+  const response = await axios.patch(serverURL + "/auth/reset-password", {
+    email: email,
+    code: code,
+    password: password,
+  });
   return response;
 };
 

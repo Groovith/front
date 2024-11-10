@@ -10,6 +10,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Callback } from "./pages/Callback";
 import ResetPassword from "./pages/ResetPassword";
 import ChatRoomPage from "./pages/ChatRoomPage";
+import ChangePassword from "./pages/ChangePassword";
 
 const queryClient = new QueryClient();
 
@@ -27,6 +28,7 @@ function App() {
           </Route>
           <Route path="/login" element={<Login />} />
           <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/change-password" element={<ChangePassword />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/callback" element={<Callback />} />
         </Routes>

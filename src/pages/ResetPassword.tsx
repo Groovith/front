@@ -1,11 +1,20 @@
 import { useRef, useState } from "react";
 import { Button } from "../components/Button";
-import { checkEmail } from "../utils/apis/serverAPI";
+import { checkEmail, requestPasswordReset } from "../utils/apis/serverAPI";
 import { ResponseCode } from "../types/enums";
+import { Modal } from "../components/Modal";
+import { MoonLoader } from "react-spinners";
+import { Mail } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export default function ResetPassword() {
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [email, setEmail] = useState("");
-  const [emailErrorMessage, setEmailErrorMessage] = useState<string | null>(null);
+  const [emailErrorMessage, setEmailErrorMessage] = useState<string | null>(
+    null,
+  );
   const [emailValid, setEmailValid] = useState<boolean | null>(null); // 이메일 유효성 상태
   const emailRef = useRef<HTMLInputElement>(null);
 
@@ -49,6 +58,18 @@ export default function ResetPassword() {
     }
   };
 
+  // 비밀번호 변경 링크 요청 버튼
+  const handleRequestUrlClick = async () => {
+    setLoading(true);
+    try {
+      await requestPasswordReset(email);
+      setIsModalOpen(true);
+    } catch (e) {
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="flex h-screen w-screen items-center justify-center text-neutral-900">
       <div className="flex w-fit flex-col items-center justify-center rounded-xl border border-gray-300 p-10">
@@ -72,10 +93,40 @@ export default function ResetPassword() {
             <p className="mt-3 text-sm text-red-500">{emailErrorMessage}</p>
           )}
         </div>
-        <Button className="mt-6 w-full rounded-lg px-6">
-          변경 링크 전송하기
+        <Button
+          className="mt-6 flex w-full justify-center gap-3 rounded-lg px-6"
+          onClick={handleRequestUrlClick}
+          disabled={loading}
+        >
+          {loading ? (
+            <MoonLoader size={18} color="#FFFFFF" />
+          ) : (
+            <p>변경 링크 전송하기</p>
+          )}
         </Button>
       </div>
+      {isModalOpen && (
+        <Modal onClose={() => setIsModalOpen(false)}>
+          <div className="flex flex-col gap-5">
+            <h1 className="font-bold">비밀번호 설정 메일 발송</h1>
+            <div className="flex rounded-xl bg-neutral-200 p-3 font-bold gap-3">
+              <Mail />
+              {email}
+            </div>
+            <p className="w-full text-neutral-600">
+              위 이메일로 비밀번호 설정 메일이 발송되었습니다. 메일이 보이지
+              않을 경우, 스팸함을 확인해 주세요.
+            </p>
+            <Button
+              onClick={() => {
+                navigate(-1);
+              }}
+            >
+              이전 페이지로
+            </Button>
+          </div>
+        </Modal>
+      )}
     </div>
   );
 }
