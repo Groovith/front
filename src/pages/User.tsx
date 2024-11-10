@@ -4,6 +4,7 @@ import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import {
   checkUsername,
+  deleteProfileImage,
   getUserDetailsByUsername,
   uploadProfileImage,
 } from "../utils/apis/serverAPI";
@@ -115,11 +116,21 @@ export default function User() {
         console.log(compressedFile.size);
         await uploadProfileImage(compressedFile);
         refetch();
-        toast.success("프로필 이미지가 변경되었습니다.");
+        toast.success("프로필 사진이 변경되었습니다.");
       } catch (e) {
         console.error(e);
-        toast.error("프로필 이미지 업로드 중 문제가 발생하였습니다.");
+        toast.error("프로필 사진 업로드 중 문제가 발생하였습니다.");
       }
+    }
+  };
+
+  const handleProfileImageDelete = async () => {
+    try {
+      deleteProfileImage();
+      refetch();
+      toast.success("프로필 사진이 삭제되었습니다.");
+    } catch (e) {
+      toast.error("프로필 사진 삭제 중 문제가 발생하였습니다.");
     }
   };
 
@@ -192,6 +203,7 @@ export default function User() {
                           <Button
                             variant={"transparent"}
                             className="text-red-500 hover:text-red-800"
+                            onClick={handleProfileImageDelete}
                           >
                             삭제
                           </Button>

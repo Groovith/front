@@ -206,6 +206,12 @@ export const uploadProfileImage = async (file: File) => {
   return response.data;
 };
 
+// 유저 프로필 사진 삭제
+export const deleteProfileImage = async () => {
+  const response = await api.delete("/users/me/update/profile-picture");
+  return response.data;
+}
+
 interface SporifyTokenResponse {
   message: string;
   spotifyAccessToken: string;
