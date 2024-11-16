@@ -1,7 +1,6 @@
 import { User } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { UserDetailsType } from "../../types/types";
-import { getChatRoomMembers } from "../../utils/apis/serverAPI";
 import { Button } from "../common/Button";
 import { Modal } from "../common/Modal";
 import { useNavigate } from "react-router-dom";

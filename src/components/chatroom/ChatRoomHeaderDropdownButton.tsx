@@ -4,8 +4,6 @@ import DropdownButton, { DropdownItem } from "../common/DropdownButton";
 import { toast } from "sonner";
 import { leaveChatRoom } from "../../utils/apis/serverAPI";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
-import InvitationModal from "./InvitationModal";
 
 interface ChatRoomHeaderDropdownButtonProps {
   chatRoomId: number | undefined;
