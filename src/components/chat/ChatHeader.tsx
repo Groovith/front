@@ -1,5 +1,5 @@
 import { MessageCirclePlus } from "lucide-react";
-import { Button } from "../Button";
+import { Button } from "../common/Button";
 
 interface ChatHeaderProps {
   setIsModalOpen: (value: boolean) => void;

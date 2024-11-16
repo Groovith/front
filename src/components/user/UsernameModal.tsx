@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
-import { Button } from "../Button";
-import { Modal } from "../Modal";
+import { Button } from "../common/Button";
+import { Modal } from "../common/Modal";
 import { ResponseCode } from "../../types/enums";
 import { checkUsername } from "../../utils/apis/serverAPI";
 

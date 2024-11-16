@@ -1,6 +1,6 @@
 import { ListMusic } from "lucide-react";
 import { Track } from "../../types/track.type";
-import { Button } from "../Button";
+import { Button } from "../common/Button";
 
 interface ChatRoomTrackInfoMiniProps {
   track: Track | undefined;

@@ -5,8 +5,8 @@ import {
   uploadProfileImage,
   deleteProfileImage,
 } from "../../utils/apis/serverAPI";
-import { Button } from "../Button";
-import { Modal } from "../Modal";
+import { Button } from "../common/Button";
+import { Modal } from "../common/Modal";
 
 interface ProfileModalProps {
   userDetails: UserDetailsType | undefined;

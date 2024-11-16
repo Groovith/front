@@ -1,6 +1,6 @@
 import { ListMusic, ListPlus } from "lucide-react";
 import { useEffect, useState } from "react";
-import { Button } from "../Button";
+import { Button } from "../common/Button";
 import { Track } from "../../types/track.type";
 import CurrentPlaylistItem from "./CurrentPlaylistItem";
 import AddTrackModal from "./AddTrackModal";

@@ -1,8 +1,8 @@
 import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Button } from "../components/Button";
+import { Button } from "../components/common/Button";
 import { SearchIcon } from "lucide-react";
-import { SearchResults } from "../components/SearchResults";
+import { SearchResults } from "../components/search/SearchResults";
 
 export default function Search() {
   const [searchQuery, setSearchQuery] = useState("");

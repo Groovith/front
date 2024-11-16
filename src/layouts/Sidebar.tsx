@@ -8,9 +8,9 @@ import {
   LogOut,
 } from "lucide-react";
 import logo from "../assets/Logo-Full-BW.png";
-import { Button } from "../components/Button";
+import { Button } from "../components/common/Button";
 import { useNavigate } from "react-router-dom";
-import DropdownButton from "../components/DropdownButton";
+import DropdownButton from "../components/common/DropdownButton";
 import { logout } from "../utils/apis/serverAPI";
 import { useUser } from "../hooks/useUser";
 import { useChatRoomStore } from "../stores/useChatRoomStore";

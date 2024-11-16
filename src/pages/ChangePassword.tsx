@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { resetPassword } from "../utils/apis/serverAPI";
 import { toast } from "sonner";
-import { Button } from "../components/Button";
+import { Button } from "../components/common/Button";
 
 export default function ChangePassword() {
   const navigate = useNavigate();

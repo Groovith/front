@@ -1,6 +1,6 @@
 import { SendHorizonal } from "lucide-react";
 import { useState } from "react";
-import { Button } from "../Button";
+import { Button } from "../common/Button";
 import { useStompStore } from "../../stores/useStompStore";
 
 interface ChatRoomInputProps {

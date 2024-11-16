@@ -3,7 +3,7 @@ import { useUser } from "../hooks/useUser";
 import { useChatRoomStore } from "../stores/useChatRoomStore";
 import { Home, Menu, Search, Send, UserRound } from "lucide-react";
 
-import { Button } from "../components/Button";
+import { Button } from "../components/common/Button";
 
 export default function BottomNavigation() {
   const navigate = useNavigate();

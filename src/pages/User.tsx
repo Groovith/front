@@ -1,4 +1,4 @@
-import { Button } from "../components/Button";
+import { Button } from "../components/common/Button";
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { getUserDetailsByUsername } from "../utils/apis/serverAPI";
@@ -9,6 +9,7 @@ import { useState } from "react";
 import ProfileModal from "../components/user/ProfileModal";
 import UsernameModal from "../components/user/UsernameModal";
 import { UserPlus } from "lucide-react";
+import FriendsList from "../components/user/FriendsList";
 
 export default function User() {
   const { getUserId } = useUser();
@@ -60,12 +61,7 @@ export default function User() {
                   프로필 수정
                 </Button>
               </div>
-              <div className="flex w-full justify-between items-center">
-                <h1 className="text-xl font-bold">친구 목록</h1>
-                <Button variant={"ghost"}>
-                  <UserPlus />
-                </Button>
-              </div>
+              <FriendsList />
               {profileModalOpen && (
                 <ProfileModal
                   userDetails={userDetails}

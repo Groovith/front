@@ -39,7 +39,8 @@ export default function DropdownButton({ children, items }: DropdownProps) {
   }, []);
 
   // 메뉴 토글
-  const handleClick = (): void => {
+  const handleClick = (e: React.MouseEvent): void => {
+    e.stopPropagation();
     setIsOpen(!isOpen);
   };
 

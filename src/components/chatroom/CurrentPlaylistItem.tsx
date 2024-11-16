@@ -1,8 +1,8 @@
 import { AudioLines, EllipsisVertical } from "lucide-react";
 import { usePlayer } from "../../hooks/usePlayer";
 import { Track } from "../../types/track.type";
-import { Button } from "../Button";
-import DropdownButton from "../DropdownButton";
+import { Button } from "../common/Button";
+import DropdownButton from "../common/DropdownButton";
 import { formatDurationSec } from "../../utils/formatDurationSec";
 
 interface CurrentPlaylistItemProps {

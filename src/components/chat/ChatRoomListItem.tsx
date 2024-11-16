@@ -1,6 +1,6 @@
 import { EllipsisVertical, LogOut } from "lucide-react";
-import DropdownButton from "../DropdownButton";
-import { Button } from "../Button";
+import DropdownButton from "../common/DropdownButton";
+import { Button } from "../common/Button";
 import { ChatRoomDetailsType } from "../../types/types";
 
 interface ChatRoomListItemProps {

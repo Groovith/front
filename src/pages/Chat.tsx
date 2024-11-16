@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import ChatHeader from "../components/chat/ChatHeader";
-import { Modal } from "../components/Modal";
-import { Button } from "../components/Button";
+import { Modal } from "../components/common/Modal";
+import { Button } from "../components/common/Button";
 import { useNavigate } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {

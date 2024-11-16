@@ -1,5 +1,5 @@
 import { ListPlus, X } from "lucide-react";
-import { Button } from "../Button";
+import { Button } from "../common/Button";
 import { Track } from "../../types/track.type";
 import AddTrackModal from "./AddTrackModal";
 import { useState } from "react";

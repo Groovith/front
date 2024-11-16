@@ -1,8 +1,8 @@
 import { useRef, useState } from "react";
-import { Button } from "../components/Button";
+import { Button } from "../components/common/Button";
 import { checkEmail, requestPasswordReset } from "../utils/apis/serverAPI";
 import { ResponseCode } from "../types/enums";
-import { Modal } from "../components/Modal";
+import { Modal } from "../components/common/Modal";
 import { MoonLoader } from "react-spinners";
 import { Mail } from "lucide-react";
 import { useNavigate } from "react-router-dom";

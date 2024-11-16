@@ -1,15 +1,14 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Button } from "./Button";
+import { Button } from "../common/Button";
 import { EllipsisVertical, UserPlus } from "lucide-react";
 import {
   joinChatRoom,
   searchChatRooms,
   searchUsers,
-} from "../utils/apis/serverAPI";
-import defaultChatRoomImage from "../assets/default-image-mountain.png";
-import DropdownButton from "./DropdownButton";
+} from "../../utils/apis/serverAPI";
+import DropdownButton from "../common/DropdownButton";
 
 export function SearchResults() {
   const queryClient = useQueryClient();
@@ -79,7 +78,7 @@ export function SearchResults() {
               >
                 <div className="flex items-center gap-3">
                   <img
-                    src={defaultChatRoomImage}
+                    src={chatRoom.imageUrl}
                     className="size-12 rounded-full"
                   />
                   <div className="flex flex-col">

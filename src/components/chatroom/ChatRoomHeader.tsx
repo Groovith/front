@@ -3,18 +3,14 @@ import {
   Headphones,
   Menu,
   Unplug,
-  User,
   UserPlus,
 } from "lucide-react";
 import {
   ChatRoomDetailsType,
   PlayerResponseDto,
-  UserDetailsType,
 } from "../../types/types";
-import { Button } from "../Button";
-import DropdownButton from "../DropdownButton";
+import { Button } from "../common/Button";
 import {
-  getChatRoomMembers,
   joinPlayer,
   leaveChatRoom,
   leavePlayer,
@@ -25,8 +21,8 @@ import { usePlayerStore } from "../../stores/usePlayerStore";
 import { useStompStore } from "../../stores/useStompStore";
 import { usePlayer } from "../../hooks/usePlayer";
 import { useChatRoomStore } from "../../stores/useChatRoomStore";
-import { useEffect, useState } from "react";
 import ChatRoomMembers from "./ChatRoomMembers";
+import DropdownButton from "../common/DropdownButton";
 
 interface ChatRoomHeaderProps {
   chatRoomDetails: ChatRoomDetailsType | null;

@@ -1,5 +1,5 @@
-import { Button } from "../Button";
-import { Modal } from "../Modal";
+import { Button } from "../common/Button";
+import { Modal } from "../common/Modal";
 import { useState } from "react";
 import getVideoId from "get-video-id";
 import { usePlayer } from "../../hooks/usePlayer";

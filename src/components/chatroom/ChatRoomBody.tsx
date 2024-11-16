@@ -6,7 +6,7 @@ import { useStompStore } from "../../stores/useStompStore";
 import ChatMessageItem from "./ChatMessageItem";
 import { useInView } from "react-intersection-observer";
 import { getChatRoomMessages } from "../../utils/apis/serverAPI";
-import { Button } from "../Button";
+import { Button } from "../common/Button";
 import { ChevronDown } from "lucide-react";
 import { toast } from "sonner";
 import { usePlayerStore } from "../../stores/usePlayerStore";
