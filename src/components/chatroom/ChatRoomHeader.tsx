@@ -50,6 +50,7 @@ export default function ChatRoomHeader({
   const handleLeaveChatRoom = async (chatRoomId: number) => {
     try {
       await leaveChatRoom(chatRoomId);
+      navigate("/chat");
     } catch (e) {
       console.error("채팅방 나가기 중 오류 발생: ", e);
       toast.error("채팅방 나가기 중 오류가 발생하였습니다.");
