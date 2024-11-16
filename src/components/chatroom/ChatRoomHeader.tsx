@@ -1,10 +1,7 @@
-import { ArrowLeft, Headphones, Unplug, UserPlus } from "lucide-react";
-import { ChatRoomDetailsType, PlayerResponseDto } from "../../types/types";
+import { ArrowLeft, Headphones, Unplug } from "lucide-react";
+import { ChatRoomDetailsType, PlayerResponseDto, UserDetailsType } from "../../types/types";
 import { Button } from "../common/Button";
-import {
-  joinPlayer,
-  leavePlayer,
-} from "../../utils/apis/serverAPI";
+import { getChatRoomMembers, joinPlayer, leavePlayer } from "../../utils/apis/serverAPI";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { usePlayerStore } from "../../stores/usePlayerStore";
@@ -13,6 +10,8 @@ import { usePlayer } from "../../hooks/usePlayer";
 import { useChatRoomStore } from "../../stores/useChatRoomStore";
 import ChatRoomMembers from "./ChatRoomMembers";
 import ChatRoomHeaderDropdownButton from "./ChatRoomHeaderDropdownButton";
+import InvitationModal from "./InvitationModal";
+import { useEffect, useState } from "react";
 
 interface ChatRoomHeaderProps {
   chatRoomDetails: ChatRoomDetailsType | null;
@@ -21,6 +20,8 @@ interface ChatRoomHeaderProps {
 export default function ChatRoomHeader({
   chatRoomDetails,
 }: ChatRoomHeaderProps) {
+  const [isInvitationModalOpen, setInvitationModalOpen] = useState(false);
+  const [members, setMembers] = useState<UserDetailsType[]>([]);
   const { stopPlayer } = usePlayer();
   const {
     player,
@@ -131,6 +132,24 @@ export default function ChatRoomHeader({
     setDuration(0);
   };
 
+  /**
+   * 채팅방 유저 목록 불러오기
+   */
+  const fetchChatRoomMembers = async () => {
+    if (chatRoomDetails?.chatRoomId == undefined) return;
+    try {
+      const response = await getChatRoomMembers(chatRoomDetails?.chatRoomId);
+      setMembers(response.data);
+    } catch (e) {
+      console.error("채팅방 멤버 로딩 중 에러: ", e);
+    }
+  };
+
+  useEffect(() => {
+    if (chatRoomDetails?.chatRoomId === undefined) return;
+    fetchChatRoomMembers();
+  }, [chatRoomDetails]);
+
   return (
     <div className="flex h-[100px] items-center justify-between border-b px-2">
       {chatRoomDetails ? (
@@ -151,7 +170,7 @@ export default function ChatRoomHeader({
             ></img>
             <div className="flex flex-col justify-start gap-2">
               <h1>{chatRoomDetails?.name}</h1>
-              <ChatRoomMembers chatRoomId={chatRoomDetails?.chatRoomId} />
+              <ChatRoomMembers members={members} />
             </div>
           </div>
           <div className="flex">
@@ -167,8 +186,16 @@ export default function ChatRoomHeader({
             )}
             <ChatRoomHeaderDropdownButton
               chatRoomId={chatRoomDetails.chatRoomId}
+              openInvitationModal={() => setInvitationModalOpen(true)}
             />
           </div>
+          {isInvitationModalOpen && (
+            <InvitationModal
+              chatRoomId={chatRoomDetails.chatRoomId}
+              members={members}
+              onClose={() => setInvitationModalOpen(false)}
+            />
+          )}
         </>
       ) : (
         <span className="flex h-full w-full items-center justify-start px-5 text-sm text-neutral-400">

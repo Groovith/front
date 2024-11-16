@@ -7,30 +7,12 @@ import { Modal } from "../common/Modal";
 import { useNavigate } from "react-router-dom";
 
 interface ChatRoomMembersProps {
-  chatRoomId: string | number | undefined;
+  members: UserDetailsType[];
 }
 
-export default function ChatRoomMembers({ chatRoomId }: ChatRoomMembersProps) {
+export default function ChatRoomMembers({ members }: ChatRoomMembersProps) {
   const navigate = useNavigate();
-  const [members, setMembers] = useState<UserDetailsType[]>([]);
   const [isModalOpen, setModalOpen] = useState(false);
-  /**
-   * 채팅방 유저 목록 불러오기
-   */
-  const fetchChatRoomMembers = async () => {
-    if (chatRoomId == undefined) return;
-    try {
-      const response = await getChatRoomMembers(chatRoomId);
-      setMembers(response.data);
-    } catch (e) {
-      console.error("채팅방 멤버 로딩 중 에러: ", e);
-    }
-  };
-
-  useEffect(() => {
-    if (chatRoomId === undefined) return;
-    fetchChatRoomMembers();
-  }, [chatRoomId]);
 
   return (
     <>

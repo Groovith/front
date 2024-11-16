@@ -6,6 +6,7 @@ export const buttonStyles = cva(["transition-colors"], {
   variants: {
     variant: {
       default: ["bg-neutral-900", "text-white", "hover:bg-neutral-600"],
+      white:["bg-white", "text-neutral-900", "hover:bg-neutral-100", "border", "border-neutral-200"],
       ghost: ["hover:bg-neutral-100"],
       transparent: ["text-neutral-400", "hover:text-black"],
       dark: [

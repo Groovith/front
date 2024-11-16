@@ -8,7 +8,6 @@ import Loading from "./Loading";
 import { useState } from "react";
 import ProfileModal from "../components/user/ProfileModal";
 import UsernameModal from "../components/user/UsernameModal";
-import { UserPlus } from "lucide-react";
 import FriendsList from "../components/user/FriendsList";
 
 export default function User() {
@@ -44,7 +43,7 @@ export default function User() {
           />
           <div className="flex flex-col gap-2 py-5">
             <div className="flex flex-col gap-2">
-              <h1 className="text-3xl font-bold text-neutral-900">
+              <h1 className="text-2xl font-bold text-neutral-900">
                 {userDetails?.username}
               </h1>
             </div>
