@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
-import { connectSpotify } from "../utils/apis/serverAPI";
 
 export function Callback() {
   const location = useLocation();
@@ -13,17 +12,17 @@ export function Callback() {
   });
 
   useEffect(() => {
-    if (code) {
-      try {
-        connectSpotify(code).then((res) => {
-          localStorage.setItem("spotifyAccessToken", res.spotifyAccessToken);
-          window.location.replace("/setting");
-        });
-      } catch (e) {
-        console.log("스포티파이 연결 에러: ", e);
-        window.location.replace("/setting");
-      }
-    }
+    // if (code) {
+    //   try {
+    //     connectSpotify(code).then((res) => {
+    //       localStorage.setItem("spotifyAccessToken", res.spotifyAccessToken);
+    //       window.location.replace("/setting");
+    //     });
+    //   } catch (e) {
+    //     console.log("스포티파이 연결 에러: ", e);
+    //     window.location.replace("/setting");
+    //   }
+    // }
   }, [code]);
 
   return <></>;

@@ -210,31 +210,6 @@ export const uploadProfileImage = async (file: File) => {
 export const deleteProfileImage = async () => {
   const response = await api.delete("/users/me/update/profile-picture");
   return response.data;
-}
-
-interface SporifyTokenResponse {
-  message: string;
-  spotifyAccessToken: string;
-}
-
-// Spotify 연결
-export const connectSpotify = async (code: string) => {
-  const response = await api.post<SporifyTokenResponse>("/streaming/spotify", {
-    code: code,
-  });
-  return response.data;
-};
-
-// Spotify 연결 해제
-export const disconnectSpotify = async () => {
-  const response = await api.delete("/streaming/spotify");
-  return response.data;
-};
-
-// Spotify 토큰 재발급
-export const getSpotifyToken = async () => {
-  const response = await api.get<SporifyTokenResponse>("/streaming/spotify");
-  return response.data;
 };
 
 interface SearchUsersResponse {
@@ -278,6 +253,14 @@ interface CreateChatRoomRequest {
   status: ChatRoomVisibilityType;
   permission: ChatRoomPlayerPermissionType;
 }
+
+// 채팅방 사용자 목록 조회
+export const getChatRoomMembers = async (chatRoomId: string | number) => {
+  const response = await api.get<{ data: UserDetailsType[] }>(
+    `/chatrooms/${chatRoomId}/members`,
+  );
+  return response.data;
+};
 
 export type ChatRoomVisibilityType = "PUBLIC" | "PRIVATE";
 export type ChatRoomPlayerPermissionType = "MASTER" | "EVERYONE";
@@ -326,23 +309,6 @@ export const getChatRoomMessages = async (
   );
   return response.data.messages;
 };
-
-// export const useGetChatRoomMessage = (chatRoomId: number) => {
-//   return useInfiniteQuery({
-//     queryKey: ["chatRoomMessages", chatRoomId],
-//     queryFn: ({ pageParam = null }) => {
-//       return getChatRoomMessages(chatRoomId, pageParam);
-//     },
-//     getNextPageParam: (last: MessageType[]) => {
-//       if (last.length >= 20) {
-//         return last[last.length - 1].messageId;
-//       }
-//       return undefined;
-//     },
-//     initialPageParam: null,
-//     refetchOnWindowFocus: false,
-//   });
-// };
 
 // ------------------ 같이 듣기 ----------------------
 

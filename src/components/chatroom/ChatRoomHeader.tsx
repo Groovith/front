@@ -6,10 +6,15 @@ import {
   User,
   UserPlus,
 } from "lucide-react";
-import { ChatRoomDetailsType, PlayerResponseDto } from "../../types/types";
+import {
+  ChatRoomDetailsType,
+  PlayerResponseDto,
+  UserDetailsType,
+} from "../../types/types";
 import { Button } from "../Button";
 import DropdownButton from "../DropdownButton";
 import {
+  getChatRoomMembers,
   joinPlayer,
   leaveChatRoom,
   leavePlayer,
@@ -20,6 +25,8 @@ import { usePlayerStore } from "../../stores/usePlayerStore";
 import { useStompStore } from "../../stores/useStompStore";
 import { usePlayer } from "../../hooks/usePlayer";
 import { useChatRoomStore } from "../../stores/useChatRoomStore";
+import { useEffect, useState } from "react";
+import ChatRoomMembers from "./ChatRoomMembers";
 
 interface ChatRoomHeaderProps {
   chatRoomDetails: ChatRoomDetailsType | null;
@@ -47,6 +54,7 @@ export default function ChatRoomHeader({
   const { stompClient } = useStompStore();
   const { isCurrentChatRoomOpen } = useChatRoomStore();
   const navigate = useNavigate();
+
   const handleLeaveChatRoom = async (chatRoomId: number) => {
     try {
       await leaveChatRoom(chatRoomId);
@@ -167,12 +175,7 @@ export default function ChatRoomHeader({
             ></img>
             <div className="flex flex-col justify-start gap-2">
               <h1>{chatRoomDetails?.name}</h1>
-              <Button
-                variant={"transparent"}
-                className="flex w-fit items-center gap-1 p-0 text-sm text-neutral-500"
-              >
-                <User size={15} />0
-              </Button>
+              <ChatRoomMembers chatRoomId={chatRoomDetails?.chatRoomId} />
             </div>
           </div>
           <div className="flex">
