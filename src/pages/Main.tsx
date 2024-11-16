@@ -115,7 +115,7 @@ export default function Main() {
   return (
     <>
       <Toaster position="bottom-center" richColors />
-      <div className="flex h-screen w-screen flex-col text-neutral-900">
+      <div className="flex h-screen w-screen text-ellipsis flex-col text-neutral-900">
         <div className="flex h-full overflow-hidden">
           <Sidebar />
           <div className="relative flex h-full w-full">

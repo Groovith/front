@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ChatHeader from "../components/chat/ChatHeader";
 import { Modal } from "../components/Modal";
 import { Button } from "../components/Button";
@@ -31,6 +31,10 @@ export default function Chat() {
     queryKey: ["chatRooms"],
     queryFn: () => fetchChatRooms(),
   });
+
+  useEffect(() => {
+    if (data) console.log(data);
+  }, [data]);
 
   const { mutate: createChatRoomMutate } = useMutation({
     mutationFn: createChatRoom,
@@ -127,7 +131,7 @@ export default function Chat() {
                     onChange={() => setChatRoomVisibility("PUBLIC")}
                     className="form-radio h-5 w-5 text-blue-600"
                   />
-                  <div className="flex flex-col gap-1 justify-start ml-3">
+                  <div className="ml-3 flex flex-col justify-start gap-1">
                     <span className="font-medium">공개</span>
                     <p className="text-xs font-normal text-gray-500">
                       검색을 통해 채팅방을 찾을 수 있고, 참여할 수 있습니다.
@@ -143,10 +147,11 @@ export default function Chat() {
                     onChange={() => setChatRoomVisibility("PRIVATE")}
                     className="form-radio h-5 w-5 text-blue-600"
                   />
-                  <div className="flex flex-col gap-1 justify-start ml-3">
+                  <div className="ml-3 flex flex-col justify-start gap-1">
                     <span className="font-medium">비공개</span>
                     <p className="text-xs font-normal text-gray-500">
-                      검색을 통해 채팅방을 찾을 수 없으며, 초대를 통해서만 참여할 수 있습니다.
+                      검색을 통해 채팅방을 찾을 수 없으며, 초대를 통해서만
+                      참여할 수 있습니다.
                     </p>
                   </div>
                 </label>
@@ -166,11 +171,11 @@ export default function Chat() {
                     onChange={() => setMusicPlayerPermission("EVERYONE")}
                     className="form-radio h-5 w-5 text-blue-600"
                   />
-                  <div className="flex flex-col gap-1 justify-start ml-3">
+                  <div className="ml-3 flex flex-col justify-start gap-1">
                     <span className="font-medium">모두</span>
                     <p className="text-xs font-normal text-gray-500">
-                      채팅방에 참가한 모든 사용자가 음악을 정지/재생, 추가/삭제할 수
-                      있습니다.
+                      채팅방에 참가한 모든 사용자가 음악을 정지/재생,
+                      추가/삭제할 수 있습니다.
                     </p>
                   </div>
                 </label>
@@ -183,11 +188,10 @@ export default function Chat() {
                     onChange={() => setMusicPlayerPermission("MASTER")}
                     className="form-radio h-5 w-5 text-blue-600"
                   />
-                  <div className="flex flex-col gap-1 justify-start ml-3">
+                  <div className="ml-3 flex flex-col justify-start gap-1">
                     <span className="font-medium">방장만</span>
                     <p className="text-xs font-normal text-gray-500">
-                      채팅방 방장만 음악을 정지/재생, 추가/삭제할 수
-                      있습니다.
+                      채팅방 방장만 음악을 정지/재생, 추가/삭제할 수 있습니다.
                     </p>
                   </div>
                 </label>

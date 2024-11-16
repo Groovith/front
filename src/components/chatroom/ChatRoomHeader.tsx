@@ -1,8 +1,12 @@
-import { ArrowLeft, Headphones, Menu, Unplug, UserPlus } from "lucide-react";
 import {
-  ChatRoomDetailsType,
-  PlayerResponseDto,
-} from "../../types/types";
+  ArrowLeft,
+  Headphones,
+  Menu,
+  Unplug,
+  User,
+  UserPlus,
+} from "lucide-react";
+import { ChatRoomDetailsType, PlayerResponseDto } from "../../types/types";
 import { Button } from "../Button";
 import DropdownButton from "../DropdownButton";
 import {
@@ -143,7 +147,7 @@ export default function ChatRoomHeader({
   };
 
   return (
-    <div className="flex h-[80px] items-center justify-between border-b px-2">
+    <div className="flex h-[100px] items-center justify-between border-b px-2">
       {chatRoomDetails ? (
         <>
           <div className="flex items-center">
@@ -158,9 +162,17 @@ export default function ChatRoomHeader({
 
             <img
               src={chatRoomDetails.imageUrl}
-              className="mr-5 size-12 rounded-full"
+              className="mr-3 size-12 rounded-full"
             ></img>
-            <h1>{chatRoomDetails?.name}</h1>
+            <div className="flex flex-col justify-start gap-2">
+              <h1>{chatRoomDetails?.name}</h1>
+              <Button
+                variant={"transparent"}
+                className="flex w-fit items-center gap-1 p-0 text-sm text-neutral-500"
+              >
+                <User size={15} />0
+              </Button>
+            </div>
           </div>
           <div className="flex">
             <Button variant={"ghost"}>

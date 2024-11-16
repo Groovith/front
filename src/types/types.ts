@@ -15,6 +15,7 @@ export interface ChatRoomDetailsType {
   imageUrl: string;
   chatRoomId: number;
   name: string;
+  masterUserName: string;
   totalUsers: number;
   currentUsers: number;
   masterId: number;

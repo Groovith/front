@@ -8,7 +8,6 @@ import {
   searchChatRooms,
   searchUsers,
 } from "../utils/apis/serverAPI";
-import defaultUserImage from "../assets/default-user-image.png";
 import defaultChatRoomImage from "../assets/default-image-mountain.png";
 import DropdownButton from "./DropdownButton";
 
@@ -26,30 +25,15 @@ export function SearchResults() {
     }
   }, [location.search]);
 
-  // 트랙 검색
-  // const {
-  //   data: spotifyData,
-  //   error: spotifyError,
-  //   isLoading: spotifyLoading,
-  // } = useQuery({
-  //   queryKey: ["spotifyData", query],
-  //   queryFn: () => spotifySearch(query || ""),
-  //   enabled: !!query,
-  // });
-
   // 유저 검색
-  const {
-    data: userData,
-  } = useQuery({
+  const { data: userData } = useQuery({
     queryKey: ["searchUsers", query],
     queryFn: () => searchUsers(query || ""),
     enabled: !!query,
   });
 
   // 채팅방 검색
-  const {
-    data: chatRoomData,
-  } = useQuery({
+  const { data: chatRoomData } = useQuery({
     queryKey: ["searchChatRooms", query],
     queryFn: () => searchChatRooms(query || ""),
     enabled: !!query,
@@ -81,67 +65,6 @@ export function SearchResults() {
 
   return (
     <div className="flex flex-col gap-10 pb-20">
-      <div className="flex flex-col">
-        <h1 className="mb-4 px-3 text-2xl font-bold text-neutral-900">노래</h1>
-        {/* <div className="flex flex-col">
-          {spotifyData?.tracks.items && spotifyData.tracks.items.length > 0 ? (
-            spotifyData.tracks.items.map((track) => (
-              <div
-                key={track.id}
-                className="group flex w-full items-center justify-between rounded-md px-3 py-3 text-left hover:bg-neutral-100"
-              >
-                <div
-                  className="flex items-center gap-3 hover:cursor-pointer"
-                  // onClick={() => playNewTrack(track)}
-                >
-                  <img
-                    src={track.album.images[0].url}
-                    className="size-12 rounded-sm"
-                  />
-                  <div className="flex flex-col">
-                    <h2 className="font-medium">{track.name}</h2>
-                    <div className="flex items-center gap-1">
-                      <p className="text-sm text-neutral-500">
-                        {track.artists[0].name}
-                      </p>
-                      <p>·</p>
-                      <p className="text-sm text-neutral-500">
-                        {track.album.name}
-                      </p>
-                      <p>·</p>
-                      <p className="text-sm text-neutral-500">
-                        {formatDuration(track.duration_ms)}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-                <DropdownButton
-                  items={[
-                    {
-                      label: "현재 재생목록에 추가",
-                      action: () => {
-                        // addToCurrentPlaylist(track);
-                      },
-                      Icon: ListPlus,
-                    },
-                  ]}
-                >
-                  <Button
-                    variant={"ghost"}
-                    className="text-neutral-500 opacity-0 hover:text-neutral-900 group-hover:opacity-100"
-                  >
-                    <EllipsisVertical />
-                  </Button>
-                </DropdownButton>
-              </div>
-            ))
-          ) : (
-            <p className="px-3 text-neutral-500">
-              "{query}"로 검색한 노래 결과가 없습니다
-            </p>
-          )}
-        </div> */}
-      </div>
       <div className="flex flex-col">
         <h1 className="mb-4 px-3 text-2xl font-bold text-neutral-900">
           채팅방
@@ -195,7 +118,10 @@ export function SearchResults() {
                     navigate(`/user/${user.username}`);
                   }}
                 >
-                  <img src={defaultUserImage} className="size-12 rounded-md" />
+                  <img
+                    src={user.imageUrl}
+                    className="size-12 rounded-full object-cover"
+                  />
                   <div className="flex flex-col">
                     <h2 className="font-medium">{user.username}</h2>
                   </div>

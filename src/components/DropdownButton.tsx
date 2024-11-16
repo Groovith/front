@@ -46,39 +46,40 @@ export default function DropdownButton({ children, items }: DropdownProps) {
   // 메뉴가 화면 밖으로 나가지 않도록 조정
   useEffect(() => {
     if (isOpen && menuRef.current) {
-        const { top, right, bottom, left } = menuRef.current.getBoundingClientRect();
-        const viewportHeight = window.innerHeight;
-        const viewportWidth = window.innerWidth;
+      const { top, right, bottom, left } =
+        menuRef.current.getBoundingClientRect();
+      const viewportHeight = window.innerHeight;
+      const viewportWidth = window.innerWidth;
 
-        // 이동할 거리 계산
-        let offsetY = 0;
-        let offsetX = 0;
+      // 이동할 거리 계산
+      let offsetY = 0;
+      let offsetX = 0;
 
-        // 위쪽으로 나갔을 경우
-        if (top < 0) {
-            offsetY = -top; // top이 0보다 작으면 위쪽으로 나간 만큼 이동
-        }
-        // 아래쪽으로 나갔을 경우
-        if (bottom > viewportHeight) {
-            offsetY = Math.min(offsetY, viewportHeight - bottom); // 아래쪽으로 나간 만큼 이동
-        }
-        // 왼쪽으로 나갔을 경우
-        if (left < 0) {
-            offsetX = -left; // left가 0보다 작으면 왼쪽으로 나간 만큼 이동
-        }
-        // 오른쪽으로 나갔을 경우
-        if (right > viewportWidth) {
-            offsetX = Math.min(offsetX, viewportWidth - right); // 오른쪽으로 나간 만큼 이동
-        }
+      // 위쪽으로 나갔을 경우
+      if (top < 0) {
+        offsetY = -top; // top이 0보다 작으면 위쪽으로 나간 만큼 이동
+      }
+      // 아래쪽으로 나갔을 경우
+      if (bottom > viewportHeight) {
+        offsetY = Math.min(offsetY, viewportHeight - bottom); // 아래쪽으로 나간 만큼 이동
+      }
+      // 왼쪽으로 나갔을 경우
+      if (left < 0) {
+        offsetX = -left; // left가 0보다 작으면 왼쪽으로 나간 만큼 이동
+      }
+      // 오른쪽으로 나갔을 경우
+      if (right > viewportWidth) {
+        offsetX = Math.min(offsetX, viewportWidth - right); // 오른쪽으로 나간 만큼 이동
+      }
 
-        // 메뉴 위치 조정
-        if (offsetY !== 0 || offsetX !== 0) {
-            menuRef.current.style.position = "absolute";
-            menuRef.current.style.top = `${menuRef.current.offsetTop + offsetY}px`;
-            menuRef.current.style.left = `${menuRef.current.offsetLeft + offsetX}px`;
-        }
+      // 메뉴 위치 조정
+      if (offsetY !== 0 || offsetX !== 0) {
+        menuRef.current.style.position = "absolute";
+        menuRef.current.style.top = `${menuRef.current.offsetTop + offsetY}px`;
+        menuRef.current.style.left = `${menuRef.current.offsetLeft + offsetX}px`;
+      }
     }
-}, [isOpen]);
+  }, [isOpen]);
 
   const handleButtonClick = (action: () => void) => {
     action();
@@ -86,28 +87,30 @@ export default function DropdownButton({ children, items }: DropdownProps) {
   };
 
   return (
-    <div>
-      <div className="flex gap-2" onClick={handleClick} ref={buttonRef}>
+    <>
+      <div className="relative flex gap-2" onClick={handleClick} ref={buttonRef}>
         {children}
+        {isOpen && (
+          <div
+            ref={menuRef}
+            className="absolute top-10 z-50 flex w-fit min-w-[200px] flex-col rounded-lg border bg-white py-3 shadow-lg"
+          >
+            {items.map((item, index) => (
+              <Button
+                key={index}
+                variant={"ghost"}
+                onClick={() => handleButtonClick(item.action)}
+                className="flex w-full gap-3 rounded-none px-4"
+              >
+                {item.Icon && <item.Icon />}
+                <p className="w-fit whitespace-nowrap text-left">
+                  {item.label}
+                </p>
+              </Button>
+            ))}
+          </div>
+        )}
       </div>
-      {isOpen && (
-        <div
-          ref={menuRef}
-          className="absolute z-50 flex w-fit min-w-[200px] flex-col rounded-lg border bg-white py-3 shadow-lg"
-        >
-          {items.map((item, index) => (
-            <Button
-              key={index}
-              variant={"ghost"}
-              onClick={() => handleButtonClick(item.action)}
-              className="flex w-full gap-3 rounded-none px-4"
-            >
-              {item.Icon && <item.Icon />}
-              <p className="w-fit whitespace-nowrap text-left">{item.label}</p>
-            </Button>
-          ))}
-        </div>
-      )}
-    </div>
+    </>
   );
 }
