@@ -1,18 +1,8 @@
-import {
-  ArrowLeft,
-  Headphones,
-  Menu,
-  Unplug,
-  UserPlus,
-} from "lucide-react";
-import {
-  ChatRoomDetailsType,
-  PlayerResponseDto,
-} from "../../types/types";
+import { ArrowLeft, Headphones, Unplug, UserPlus } from "lucide-react";
+import { ChatRoomDetailsType, PlayerResponseDto } from "../../types/types";
 import { Button } from "../common/Button";
 import {
   joinPlayer,
-  leaveChatRoom,
   leavePlayer,
 } from "../../utils/apis/serverAPI";
 import { toast } from "sonner";
@@ -22,7 +12,7 @@ import { useStompStore } from "../../stores/useStompStore";
 import { usePlayer } from "../../hooks/usePlayer";
 import { useChatRoomStore } from "../../stores/useChatRoomStore";
 import ChatRoomMembers from "./ChatRoomMembers";
-import DropdownButton from "../common/DropdownButton";
+import ChatRoomHeaderDropdownButton from "./ChatRoomHeaderDropdownButton";
 
 interface ChatRoomHeaderProps {
   chatRoomDetails: ChatRoomDetailsType | null;
@@ -50,16 +40,6 @@ export default function ChatRoomHeader({
   const { stompClient } = useStompStore();
   const { isCurrentChatRoomOpen } = useChatRoomStore();
   const navigate = useNavigate();
-
-  const handleLeaveChatRoom = async (chatRoomId: number) => {
-    try {
-      await leaveChatRoom(chatRoomId);
-      navigate("/chat");
-    } catch (e) {
-      console.error("채팅방 나가기 중 오류 발생: ", e);
-      toast.error("채팅방 나가기 중 오류가 발생하였습니다.");
-    }
-  };
 
   // 같이 듣기 연결
   const connectListenTogether = async () => {
@@ -175,9 +155,6 @@ export default function ChatRoomHeader({
             </div>
           </div>
           <div className="flex">
-            <Button variant={"ghost"}>
-              <UserPlus />
-            </Button>
             {listenTogetherId &&
             listenTogetherId === chatRoomDetails.chatRoomId ? (
               <Button variant={"ghost"} onClick={disconnectListenTogether}>
@@ -188,21 +165,9 @@ export default function ChatRoomHeader({
                 <Headphones />
               </Button>
             )}
-
-            <DropdownButton
-              items={[
-                {
-                  label: "채팅방 나가기",
-                  action: () => {
-                    handleLeaveChatRoom(chatRoomDetails.chatRoomId);
-                  },
-                },
-              ]}
-            >
-              <Button variant={"ghost"}>
-                <Menu />
-              </Button>
-            </DropdownButton>
+            <ChatRoomHeaderDropdownButton
+              chatRoomId={chatRoomDetails.chatRoomId}
+            />
           </div>
         </>
       ) : (

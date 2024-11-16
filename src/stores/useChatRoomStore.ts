@@ -12,6 +12,7 @@ interface useChatRoomStoreType {
   setCurrentChatRoomMessages: ([]: MessageType[]) => void;
   setNewMessage: (newMessage: MessageType) => void;
   toggleCurrentChatRoomOpen: () => void;
+  closeCurrentChatRoom: () => void;
   getChatRoomById: (chatRoomId: number) => ChatRoomDetailsType | undefined;
   addToCurrentChatRoomMessages: (message: MessageType) => void;
 }
@@ -31,6 +32,7 @@ export const useChatRoomStore = create<useChatRoomStoreType>((set, get) => ({
   setNewMessage: (newMessage: MessageType) => set({ newMessage }),
   toggleCurrentChatRoomOpen: () =>
     set((state) => ({ isCurrentChatRoomOpen: !state.isCurrentChatRoomOpen })),
+  closeCurrentChatRoom: () => set(() => ({isCurrentChatRoomOpen: false})),
   getChatRoomById: (chatRoomId: number) =>
     get().chatRoomList.find((chatRoom) => chatRoom.chatRoomId === chatRoomId),
   addToCurrentChatRoomMessages: (message: MessageType) => {

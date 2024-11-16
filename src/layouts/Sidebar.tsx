@@ -18,7 +18,7 @@ import { useChatRoomStore } from "../stores/useChatRoomStore";
 export default function Sidebar() {
   const navigate = useNavigate();
   const { getUsername } = useUser();
-  const { setCurrentChatRoomId } = useChatRoomStore();
+  const { setCurrentChatRoomId, closeCurrentChatRoom } = useChatRoomStore();
 
   // 더보기 버튼
   const moreButtonItems = [
@@ -46,9 +46,10 @@ export default function Sidebar() {
     },
   ];
 
-  const handleUserClick = async () => {
-    navigate(`/user/${getUsername()}`);
-  };
+  const handleButtonClick = (navigateTo:string) => {
+    navigate(navigateTo);
+    closeCurrentChatRoom();
+  }
 
   return (
     <div className="hidden h-full w-[80px] flex-none flex-col items-center justify-start gap-y-10 border-r border-gray-200 pt-8 md:flex">
@@ -63,7 +64,7 @@ export default function Sidebar() {
         <Button
           variant={"ghost"}
           onClick={() => {
-            navigate("/");
+            handleButtonClick("/");
           }}
         >
           <Home />
@@ -71,7 +72,7 @@ export default function Sidebar() {
         <Button
           variant={"ghost"}
           onClick={() => {
-            navigate("/search");
+            handleButtonClick("/search");
           }}
         >
           <Search />
@@ -79,13 +80,13 @@ export default function Sidebar() {
         <Button
           variant={"ghost"}
           onClick={() => {
-            navigate("/chat");
+            handleButtonClick("/chat");
             setCurrentChatRoomId(-1);
           }}
         >
           <Send />
         </Button>
-        <Button variant={"ghost"} onClick={handleUserClick}>
+        <Button variant={"ghost"} onClick={() => handleButtonClick(`/user/${getUsername()}`)}>
           <UserRound />
         </Button>
         <DropdownButton items={moreButtonItems}>
