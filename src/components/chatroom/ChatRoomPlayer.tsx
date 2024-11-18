@@ -8,10 +8,9 @@ interface ChatRoomPlayerProps {
 }
 
 export default function ChatRoomPlayer({ playerDetails }: ChatRoomPlayerProps) {
-  const { listenTogetherId } = usePlayerStore();
-  const isListeningChatRoom = typeof playerDetails?.chatRoomId == 'undefined' ? true : playerDetails.chatRoomId === listenTogetherId;
+  const { currentPlaylist, currentPlaylistIndex, listenTogetherId } = usePlayerStore();
+  const isListeningChatRoom = !playerDetails || playerDetails.chatRoomId === listenTogetherId;
   if (!playerDetails) {
-    const { currentPlaylist, currentPlaylistIndex } = usePlayerStore();
     return (
       <div className="flex size-full flex-col">
         <ChatRoomTrackInfo track={currentPlaylist[currentPlaylistIndex]} />

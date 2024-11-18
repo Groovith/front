@@ -59,7 +59,7 @@ export default function ChatRoomPlaylistOverlay({
           </div>
         </div>
         <div
-          className="overflow-y-auto"
+          className="overflow-y-auto flex flex-col"
           style={{ maxHeight: height - 80 }}
         >
           {currentPlaylist?.map((track, index) => (

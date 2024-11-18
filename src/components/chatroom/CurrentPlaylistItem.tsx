@@ -1,4 +1,4 @@
-import { AudioLines, EllipsisVertical } from "lucide-react";
+import { AudioLines, EllipsisVertical, Trash2 } from "lucide-react";
 import { usePlayer } from "../../hooks/usePlayer";
 import { Track } from "../../types/track.type";
 import { Button } from "../common/Button";
@@ -61,6 +61,7 @@ export default function CurrentPlaylistItem({
           <DropdownButton
             items={[
               {
+                Icon: Trash2,
                 label: "현재 재생목록에서 삭제",
                 action: () => {
                   removeFromCurrentPlaylist(index);

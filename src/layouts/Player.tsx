@@ -164,6 +164,14 @@ export default function Player() {
           if (!newCurrentPlaylist || typeof index === "undefined") break;
           setCurrentPlaylist(newCurrentPlaylist);
           setCurrentPlaylistIndex(index);
+          
+          // 플레이리스트가 비어있던 경우 자동 재생
+          if (player?.current?.target.getPlayerState() === YouTube.PlayerState.UNSTARTED) {
+            player.current.target.loadVideoById({
+              videoId: newCurrentPlaylist[index].videoId,
+              startSeconds: 0,
+            });
+          }
           break;
       }
     }
