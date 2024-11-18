@@ -6,6 +6,6 @@ export interface FriendsListResponseDto {
 }
 
 export const getFriendsList = async () => {
-    const response = await api.get<FriendsListResponseDto>("/users/friends");
+    const response = await api.get<FriendsListResponseDto>("/users/me/friends");
     return response.data;
 }

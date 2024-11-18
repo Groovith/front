@@ -18,7 +18,7 @@ export interface ChatRoomDetailsType {
   masterUserName: string;
   totalUsers: number;
   currentUsers: number;
-  masterId: number;
+  masterUserId: number;
   playListId: number;
   playListIndex: number;
   position: number;

@@ -8,6 +8,8 @@ interface ChatRoomPlayerProps {
 }
 
 export default function ChatRoomPlayer({ playerDetails }: ChatRoomPlayerProps) {
+  const { listenTogetherId } = usePlayerStore();
+  const isListeningChatRoom = typeof playerDetails?.chatRoomId == 'undefined' ? true : playerDetails.chatRoomId === listenTogetherId;
   if (!playerDetails) {
     const { currentPlaylist, currentPlaylistIndex } = usePlayerStore();
     return (
@@ -16,6 +18,7 @@ export default function ChatRoomPlayer({ playerDetails }: ChatRoomPlayerProps) {
         <ChatRoomPlaylist
           currentPlaylist={currentPlaylist}
           currentPlaylistIndex={currentPlaylistIndex}
+          isListeningChatRoom={isListeningChatRoom}
         />
       </div>
     );
@@ -31,6 +34,7 @@ export default function ChatRoomPlayer({ playerDetails }: ChatRoomPlayerProps) {
       <ChatRoomPlaylist
         currentPlaylist={playerDetails.currentPlaylist}
         currentPlaylistIndex={playerDetails.currentPlaylistIndex}
+        isListeningChatRoom={isListeningChatRoom}
       />
     </div>
   );

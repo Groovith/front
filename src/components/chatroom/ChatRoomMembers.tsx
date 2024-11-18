@@ -1,5 +1,5 @@
-import { User } from "lucide-react";
-import { useState } from "react";
+import { Crown, Plus, User } from "lucide-react";
+import { useEffect, useState } from "react";
 import { UserDetailsType } from "../../types/types";
 import { Button } from "../common/Button";
 import { Modal } from "../common/Modal";
@@ -7,12 +7,20 @@ import { useNavigate } from "react-router-dom";
 
 interface ChatRoomMembersProps {
   members: UserDetailsType[];
+  masterId: number;
+  openInvitationModal: () => void;
 }
 
-export default function ChatRoomMembers({ members }: ChatRoomMembersProps) {
+export default function ChatRoomMembers({
+  members,
+  masterId,
+  openInvitationModal,
+}: ChatRoomMembersProps) {
   const navigate = useNavigate();
   const [isModalOpen, setModalOpen] = useState(false);
-
+  useEffect(() => {
+    console.log(masterId);
+  }, [])
   return (
     <>
       <Button
@@ -30,19 +38,33 @@ export default function ChatRoomMembers({ members }: ChatRoomMembersProps) {
               members.length > 0 &&
               members.map((member) => (
                 <Button
-                    variant={"ghost"}
-                  className="flex gap-5 px-5 min-w-[300px] justify-start items-center rounded-lg cursor-default"
+                  variant={"ghost"}
+                  className="flex min-w-[300px] cursor-default items-center justify-between rounded-lg"
                   key={member.id}
                   onClick={() => navigate(`/user/${member.username}`)}
                 >
-                  <img
-                    src={member.imageUrl}
-                    alt="profile"
-                    className="size-10 object-cover rounded-full"
-                  />
-                  <p>{member.username}</p>
+                  <div className="flex gap-4 items-center">
+                    <img
+                      src={member.imageUrl}
+                      alt="profile"
+                      className="size-12 rounded-full object-cover"
+                    />
+                    <p>{member.username}</p>
+                  </div>
+                  {masterId === member.id ? <div className="text-neutral-500"><Crown size={20} /></div> : <div></div>}
                 </Button>
               ))}
+            <Button
+              variant={"white"}
+              className="mx-2 mt-5 flex items-center justify-center gap-2"
+              onClick={() => {
+                setModalOpen(false);
+                openInvitationModal();
+              }}
+            >
+              <Plus size={18} />
+              <p>채팅에 초대하기</p>
+            </Button>
           </div>
         </Modal>
       )}

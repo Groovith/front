@@ -86,12 +86,6 @@ export default function ChatRoom({ chatRoomId }: ChatRoomProps) {
     };
   }, [stompClient, chatRoomId]);
 
-  useEffect(() => {
-    if (playerDetails) {
-      console.log(playerDetails);
-    }
-  }, [playerDetails])
-
   return (
     <div className="flex size-full">
       <ChatRoomMain chatRoomId={chatRoomId} chatRoomDetails={chatRoomDetails} playerDetails={playerDetails} />

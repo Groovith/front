@@ -20,7 +20,7 @@ export default function ChatRoomBody({
   chatRoomId,
   playerDetails,
 }: ChatRoomBodyProps) {
-  const { currentPlaylist, currentPlaylistIndex } = usePlayerStore();
+  const { currentPlaylist, currentPlaylistIndex, listenTogetherId } = usePlayerStore();
   const [messages, setMessages] = useState<MessageType[]>([]);
   const [lastMessageId, setLastMessageId] = useState<number | null>(null);
   const [hasMoreMessage, setHasMoreMessage] = useState(true);
@@ -33,6 +33,7 @@ export default function ChatRoomBody({
   const { ref: topRef, inView: topInView } = useInView();
   const { ref: bottomRef, inView: bottomInView } = useInView();
   const messageContainerRef = useRef<HTMLUListElement>(null);
+  const isListeningChatRoom = typeof playerDetails?.chatRoomId == 'undefined' ? true : playerDetails.chatRoomId === listenTogetherId;
 
   useEffect(() => {
     if (chatRoomId && topInView && hasMoreMessage && !loading) {
@@ -160,6 +161,7 @@ export default function ChatRoomBody({
         show={showPlaylist}
         togglePlaylist={togglePlaylist}
         height={chatContainerRef.current?.clientHeight}
+        isListeningChatRoom={isListeningChatRoom}
       />
     </div>
   );

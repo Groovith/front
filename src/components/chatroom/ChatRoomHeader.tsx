@@ -1,7 +1,15 @@
 import { ArrowLeft, Headphones, Unplug } from "lucide-react";
-import { ChatRoomDetailsType, PlayerResponseDto, UserDetailsType } from "../../types/types";
+import {
+  ChatRoomDetailsType,
+  PlayerResponseDto,
+  UserDetailsType,
+} from "../../types/types";
 import { Button } from "../common/Button";
-import { getChatRoomMembers, joinPlayer, leavePlayer } from "../../utils/apis/serverAPI";
+import {
+  getChatRoomMembers,
+  joinPlayer,
+  leavePlayer,
+} from "../../utils/apis/serverAPI";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { usePlayerStore } from "../../stores/usePlayerStore";
@@ -66,24 +74,30 @@ export default function ChatRoomHeader({
       setCurrentPlaylist(response.currentPlaylist);
       setCurrentPlaylistIndex(response.currentPlaylistIndex);
 
-      const videoId =
-        response.currentPlaylist[response.currentPlaylistIndex].videoId;
-      const position = response.position;
-      const paused = response.paused;
+      if (
+        response.currentPlaylist[response.currentPlaylistIndex] !== undefined
+      ) {
+        const videoId =
+          response.currentPlaylist[response.currentPlaylistIndex].videoId;
+        const position = response.position;
+        const paused = response.paused;
 
-      if (!player?.current) return;
-      if (paused) {
-        player.current.target.cueVideoById({
-          videoId: videoId,
-          startSeconds: position,
-        });
-      } else {
-        player.current.target.loadVideoById({
-          videoId: videoId,
-          startSeconds: position,
-        });
+        if (!player?.current) return;
+        if (paused) {
+          player.current.target.cueVideoById({
+            videoId: videoId,
+            startSeconds: position,
+          });
+        } else {
+          player.current.target.loadVideoById({
+            videoId: videoId,
+            startSeconds: position,
+          });
+        }
       }
+      toast.message("같이 듣기에 참가합니다.");
     } catch (e) {
+      console.error(e);
       toast.error("같이 듣기 참가 중 문제가 발생하였습니다.");
     }
 
@@ -130,6 +144,7 @@ export default function ChatRoomHeader({
     stopPlayer();
     setPosition(0);
     setDuration(0);
+    toast.message("같이 듣기 연결을 해제합니다.");
   };
 
   /**
@@ -170,7 +185,13 @@ export default function ChatRoomHeader({
             ></img>
             <div className="flex flex-col justify-start gap-2">
               <h1>{chatRoomDetails?.name}</h1>
-              <ChatRoomMembers members={members} />
+              <ChatRoomMembers
+                members={members}
+                masterId={chatRoomDetails.masterUserId}
+                openInvitationModal={() => {
+                  setInvitationModalOpen(true);
+                }}
+              />
             </div>
           </div>
           <div className="flex">

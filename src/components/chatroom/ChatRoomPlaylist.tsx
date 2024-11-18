@@ -9,16 +9,19 @@ import AddTrackModal from "./AddTrackModal";
 interface ChatRoomPlaylistProps {
   currentPlaylist: Track[]; // playlist 데이터 타입을 정의할 수 있습니다.
   currentPlaylistIndex: number;
+  isListeningChatRoom: boolean;
 }
 
 export default function ChatRoomPlaylist({
   currentPlaylist,
   currentPlaylistIndex,
+  isListeningChatRoom
 }: ChatRoomPlaylistProps) {
   const [hoveredTrackIndex, setHoveredTrackIndex] = useState<number | null>(
     null,
   );
   const [addTrackModalVisible, setAddTrackModalVisible] = useState(false);
+  
 
   useEffect(() => {
     if (addTrackModalVisible) {
@@ -37,6 +40,7 @@ export default function ChatRoomPlaylist({
           <Button
             variant={"transparent"}
             onClick={() => setAddTrackModalVisible(true)}
+            disabled={!isListeningChatRoom}
           >
             <ListPlus />
           </Button>

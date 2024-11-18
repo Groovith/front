@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import ChatHeader from "../components/chat/ChatHeader";
 import { Modal } from "../components/common/Modal";
 import { Button } from "../components/common/Button";
@@ -32,9 +32,9 @@ export default function Chat() {
     queryFn: () => fetchChatRooms(),
   });
 
-  useEffect(() => {
-    if (data) console.log(data);
-  }, [data]);
+  if (data) {
+    console.log(data);
+  }
 
   const { mutate: createChatRoomMutate } = useMutation({
     mutationFn: createChatRoom,
@@ -75,7 +75,7 @@ export default function Chat() {
 
   return (
     <>
-      <div className="flex size-full justify-center px-10 py-16">
+      <div className="flex size-full overflow-y-auto justify-center px-10 pt-16 ">
         <div className="flex size-full max-w-screen-sm flex-col gap-5">
           <ChatHeader setIsModalOpen={setIsModalOpen} />
 
@@ -88,7 +88,7 @@ export default function Chat() {
           )}
 
           {data?.chatRooms && data.chatRooms.length > 0 && (
-            <ul className="flex flex-col">
+            <ul className="flex flex-col pb-10 w-full">
               {data.chatRooms.map((chatRoom) => (
                 <ChatRoomListItem
                   key={chatRoom.chatRoomId}

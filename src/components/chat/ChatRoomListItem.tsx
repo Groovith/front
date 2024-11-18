@@ -26,6 +26,7 @@ export default function ChatRoomListItem({
         <img src={chatRoom.imageUrl} className="size-12 rounded-full" />
         <div className="flex flex-col">
           <h2 className="text-neutral-900">{chatRoom.name}</h2>
+          <p className="text-sm text-neutral-400">{chatRoom.masterUserName ? "@" + chatRoom.masterUserName : "@알 수 없음"}</p>
         </div>
       </div>
 
@@ -40,7 +41,7 @@ export default function ChatRoomListItem({
       >
         <Button
           variant={"transparent"}
-          className="p-0 opacity-0 group-hover:opacity-100"
+          className="p-0 md:opacity-0 group-hover:opacity-100"
         >
           <EllipsisVertical />
         </Button>

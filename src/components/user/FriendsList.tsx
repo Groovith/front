@@ -29,7 +29,7 @@ export default function FriendsList() {
         {data &&
           data.friends.length > 0 &&
           data.friends.map((user) => (
-            <FriendItem user={user} refetch={refetch} />
+            <FriendItem user={user} key={user.id} refetch={refetch} />
           ))}
       </div>
       {isAddFriendModalOpen && (

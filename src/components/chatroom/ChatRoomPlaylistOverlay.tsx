@@ -11,6 +11,7 @@ interface ChatRoomPlaylistOverlayProps {
   show: boolean;
   togglePlaylist: () => void;
   height?: number;
+  isListeningChatRoom: boolean;
 }
 
 export default function ChatRoomPlaylistOverlay({
@@ -19,6 +20,7 @@ export default function ChatRoomPlaylistOverlay({
   show,
   togglePlaylist,
   height = 0, // 기본값을 0으로 설정
+  isListeningChatRoom,
 }: ChatRoomPlaylistOverlayProps) {
   const [addTrackModalVisible, setAddTrackModalVisible] = useState(false);
   const [hoveredTrackIndex, setHoveredTrackIndex] = useState<number | null>(
@@ -39,6 +41,7 @@ export default function ChatRoomPlaylistOverlay({
               variant={"ghost"}
               className="p-1"
               onClick={() => setAddTrackModalVisible(true)}
+              disabled={!isListeningChatRoom}
             >
               <ListPlus />
             </Button>
