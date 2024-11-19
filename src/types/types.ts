@@ -4,6 +4,7 @@ export interface UserDetailsType {
   id: number;
   username: string;
   imageUrl: string;
+  userRelationship: "SELF" | "FRIEND" | "NOT_FRIEND"
 }
 
 export interface ChatRoomDetailsType {

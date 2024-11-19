@@ -1,20 +1,24 @@
 import { Button } from "../components/common/Button";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { getUserDetailsByUsername } from "../utils/apis/serverAPI";
 import { UserDetailsType } from "../types/types";
-import { useUser } from "../hooks/useUser";
 import Loading from "./Loading";
 import { useState } from "react";
 import ProfileModal from "../components/user/ProfileModal";
 import UsernameModal from "../components/user/UsernameModal";
 import FriendsList from "../components/user/FriendsList";
+import NotFound from "./errors/NotFound";
+import { ChevronLeft } from "lucide-react";
+import { deleteFriend } from "../utils/apis/friends/deleteFriend.api";
+import { toast } from "sonner";
+import { addFriend } from "../utils/apis/friends/addFriend.api";
 
 export default function User() {
-  const { getUserId } = useUser();
   const { username } = useParams();
   const [profileModalOpen, setProfileModalOpen] = useState(false);
   const [usernameModalOpen, setUsernameModalOpen] = useState(false);
+  const navigate = useNavigate();
 
   // username으로 프로필 검색 -> 없으면 없는 유저 화면
   const {
@@ -27,15 +31,46 @@ export default function User() {
     enabled: !!username,
   });
 
+  // 친구 추가
+  const handleAddFriend = async () => {
+    if (!userDetails) return;
+    try {
+      await addFriend(userDetails.username);
+      refetch();
+      toast.success("사용자를 친구로 추가하였습니다.")
+    } catch (e) {
+      toast.error("친구 추가 중 문제가 발생하였습니다.");
+      console.error("친구 추가 요청 실패: ", e);
+    }
+  };
+
+  // 친구 삭제
+  const handleDeleteFriend = async () => {
+    if (!userDetails) return;
+    try {
+      await deleteFriend(userDetails.username);
+      refetch();
+      toast.success("사용자를 친구 목록에서 삭제하였습니다.")
+    } catch (e) {
+        toast.error("친구 삭제 중 문제가 발생하였습니다.");
+        console.error(e);
+    }
+  };
+
   if (isUserDetailsLoading) {
     return <Loading />;
+  }
+
+  if (!userDetails) {
+    return(<NotFound />)
   }
 
   // 유저네임이 현재 로그인한 유저네임과 같은지 확인 -> 내 프로필 화면 | 타 유저 프로필 화면 결정
 
   return (
-    <div className="flex h-full w-full justify-center px-10 text-neutral-900">
-      <div className="flex w-full max-w-screen-md flex-col gap-10 py-20">
+    <div className="flex flex-col h-full w-full justify-between items-center text-neutral-900">
+      <div className="w-full pt-2 px-2 md:hidden" onClick={() => navigate(-1)}><Button variant={"ghost"}><ChevronLeft /></Button></div>
+      <div className="flex w-full h-full max-w-screen-md flex-col gap-10 px-10 py-10">
         <div className="flex items-center gap-8">
           <img
             src={userDetails?.imageUrl}
@@ -50,7 +85,7 @@ export default function User() {
           </div>
         </div>
         <div className="flex w-full items-center justify-between gap-5">
-          {userDetails && userDetails.id === getUserId() ? (
+          {userDetails.userRelationship === "SELF" && (
             <div className="flex flex-col w-full h-fit gap-10">
               <div className="flex w-full">
                 <Button
@@ -82,10 +117,12 @@ export default function User() {
                 />
               )}
             </div>
-          ) : (
-            <>
-              <Button className="w-full">친구 추가</Button>
-            </>
+          )}
+          {userDetails.userRelationship === "FRIEND" && (
+            <Button variant={"white"} className="w-full" onClick={handleDeleteFriend}>친구 삭제</Button>
+          )}
+          {userDetails.userRelationship === "NOT_FRIEND" && (
+            <Button className="w-full" onClick={handleAddFriend}>친구 추가</Button>
           )}
         </div>
       </div>
