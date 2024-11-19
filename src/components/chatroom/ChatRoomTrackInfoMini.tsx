@@ -25,9 +25,9 @@ export default function ChatRoomTrackInfoMini({
             />
 
             {/* 음악 정보 */}
-            <div className="ml-4 flex flex-col justify-center text-white">
-              <p className="truncate text-lg font-bold">{track.title}</p>
-              <p className="truncate text-sm text-neutral-100">
+            <div className="truncate ml-4 flex flex-col justify-center text-white w-full">
+              <p className="truncate text-lg font-bold w-full">{track.title}</p>
+              <p className="truncate text-sm text-neutral-100 w-full">
                 {track.artist}
               </p>
             </div>

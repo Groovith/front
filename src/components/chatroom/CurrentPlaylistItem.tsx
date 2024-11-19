@@ -24,7 +24,7 @@ export default function CurrentPlaylistItem({
   return (
     <div
       key={index}
-      className={`flex h-[65px] w-full flex-none items-center justify-between border-b px-4 py-2 hover:bg-neutral-100 ${
+      className={`flex h-fit w-full flex-none items-center justify-between border-b px-4 py-2 hover:bg-neutral-100 ${
         isCurrentTrack ? "bg-neutral-100" : ""
       }`}
       onMouseEnter={() => setHoveredTrackIndex(index)}
@@ -48,12 +48,12 @@ export default function CurrentPlaylistItem({
         </div>
         <div className="flex w-full flex-col gap-0.5 overflow-hidden text-ellipsis whitespace-nowrap">
           <p
-            className="w-fit overflow-hidden text-ellipsis whitespace-nowrap text-neutral-900 hover:cursor-pointer"
+            className="w-full truncate text-neutral-900 hover:cursor-pointer"
             onClick={() => playAtIndex(index)}
           >
             {track.title}
           </p>
-          <p className="text-sm text-neutral-500">{track.artist}</p>
+          <p className="text-sm text-neutral-500 w-full truncate">{track.artist}</p>
         </div>
       </div>
       <div className="hidden w-10 items-center justify-center gap-1 md:flex">
