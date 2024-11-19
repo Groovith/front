@@ -6,7 +6,7 @@ import { Modal } from "../common/Modal";
 import { useNavigate } from "react-router-dom";
 
 interface ChatRoomMembersProps {
-  members: UserDetailsType[];
+  members: UserDetailsType[] | undefined;
   masterId: number;
   openInvitationModal: () => void;
 }
@@ -18,6 +18,10 @@ export default function ChatRoomMembers({
 }: ChatRoomMembersProps) {
   const navigate = useNavigate();
   const [isModalOpen, setModalOpen] = useState(false);
+
+  if (members == undefined) {
+    return(<></>)
+  }
 
   return (
     <>

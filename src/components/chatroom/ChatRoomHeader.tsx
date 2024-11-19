@@ -19,7 +19,8 @@ import { useChatRoomStore } from "../../stores/useChatRoomStore";
 import ChatRoomMembers from "./ChatRoomMembers";
 import ChatRoomHeaderDropdownButton from "./ChatRoomHeaderDropdownButton";
 import InvitationModal from "./InvitationModal";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 
 interface ChatRoomHeaderProps {
   chatRoomDetails: ChatRoomDetailsType | null;
@@ -29,7 +30,7 @@ export default function ChatRoomHeader({
   chatRoomDetails,
 }: ChatRoomHeaderProps) {
   const [isInvitationModalOpen, setInvitationModalOpen] = useState(false);
-  const [members, setMembers] = useState<UserDetailsType[]>([]);
+  //const [members, setMembers] = useState<UserDetailsType[]>([]);
   const { stopPlayer } = usePlayer();
   const {
     player,
@@ -150,20 +151,11 @@ export default function ChatRoomHeader({
   /**
    * 채팅방 유저 목록 불러오기
    */
-  const fetchChatRoomMembers = async () => {
-    if (chatRoomDetails?.chatRoomId == undefined) return;
-    try {
-      const response = await getChatRoomMembers(chatRoomDetails?.chatRoomId);
-      setMembers(response.data);
-    } catch (e) {
-      console.error("채팅방 멤버 로딩 중 에러: ", e);
-    }
-  };
-
-  useEffect(() => {
-    if (chatRoomDetails?.chatRoomId === undefined) return;
-    fetchChatRoomMembers();
-  }, [chatRoomDetails]);
+  const { data: members, refetch } = useQuery<UserDetailsType[]>({
+    queryKey: ["members", chatRoomDetails?.chatRoomId],
+    queryFn: () => getChatRoomMembers(chatRoomDetails?.chatRoomId as number),
+    enabled: chatRoomDetails !== null,
+  });
 
   return (
     <div className="flex h-[100px] items-center justify-between border-b px-2">
@@ -215,6 +207,7 @@ export default function ChatRoomHeader({
               chatRoomId={chatRoomDetails.chatRoomId}
               members={members}
               onClose={() => setInvitationModalOpen(false)}
+              refetch={refetch}
             />
           )}
         </>

@@ -259,7 +259,7 @@ export const getChatRoomMembers = async (chatRoomId: string | number) => {
   const response = await api.get<{ data: UserDetailsType[] }>(
     `/chatrooms/${chatRoomId}/members`,
   );
-  return response.data;
+  return response.data.data;
 };
 
 export type ChatRoomVisibilityType = "PUBLIC" | "PRIVATE";

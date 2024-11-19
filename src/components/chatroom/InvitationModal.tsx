@@ -13,14 +13,16 @@ import { UserDetailsType } from "../../types/types";
 
 interface InvitationModalProps {
   chatRoomId: number | undefined;
-  members: UserDetailsType[];
+  members: UserDetailsType[] | undefined;
   onClose: () => void;
+  refetch: () => void;
 }
 
 export default function InvitationModal({
   chatRoomId,
   members,
   onClose,
+  refetch,
 }: InvitationModalProps) {
   const [selectedUsers, setSelectedUsers] = useState<number[]>([]);
   const { data } = useQuery<FriendsListResponseDto>({
@@ -41,12 +43,17 @@ export default function InvitationModal({
     try {
       await inviteFriends(chatRoomId, selectedUsers);
       toast.info("사용자를 초대하였습니다.");
+      refetch();
       onClose();
     } catch (e) {
       console.error(e);
       toast.error("사용자 초대 중 문제가 발생하였습니다.");
     }
   };
+
+  if (!members) {
+    return <></>;
+  }
 
   return (
     <Modal onClose={onClose} closeOnOutsideClick={true}>
