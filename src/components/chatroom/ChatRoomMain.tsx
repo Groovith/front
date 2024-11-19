@@ -5,18 +5,20 @@ import ChatRoomInput from "./ChatRoomInput";
 
 interface ChatRoomProps {
   chatRoomId: number | null | undefined;
-  chatRoomDetails: ChatRoomDetailsType | null;
+  chatRoomDetails: ChatRoomDetailsType | undefined;
+  refetchChatRoom: () => {};
   playerDetails: PlayerDetailsDto | null;
 }
 
 export default function ChatRoomMain({
   chatRoomId,
   chatRoomDetails,
-  playerDetails
+  playerDetails,
+  refetchChatRoom
 }: ChatRoomProps) {
   return (
     <div className="flex size-full flex-col border-r">
-      <ChatRoomHeader chatRoomDetails={chatRoomDetails} />
+      <ChatRoomHeader chatRoomDetails={chatRoomDetails} refetchChatRoom={refetchChatRoom} />
       <ChatRoomBody chatRoomId={chatRoomId} playerDetails={playerDetails} />
       <ChatRoomInput chatRoomId={chatRoomId} />
     </div>

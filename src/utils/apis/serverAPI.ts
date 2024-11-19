@@ -250,19 +250,20 @@ export const fetchChatRooms = async () => {
 
 interface CreateChatRoomRequest {
   name: string;
-  status: ChatRoomVisibilityType;
+  status: ChatRoomPrivacyType;
   permission: ChatRoomPlayerPermissionType;
 }
 
 // 채팅방 사용자 목록 조회
 export const getChatRoomMembers = async (chatRoomId: string | number) => {
+  if (chatRoomId === undefined) return [];
   const response = await api.get<{ data: UserDetailsType[] }>(
     `/chatrooms/${chatRoomId}/members`,
   );
   return response.data.data;
 };
 
-export type ChatRoomVisibilityType = "PUBLIC" | "PRIVATE";
+export type ChatRoomPrivacyType = "PUBLIC" | "PRIVATE";
 export type ChatRoomPlayerPermissionType = "MASTER" | "EVERYONE";
 
 // 채팅방 생성
@@ -287,7 +288,10 @@ export const leaveChatRoom = async (chatRoomId: number) => {
 };
 
 // 채팅방 아이디로 채팅방 상세 정보 조회
-export const getChatRoomDetails = async (chatRoomId: number) => {
+export const getChatRoomDetails = async (
+  chatRoomId: number | undefined | null,
+) => {
+  if (!chatRoomId) return undefined;
   const response = await api.get<ChatRoomDetailsType>(
     `/chatrooms/${chatRoomId}`,
   );

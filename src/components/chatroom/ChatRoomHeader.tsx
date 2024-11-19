@@ -23,11 +23,13 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 
 interface ChatRoomHeaderProps {
-  chatRoomDetails: ChatRoomDetailsType | null;
+  chatRoomDetails: ChatRoomDetailsType | undefined;
+  refetchChatRoom: () => void;
 }
 
 export default function ChatRoomHeader({
   chatRoomDetails,
+  refetchChatRoom
 }: ChatRoomHeaderProps) {
   const [isInvitationModalOpen, setInvitationModalOpen] = useState(false);
   //const [members, setMembers] = useState<UserDetailsType[]>([]);
@@ -154,7 +156,7 @@ export default function ChatRoomHeader({
   const { data: members, refetch } = useQuery<UserDetailsType[]>({
     queryKey: ["members", chatRoomDetails?.chatRoomId],
     queryFn: () => getChatRoomMembers(chatRoomDetails?.chatRoomId as number),
-    enabled: chatRoomDetails !== null,
+    enabled: typeof chatRoomDetails?.chatRoomId === "number",
   });
 
   return (
@@ -198,8 +200,9 @@ export default function ChatRoomHeader({
               </Button>
             )}
             <ChatRoomHeaderDropdownButton
-              chatRoomId={chatRoomDetails.chatRoomId}
+              chatRoomDetails={chatRoomDetails}
               openInvitationModal={() => setInvitationModalOpen(true)}
+              refetch={refetchChatRoom}
             />
           </div>
           {isInvitationModalOpen && (

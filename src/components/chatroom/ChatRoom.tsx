@@ -1,13 +1,11 @@
 import ChatRoomMain from "./ChatRoomMain";
 import ChatRoomPlayer from "./ChatRoomPlayer";
 import { useEffect, useState } from "react";
-import {
-  ChatRoomDetailsType,
-  PlayerDetailsDto,
-} from "../../types/types";
+import { ChatRoomDetailsType, PlayerDetailsDto } from "../../types/types";
 import { useStompStore } from "../../stores/useStompStore";
 import { getChatRoomDetails, getPlayer } from "../../utils/apis/serverAPI";
 import { toast } from "sonner";
+import { useQuery } from "@tanstack/react-query";
 
 interface ChatRoomProps {
   chatRoomId: number | null | undefined;
@@ -18,8 +16,6 @@ interface ChatRoomProps {
 // chatRoomId로 데이터 불러오고 STOMP Client 연결 (채팅 + 플레이어) -> chatRoomId가 바뀔 때마다
 
 export default function ChatRoom({ chatRoomId }: ChatRoomProps) {
-  const [chatRoomDetails, setChatRoomDetails] =
-    useState<ChatRoomDetailsType | null>(null);
   const [playerDetails, setPlayerDetails] = useState<PlayerDetailsDto | null>(
     null,
   );
@@ -27,25 +23,17 @@ export default function ChatRoom({ chatRoomId }: ChatRoomProps) {
 
   useEffect(() => {
     if (!chatRoomId) {
-      setChatRoomDetails(null);
       return;
     }
-    handleGetChatRoomDetails();
     handleGetPlayerDetails();
   }, [chatRoomId]);
 
   // 채팅방 정보 조회
-  const handleGetChatRoomDetails = async () => {
-    if (!chatRoomId) return;
-
-    try {
-      const response = await getChatRoomDetails(chatRoomId);
-      setChatRoomDetails(response);
-    } catch (e) {
-      console.error("채팅방 정보 조회 중 에러: ", e);
-      toast.error("채팅방 정보를 불러오는 중 문제가 발생하였습니다.");
-    }
-  };
+  const { data: chatRoomDetails, refetch: refetchChatRoom } = useQuery<ChatRoomDetailsType | undefined>({
+    queryKey: ["chatRoom", chatRoomId],
+    queryFn: () => getChatRoomDetails(chatRoomId),
+    enabled: typeof chatRoomId === "number",
+  });
 
   // 채팅방 플레이어 정보 조회
   const handleGetPlayerDetails = async () => {
@@ -88,7 +76,12 @@ export default function ChatRoom({ chatRoomId }: ChatRoomProps) {
 
   return (
     <div className="flex size-full">
-      <ChatRoomMain chatRoomId={chatRoomId} chatRoomDetails={chatRoomDetails} playerDetails={playerDetails} />
+      <ChatRoomMain
+        chatRoomId={chatRoomId}
+        chatRoomDetails={chatRoomDetails}
+        refetchChatRoom={refetchChatRoom}
+        playerDetails={playerDetails}
+      />
       <div className="hidden w-full max-w-[400px] md:flex">
         <ChatRoomPlayer playerDetails={playerDetails} />
       </div>

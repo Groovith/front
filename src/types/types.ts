@@ -13,14 +13,8 @@ export interface ChatRoomDetailsType {
   name: string;
   masterUserId: number;
   masterUserName: string;
-  totalUsers: number;
-  currentUsers: number;
-  playListId: number;
-  playListIndex: number;
-  position: number;
-  paused: boolean;
-  status: "PRIVATE" | "FRIENDS" | "PUBLIC";
-  messages: MessageType[];
+  privacy: "PRIVATE" | "FRIENDS" | "PUBLIC";
+  permission: "MASTER" | "EVERYONE";
 }
 
 export interface MessageType {
