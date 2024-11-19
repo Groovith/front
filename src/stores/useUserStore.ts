@@ -1,13 +1,10 @@
 import { create } from "zustand";
-import { StreamingType } from "../types/types";
 
 interface UserStoreType {
   userId: number | null;
   username: string | null;
-  streaming: StreamingType;
   setUserId: (userId: number) => void;
   setUsername: (username: string) => void;
-  setStreaming: (streaming: StreamingType) => void;
 }
 
 /**
@@ -19,5 +16,4 @@ export const useUserStore = create<UserStoreType>((set) => ({
   streaming: "NONE",
   setUserId: (userId: number) => set({ userId }),
   setUsername: (username: string) => set({ username }),
-  setStreaming: (streaming: StreamingType) => set({ streaming }),
 }));

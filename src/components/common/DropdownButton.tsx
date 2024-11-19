@@ -15,6 +15,7 @@ export interface DropdownItem {
   label: string;
   action: () => void;
   Icon?: LucideIcon;
+  color?: "red";
 }
 
 interface DropdownProps {
@@ -113,7 +114,7 @@ export default function DropdownButton({
                 e.stopPropagation();
                 handleButtonClick(item.action);
               }}
-              className="flex w-full gap-3 rounded-none px-4"
+              className={`flex w-full gap-3 rounded-none px-4 ${item.color === "red" ? "text-red-600" : ""}`}
             >
               {item.Icon && <item.Icon />}
               <p className="w-fit whitespace-nowrap text-left">{item.label}</p>
