@@ -1,5 +1,5 @@
 import { LucideIcon } from "lucide-react";
-import { ReactNode, useState } from "react";
+import { ReactNode, useState, useEffect } from "react";
 import { Button } from "./Button";
 import {
   useFloating,
@@ -58,6 +58,27 @@ export default function DropdownButton({
     action();
     setIsOpen(false);
   };
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const reference = refs.reference.current;
+      const floating = refs.floating.current;
+  
+      if (
+        reference instanceof HTMLElement &&
+        floating instanceof HTMLElement &&
+        !reference.contains(event.target as Node) &&
+        !floating.contains(event.target as Node)
+      ) {
+        setIsOpen(false);
+      }
+    };
+  
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [refs.reference, refs.floating]);
 
   return (
     <div
