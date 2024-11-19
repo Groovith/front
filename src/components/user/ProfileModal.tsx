@@ -78,7 +78,7 @@ export default function ProfileModal({
             />
           </div>
           <div className="flex items-center justify-between gap-8">
-            <span>프로필 사진</span>
+            <span className="w-fit flex-none">프로필 사진</span>
             <div className="flex items-center gap-0">
               <input
                 type="file"
@@ -91,14 +91,14 @@ export default function ProfileModal({
               />
               <Button
                 variant={"transparent"}
-                className="text-neutral-500"
+                className="text-neutral-500 flex-none"
                 onClick={() => document.getElementById("fileInput")?.click()}
               >
                 업로드
               </Button>
               <Button
                 variant={"transparent"}
-                className="text-red-500 hover:text-red-800"
+                className="text-red-500 hover:text-red-800 flex-none"
                 onClick={handleProfileImageDelete}
               >
                 삭제

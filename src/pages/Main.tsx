@@ -3,16 +3,11 @@ import Player from "../layouts/Player";
 import Sidebar from "../layouts/Sidebar";
 import Loading from "./Loading";
 import { useQuery } from "@tanstack/react-query";
-import { fetchChatRooms, getUserDetails } from "../utils/apis/serverAPI";
+import { getUserDetails } from "../utils/apis/serverAPI";
 import { useUser } from "../hooks/useUser";
-import {
-  ChatRoomDetailsType,
-  MessageType,
-  UserDetailsType,
-} from "../types/types";
+import { UserDetailsType } from "../types/types";
 import { Client } from "@stomp/stompjs";
 import { useStompStore } from "../stores/useStompStore";
-import { useChatRoomStore } from "../stores/useChatRoomStore";
 import CurrentChatRoom from "../layouts/CurrentChatRoom";
 import { Toaster } from "sonner";
 import BottomNavigation from "../layouts/BottomNavigation";
@@ -21,13 +16,13 @@ export default function Main() {
   const navigate = useNavigate();
   const { updateUserDetails } = useUser();
   const { stompClient, setStompClient } = useStompStore();
-  const { setChatRoomList, setNewMessage } = useChatRoomStore();
+  // const { setChatRoomList, setNewMessage } = useChatRoomStore();
 
   /**
    * 메인 화면 접속 시.
    * 토큰 유효성 검사 겸 유저 정보 요청. -> 오류 발생 시 로그인으로 리디렉션.
    */
-  const { isLoading, isError } = useQuery<UserDetailsType>({
+  const { isLoading, isError, isSuccess } = useQuery<UserDetailsType>({
     queryKey: ["user"],
     queryFn: () =>
       getUserDetails().then((data) => {
@@ -35,18 +30,6 @@ export default function Main() {
         return data;
       }),
     retry: false,
-  });
-
-  // 내 채팅방 목록 불러오기
-  const { data: chatRoomsData } = useQuery<{
-    chatRooms: ChatRoomDetailsType[];
-  }>({
-    queryKey: ["chatRooms"],
-    queryFn: () =>
-      fetchChatRooms().then((data) => {
-        setChatRoomList(data.chatRooms);
-        return data;
-      }),
   });
 
   // 로딩 중일 경우 로딩 페이지 반환
@@ -63,7 +46,7 @@ export default function Main() {
    * 유저 데이터 불러오기 성공 시 -> 웹소켓 연결 -> 채팅방 구독
    * STOMP 클라이언트는 zustand store로 전역 관리
    */
-  if (chatRoomsData && !stompClient) {
+  if (isSuccess && !stompClient) {
     const accessToken = localStorage.getItem("accessToken");
     if (!accessToken) {
       return;
@@ -82,22 +65,6 @@ export default function Main() {
 
         // zustand Store에 보관
         setStompClient(client);
-
-        const callback = function (message: any) {
-          if (message.body) {
-            const chatMessage: MessageType = JSON.parse(message.body);
-            setNewMessage(chatMessage);
-          }
-        };
-
-        // 내 채팅방 목록 불러와서 구독하기
-        chatRoomsData.chatRooms.forEach((chatRoom) => {
-          client.subscribe(
-            `/sub/api/chat/${chatRoom.chatRoomId}`,
-            callback,
-            headers,
-          );
-        });
       },
       onStompError: (e) => {
         console.error("STOMP 연결 실패: ", e);

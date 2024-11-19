@@ -33,10 +33,9 @@ export default function FriendItem({ user, refetch }: FriendItemProps) {
   ];
 
   return (
-    <Button
+    <div
       key={user.id}
-      variant={"ghost"}
-      className="flex w-full cursor-default items-center justify-between rounded-lg"
+      className="flex w-full cursor-default hover:bg-neutral-100 p-2 items-center justify-between rounded-lg"
       onClick={() => navigate(`/user/${user.username}`)}
     >
       <div className="flex items-center gap-3">
@@ -52,6 +51,6 @@ export default function FriendItem({ user, refetch }: FriendItemProps) {
           <EllipsisVertical />
         </Button>
       </DropdownButton>
-    </Button>
+    </div>
   );
 }

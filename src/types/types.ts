@@ -4,21 +4,16 @@ export interface UserDetailsType {
   id: number;
   username: string;
   imageUrl: string;
-  streaming: StreamingType;
-  followerCount: number;
-  followingCount: number;
 }
-
-export type StreamingType = "NONE" | "SPOTIFY";
 
 export interface ChatRoomDetailsType {
   imageUrl: string;
   chatRoomId: number;
   name: string;
+  masterUserId: number;
   masterUserName: string;
   totalUsers: number;
   currentUsers: number;
-  masterUserId: number;
   playListId: number;
   playListIndex: number;
   position: number;

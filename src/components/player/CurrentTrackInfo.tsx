@@ -13,10 +13,10 @@ export default function CurrentTrackInfo({
     <div className="flex items-center truncate">
       <img src={imgUrl} className="mr-3 size-12 rounded-md object-cover" />
       <div className="flex flex-col truncate">
-        <p className="w-fit truncate text-neutral-900">
+        <p className="w-full truncate text-neutral-900">
           {trackName}
         </p>
-        <p className="w-fit truncate text-neutral-500">{artistName}</p>
+        <p className="w-full truncate text-neutral-500">{artistName}</p>
       </div>
     </div>
   );

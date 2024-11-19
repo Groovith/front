@@ -32,10 +32,6 @@ export default function Chat() {
     queryFn: () => fetchChatRooms(),
   });
 
-  if (data) {
-    console.log(data);
-  }
-
   const { mutate: createChatRoomMutate } = useMutation({
     mutationFn: createChatRoom,
     onSuccess: (data) => {

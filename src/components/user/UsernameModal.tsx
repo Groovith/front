@@ -3,6 +3,9 @@ import { Button } from "../common/Button";
 import { Modal } from "../common/Modal";
 import { ResponseCode } from "../../types/enums";
 import { checkUsername } from "../../utils/apis/serverAPI";
+import { changeUsername } from "../../utils/apis/user/changeUsername.api";
+import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 
 interface UsernameModalProps {
   onClose: () => void;
@@ -19,6 +22,7 @@ export default function UsernameModal({
   const [usernameValid, setUsernameValid] = useState<boolean | null>(null);
   const [newUsername, setNewUsername] = useState("");
   const usernameRef = useRef<HTMLInputElement>(null);
+  const navigate = useNavigate();
 
   // 사용자 이름 규칙 확인 함수
   const validateUsername = (username: string): string | null => {
@@ -65,7 +69,18 @@ export default function UsernameModal({
     }
   };
 
-  const handleChangeUsername = async () => {};
+  const handleChangeUsername = async () => {
+    if (!usernameValid || !newUsername) return;
+    try {
+      await changeUsername(newUsername);
+      toast.success("사용자 이름을 변경하였습니다.");
+      navigate(`/user/${newUsername}`);
+      onClose();
+    } catch (e) {
+      console.error(e);
+      toast.error("사용자 이름 변경 중 문제가 발생하였습니다.");
+    }
+  };
 
   return (
     <Modal onClose={onClose} closeOnOutsideClick={true}>

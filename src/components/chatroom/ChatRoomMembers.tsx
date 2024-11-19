@@ -1,5 +1,5 @@
 import { Crown, Plus, User } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { UserDetailsType } from "../../types/types";
 import { Button } from "../common/Button";
 import { Modal } from "../common/Modal";
@@ -18,9 +18,7 @@ export default function ChatRoomMembers({
 }: ChatRoomMembersProps) {
   const navigate = useNavigate();
   const [isModalOpen, setModalOpen] = useState(false);
-  useEffect(() => {
-    console.log(masterId);
-  }, [])
+
   return (
     <>
       <Button

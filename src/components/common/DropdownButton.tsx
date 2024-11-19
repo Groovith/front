@@ -20,7 +20,19 @@ export interface DropdownItem {
 interface DropdownProps {
   children: ReactNode;
   items: DropdownItem[];
-  placement?: "top" | "bottom" | "right" | "left" | "top-start" | "top-end" | "bottom-start" | "bottom-end" | "right-start" | "right-end" | "left-start" | "left-end"; // 위치 설정을 위한 옵션
+  placement?:
+    | "top"
+    | "bottom"
+    | "right"
+    | "left"
+    | "top-start"
+    | "top-end"
+    | "bottom-start"
+    | "bottom-end"
+    | "right-start"
+    | "right-end"
+    | "left-start"
+    | "left-end"; // 위치 설정을 위한 옵션
 }
 
 export default function DropdownButton({
@@ -32,7 +44,7 @@ export default function DropdownButton({
 
   const { x, y, strategy, refs, context } = useFloating({
     placement,
-    strategy: 'fixed',
+    strategy: "fixed",
     middleware: [offset(4), flip(), shift()],
     open: isOpen,
     onOpenChange: setIsOpen,
@@ -48,8 +60,19 @@ export default function DropdownButton({
   };
 
   return (
-    <div className="relative flex" ref={refs.setReference} {...getReferenceProps()}>
-      <div onClick={() => setIsOpen((prev) => !prev)}>{children}</div>
+    <div
+      className="relative flex"
+      ref={refs.setReference}
+      {...getReferenceProps()}
+    >
+      <div
+        onClick={(e) => {
+          e.stopPropagation();
+          setIsOpen((prev) => !prev);
+        }}
+      >
+        {children}
+      </div>
       {isOpen && (
         <div
           ref={refs.setFloating}
@@ -65,7 +88,10 @@ export default function DropdownButton({
             <Button
               key={index}
               variant={"ghost"}
-              onClick={() => handleButtonClick(item.action)}
+              onClick={(e: React.MouseEvent) => {
+                e.stopPropagation();
+                handleButtonClick(item.action);
+              }}
               className="flex w-full gap-3 rounded-none px-4"
             >
               {item.Icon && <item.Icon />}

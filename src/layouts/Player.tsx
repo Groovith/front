@@ -164,9 +164,12 @@ export default function Player() {
           if (!newCurrentPlaylist || typeof index === "undefined") break;
           setCurrentPlaylist(newCurrentPlaylist);
           setCurrentPlaylistIndex(index);
-          
+
           // 플레이리스트가 비어있던 경우 자동 재생
-          if (player?.current?.target.getPlayerState() === YouTube.PlayerState.UNSTARTED) {
+          if (
+            player?.current?.target.getPlayerState() ===
+            YouTube.PlayerState.UNSTARTED
+          ) {
             player.current.target.loadVideoById({
               videoId: newCurrentPlaylist[index].videoId,
               startSeconds: 0,
@@ -199,112 +202,126 @@ export default function Player() {
     };
   }, [paused, loading, position]);
 
+  const handleButtonClick = (e: React.MouseEvent, func: () => void) => {
+    e.stopPropagation();
+    func();
+  };
+
   return (
-    <div className="flex h-[80px] w-full justify-between border-t">
-      <>
+    <div
+      className="flex h-[80px] w-full justify-between truncate border-t"
+      onClick={toggleCurrentChatRoomOpen}
+    >
+      {currentPlaylist[currentPlaylistIndex] ? (
+        <input
+          className="absolute z-40 h-1 w-full cursor-pointer appearance-none bg-neutral-200 accent-[#FF6735] outline-none disabled:accent-gray-200"
+          type="range"
+          min="0"
+          max={duration}
+          value={position}
+          onChange={(e) => {
+            e.preventDefault();
+            setNewPosition(Number(e.target.value));
+            setPosition(Number(e.target.value));
+          }}
+          onMouseUp={handleSeek}
+          onTouchEnd={handleSeek}
+          style={{
+            background: `linear-gradient(to right, #FF6735 ${(position / duration) * 100}%, #E5E7EB ${(position / duration) * 100}%)`,
+          }}
+        />
+      ) : (
+        <input
+          className="absolute z-40 h-1 w-full cursor-pointer appearance-none bg-neutral-200 accent-neutral-500 outline-none disabled:accent-gray-200"
+          type="range"
+          min="0"
+          max="100"
+          value={0}
+          disabled
+        />
+      )}
+      <div className="ml-6 flex items-center">
+        <div className="flex w-fit items-center justify-start gap-0">
+          <Button
+            variant={"transparent"}
+            className="hidden text-neutral-600 md:flex"
+            onClick={(e) => handleButtonClick(e, previousTrack)}
+          >
+            <SkipBack />
+          </Button>
+          {loading ? (
+            <Button variant={"transparent"} className="flex">
+              <MoonLoader size={18} />
+            </Button>
+          ) : paused ? (
+            <Button
+              variant={"transparent"}
+              className="text-neutral-600"
+              onClick={(e) => handleButtonClick(e, resumePlayer)}
+              disabled={loading}
+            >
+              <Play />
+            </Button>
+          ) : (
+            <Button
+              variant={"transparent"}
+              className="text-neutral-600"
+              onClick={(e) => handleButtonClick(e, pausePlayer)}
+              disabled={loading}
+            >
+              <Pause />
+            </Button>
+          )}
+          <Button
+            variant={"transparent"}
+            className="text-neutral-600"
+            onClick={(e) => handleButtonClick(e, nextTrack)}
+          >
+            <SkipForward />
+          </Button>
+        </div>
         {currentPlaylist[currentPlaylistIndex] ? (
-          <input
-            className="absolute z-40 h-1 w-full cursor-pointer appearance-none bg-neutral-200 accent-[#FF6735] outline-none disabled:accent-gray-200"
-            type="range"
-            min="0"
-            max={duration}
-            value={position}
-            onChange={(e) => {
-              e.preventDefault();
-              setNewPosition(Number(e.target.value));
-              setPosition(Number(e.target.value));
-            }}
-            onMouseUp={handleSeek}
-            onTouchEnd={handleSeek}
-            style={{
-              background: `linear-gradient(to right, #FF6735 ${(position / duration) * 100}%, #E5E7EB ${(position / duration) * 100}%)`,
-            }}
+          <div className="ml-2 hidden items-center gap-1 text-sm text-neutral-400 md:flex">
+            <p>{formatDurationSec(position)}</p>
+            <p>/</p>
+            <p>{formatDurationSec(duration)}</p>
+          </div>
+        ) : (
+          <div className="ml-2 hidden items-center gap-1 text-sm text-neutral-400 md:flex">
+            <p>{formatDuration(0)}</p>
+            <p>/</p>
+            <p>{formatDuration(0)}</p>
+          </div>
+        )}
+      </div>
+      <div className="flex items-center truncate">
+        {currentPlaylist[currentPlaylistIndex] ? (
+          <CurrentTrackInfo
+            imgUrl={currentPlaylist[currentPlaylistIndex].imageUrl}
+            trackName={currentPlaylist[currentPlaylistIndex].title}
+            artistName={currentPlaylist[currentPlaylistIndex].artist}
           />
         ) : (
-          <input
-            className="absolute z-40 h-1 w-full cursor-pointer appearance-none bg-neutral-200 accent-neutral-500 outline-none disabled:accent-gray-200"
-            type="range"
-            min="0"
-            max="100"
-            value={0}
-            disabled
-          />
+          <p className="text-sm text-neutral-400">재생 중인 곡이 없습니다</p>
         )}
-        <div className="ml-6 flex items-center">
-          <div className="flex w-[140px] items-center justify-between">
-            <Button
-              variant={"transparent"}
-              className="text-neutral-600"
-              onClick={previousTrack}
-            >
-              <SkipBack />
-            </Button>
-            {loading ? (
-              <MoonLoader size={20} />
-            ) : paused ? (
-              <Button
-                variant={"transparent"}
-                className="text-neutral-600"
-                onClick={resumePlayer}
-                disabled={loading}
-              >
-                <Play />
-              </Button>
-            ) : (
-              <Button
-                variant={"transparent"}
-                className="text-neutral-600"
-                onClick={pausePlayer}
-                disabled={loading}
-              >
-                <Pause />
-              </Button>
-            )}
-            <Button
-              variant={"transparent"}
-              className="text-neutral-600"
-              onClick={nextTrack}
-            >
-              <SkipForward />
-            </Button>
-          </div>
-          {currentPlaylist[currentPlaylistIndex] ? (
-            <div className="ml-2 hidden items-center gap-1 text-sm text-neutral-400 md:flex">
-              <p>{formatDurationSec(position)}</p>
-              <p>/</p>
-              <p>{formatDurationSec(duration)}</p>
-            </div>
-          ) : (
-            <div className="ml-2 hidden items-center gap-1 text-sm text-neutral-400 md:flex">
-              <p>{formatDuration(0)}</p>
-              <p>/</p>
-              <p>{formatDuration(0)}</p>
-            </div>
-          )}
-        </div>
-        <div className="flex items-center truncate">
-          {currentPlaylist[currentPlaylistIndex] ? (
-            <CurrentTrackInfo
-              imgUrl={currentPlaylist[currentPlaylistIndex].imageUrl}
-              trackName={currentPlaylist[currentPlaylistIndex].title}
-              artistName={currentPlaylist[currentPlaylistIndex].artist}
-            />
-          ) : (
-            <p className="text-sm text-neutral-400">재생 중인 곡이 없습니다</p>
-          )}
-        </div>
-        <div className="mr-6 flex items-center">
-          {isCurrentChatRoomOpen ? (
-            <Button variant={"transparent"} onClick={toggleCurrentChatRoomOpen}>
-              <ChevronDown />
-            </Button>
-          ) : (
-            <Button variant={"transparent"} onClick={toggleCurrentChatRoomOpen}>
-              <ChevronUp />
-            </Button>
-          )}
-        </div>
-      </>
+      </div>
+      <div className="mr-6 flex items-center">
+        {isCurrentChatRoomOpen ? (
+          <Button
+            variant={"transparent"}
+            onClick={(e) => handleButtonClick(e, toggleCurrentChatRoomOpen)}
+          >
+            <ChevronDown />
+          </Button>
+        ) : (
+          <Button
+            variant={"transparent"}
+            onClick={(e) => handleButtonClick(e, toggleCurrentChatRoomOpen)}
+          >
+            <ChevronUp />
+          </Button>
+        )}
+      </div>
       <YouTube
         opts={opts}
         onReady={onPlayerReady}
