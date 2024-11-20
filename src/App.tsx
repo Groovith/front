@@ -11,6 +11,8 @@ import { Callback } from "./pages/Callback";
 import ResetPassword from "./pages/ResetPassword";
 import ChatRoomPage from "./pages/ChatRoomPage";
 import ChangePassword from "./pages/ChangePassword";
+import SettingDetailsPage from "./pages/settings/SettingDetailsPage";
+import ChangePasswordPage from "./pages/settings/ChangePasswordPage";
 
 const queryClient = new QueryClient();
 
@@ -25,6 +27,9 @@ function App() {
             <Route path="/chat/:chatRoomId" element={<ChatRoomPage />} />
             <Route path="/user/:username" element={<User />} />
             <Route path="/setting" element={<Setting />} />
+            <Route element={<SettingDetailsPage />}>
+              <Route path="/setting/change-password" element={<ChangePasswordPage />} />
+            </Route>
           </Route>
           <Route path="/login" element={<Login />} />
           <Route path="/reset-password" element={<ResetPassword />} />
