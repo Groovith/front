@@ -54,7 +54,7 @@ export default function ChatRoomDetailsModal({
             </div>
             <div className="flex w-full justify-between gap-1 text-sm text-neutral-500">
               <p>플레이어 권한</p>
-              <p>{chatRoom.permission == "EVERYONE" ? "방장만" : "모두"}</p>
+              <p>{chatRoom.permission == "EVERYONE" ? "모두" : "방장만"}</p>
             </div>
           </div>
         </div>

@@ -82,7 +82,7 @@ export default function Main() {
   return (
     <>
       <Toaster position="bottom-center" richColors />
-      <div className="flex h-screen w-screen flex-col text-neutral-900">
+      <div className="flex h-screen w-screen flex-col text-neutral-900 break-keep">
         <div className="flex h-full overflow-hidden">
           <Sidebar />
           <div className="relative flex h-full w-full">
