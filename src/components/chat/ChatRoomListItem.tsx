@@ -62,7 +62,7 @@ export default function ChatRoomListItem({
         className="flex items-center gap-5 hover:cursor-pointer"
         onClick={() => handleChatRoomClick(chatRoom.chatRoomId)}
       >
-        <img src={chatRoom.imageUrl} className="size-12 rounded-full" />
+        <img src={chatRoom.imageUrl} className="size-12 rounded-full object-cover" />
         <div className="flex flex-col gap-1">
           <div className="flex items-center gap-2 text-neutral-400">
             <p className="text-sm">

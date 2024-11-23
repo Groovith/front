@@ -12,12 +12,19 @@ interface UpdateChatRoomRequestDto {
 
 export const updateChatRoom = async (
   chatRoomId: string | number,
-  { name, status, permission }: UpdateChatRoomRequestDto,
+  dto: UpdateChatRoomRequestDto,
+  file: File | null,
 ) => {
-  const response = await api.put(`/chatrooms/${chatRoomId}`, {
-    name,
-    status,
-    permission,
+  const formData = new FormData();
+  formData.append(
+    "dto",
+    new Blob([JSON.stringify(dto)], { type: "application/json" }),
+  );
+  if (file) formData.append("file", file);
+  const response = await api.put(`/chatrooms/${chatRoomId}`, formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
   });
   return response.data;
 };

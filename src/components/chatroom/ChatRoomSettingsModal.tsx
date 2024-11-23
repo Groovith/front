@@ -8,6 +8,8 @@ import { Modal } from "../common/Modal";
 import { ChatRoomDetailsType } from "../../types/types";
 import { toast } from "sonner";
 import { updateChatRoom } from "../../utils/apis/chatroom/updateChatRoom.api";
+import imageCompression from "browser-image-compression";
+import { X, ImagePlus } from "lucide-react";
 
 interface ChatRoomSettingsModalProps {
   chatRoomDetails: ChatRoomDetailsType;
@@ -25,15 +27,21 @@ export default function ChatRoomSettingsModal({
     useState<ChatRoomPrivacyType>("PUBLIC");
   const [chatRoomPermission, setChatRoomPermission] =
     useState<ChatRoomPlayerPermissionType>("EVERYONE");
+  const [file, setFile] = useState<File | null>(null);
+  const [image, setImage] = useState<string>(chatRoomDetails.imageUrl);
 
   const handleCreateNewChatRoom = async () => {
     if (newChatRoomName.trim()) {
       try {
-        await updateChatRoom(chatRoomDetails.chatRoomId, {
-          name: newChatRoomName,
-          status: chatRoomVisibility,
-          permission: chatRoomPermission,
-        });
+        await updateChatRoom(
+          chatRoomDetails.chatRoomId,
+          {
+            name: newChatRoomName,
+            status: chatRoomVisibility,
+            permission: chatRoomPermission,
+          },
+          file,
+        );
         toast.success("변경 사항을 저장하였습니다.");
         refetch();
         onClose();
@@ -46,11 +54,85 @@ export default function ChatRoomSettingsModal({
     }
   };
 
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+
+    if (file) {
+      // 이미지 파일 형식 확인 (JPG, PNG 등)
+      const allowedTypes = ["image/jpeg", "image/png"];
+      if (!allowedTypes.includes(file.type)) {
+        toast.error(
+          "허용되지 않는 파일 형식입니다. JPG, PNG 형식만 지원됩니다.",
+        );
+        return;
+      }
+
+      // 이미지 압축 옵션 설정
+      const options = {
+        maxSizeMB: 1,
+        maxWidthOrHeight: 800,
+        useWebWorker: true,
+      };
+
+      try {
+        const compressedFile = await imageCompression(file, options);
+        const imageUrl = URL.createObjectURL(compressedFile);
+        setImage(imageUrl);
+        setFile(compressedFile);
+      } catch (e) {
+        console.error(e);
+      }
+    }
+  };
+
+  const handleDeleteImage = () => {
+    setImage("");
+    setFile(null);
+    const fileInput = document.getElementById("fileInput") as HTMLInputElement;
+    if (fileInput) {
+      fileInput.value = ""; // 파일 입력 필드 값 초기화
+    }
+  };
+
   return (
     <Modal onClose={onClose} closeOnOutsideClick={true}>
       <div className="flex h-full w-full flex-col">
-        <div className="mb-10 flex items-center justify-between">
+        <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold">채팅방 설정</h1>
+        </div>
+
+        {/* 채팅방 사진 */}
+        <div className="relative flex h-fit w-full justify-center py-5">
+          {image ? (
+            <div className="relative flex size-fit">
+              <img
+                src={image}
+                alt="Image"
+                onClick={() => document.getElementById("fileInput")?.click()}
+                className="size-24 rounded-full border border-neutral-300 bg-neutral-100 object-cover hover:cursor-pointer"
+              />
+              <Button
+                variant={"white"}
+                className="absolute bottom-0 right-0 size-fit p-1"
+                onClick={handleDeleteImage}
+              >
+                <X size={18} />
+              </Button>
+            </div>
+          ) : (
+            <Button
+              className="flex size-24 items-center justify-center rounded-full bg-neutral-100 text-neutral-400"
+              onClick={() => document.getElementById("fileInput")?.click()}
+            >
+              <ImagePlus />
+            </Button>
+          )}
+          <input
+            type="file"
+            id="fileInput"
+            onChange={(e) => handleImageUpload(e)}
+            hidden
+          />
         </div>
 
         {/* 채팅방 이름 입력 */}
