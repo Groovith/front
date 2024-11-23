@@ -1,4 +1,4 @@
-import { ArrowLeft, Headphones, Unplug } from "lucide-react";
+import { ChevronLeft, Headphones, Unplug } from "lucide-react";
 import {
   ChatRoomDetailsType,
   PlayerResponseDto,
@@ -170,7 +170,7 @@ export default function ChatRoomHeader({
               onClick={() => navigate("/chat")}
               disabled={isCurrentChatRoomOpen}
             >
-              <ArrowLeft />
+              <ChevronLeft />
             </Button>
 
             <img
