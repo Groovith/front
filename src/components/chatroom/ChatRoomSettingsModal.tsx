@@ -24,20 +24,20 @@ export default function ChatRoomSettingsModal({
 }: ChatRoomSettingsModalProps) {
   const [newChatRoomName, setNewChatRoomName] = useState(chatRoomDetails?.name);
   const [chatRoomVisibility, setChatRoomVisibility] =
-    useState<ChatRoomPrivacyType>("PUBLIC");
+    useState<ChatRoomPrivacyType>(chatRoomDetails.privacy);
   const [chatRoomPermission, setChatRoomPermission] =
-    useState<ChatRoomPlayerPermissionType>("EVERYONE");
+    useState<ChatRoomPlayerPermissionType>(chatRoomDetails.permission);
   const [file, setFile] = useState<File | null>(null);
   const [image, setImage] = useState<string>(chatRoomDetails.imageUrl);
 
-  const handleCreateNewChatRoom = async () => {
+  const handleUpdateChatRoom = async () => {
     if (newChatRoomName.trim()) {
       try {
         await updateChatRoom(
           chatRoomDetails.chatRoomId,
           {
             name: newChatRoomName,
-            status: chatRoomVisibility,
+            privacy: chatRoomVisibility,
             permission: chatRoomPermission,
           },
           file,
@@ -234,7 +234,7 @@ export default function ChatRoomSettingsModal({
           >
             취소
           </Button>
-          <Button onClick={handleCreateNewChatRoom} className="w-full px-5">
+          <Button onClick={handleUpdateChatRoom} className="w-full px-5">
             저장
           </Button>
         </div>

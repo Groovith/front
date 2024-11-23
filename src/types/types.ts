@@ -14,7 +14,7 @@ export interface ChatRoomDetailsType {
   isMaster: boolean;
   masterUserId: number;
   masterUserName: string;
-  privacy: "PRIVATE" | "FRIENDS" | "PUBLIC";
+  privacy: "PRIVATE" | "PUBLIC";
   permission: "MASTER" | "EVERYONE";
 }
 

@@ -6,7 +6,7 @@ import {
 
 interface UpdateChatRoomRequestDto {
   name: string;
-  status: ChatRoomPrivacyType;
+  privacy: ChatRoomPrivacyType;
   permission: ChatRoomPlayerPermissionType;
 }
 
@@ -15,6 +15,7 @@ export const updateChatRoom = async (
   dto: UpdateChatRoomRequestDto,
   file: File | null,
 ) => {
+  console.log(dto);
   const formData = new FormData();
   formData.append(
     "dto",

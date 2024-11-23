@@ -1,17 +1,13 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Button } from "../common/Button";
 import { EllipsisVertical, UserPlus } from "lucide-react";
-import {
-  joinChatRoom,
-  searchChatRooms,
-  searchUsers,
-} from "../../utils/apis/serverAPI";
+import { searchChatRooms, searchUsers } from "../../utils/apis/serverAPI";
 import DropdownButton from "../common/DropdownButton";
+import ChatRoomSearchItem from "./ChatRoomSearchItem";
 
 export function SearchResults() {
-  const queryClient = useQueryClient();
   const location = useLocation();
   const [query, setQuery] = useState<string | null>(null);
   const navigate = useNavigate();
@@ -38,26 +34,10 @@ export function SearchResults() {
     enabled: !!query,
   });
 
-  // 채팅방 참가 요청
-  const { mutate } = useMutation({
-    mutationFn: joinChatRoom,
-    onSuccess: (variables) => {
-      queryClient.invalidateQueries({ queryKey: ["chatRooms"] });
-      navigate(`/chat/${variables}`);
-    },
-  });
-
-  // 채팅방 클릭 시
-  const handleChatRoomClick = (chatRoomId: number) => {
-    mutate(chatRoomId);
-  };
-
   if (!query) {
     return (
       <div className="flex h-full w-full items-center justify-center">
-        <p className="text-neutral-400">
-          원하는 컨텐츠를 찾아보세요.
-        </p>
+        <p className="text-neutral-400">원하는 컨텐츠를 찾아보세요.</p>
       </div>
     );
   }
@@ -70,28 +50,8 @@ export function SearchResults() {
         </h1>
         <div className="flex flex-col">
           {chatRoomData?.chatRooms && chatRoomData.chatRooms.length > 0 ? (
-            chatRoomData.chatRooms.map((chatRoom) => (
-              <div
-                key={chatRoom.chatRoomId}
-                className="group flex w-full items-center justify-between rounded-md px-3 py-3 text-left hover:cursor-pointer hover:bg-neutral-100"
-                onClick={() => handleChatRoomClick(chatRoom.chatRoomId)}
-              >
-                <div className="flex items-center gap-3">
-                  <img
-                    src={chatRoom.imageUrl}
-                    className="size-12 rounded-full"
-                  />
-                  <div className="flex flex-col">
-                    <h2 className="font-medium">{chatRoom.name}</h2>
-                  </div>
-                </div>
-                <Button
-                  variant={"ghost"}
-                  className="text-neutral-500 opacity-0 hover:text-neutral-900 group-hover:opacity-100"
-                >
-                  <EllipsisVertical />
-                </Button>
-              </div>
+            chatRoomData.chatRooms.map((chatRoom, index) => (
+              <ChatRoomSearchItem key={index} chatRoom={chatRoom} />
             ))
           ) : (
             <p className="px-3 text-neutral-500">
