@@ -13,6 +13,7 @@ import ChatRoomPage from "./pages/ChatRoomPage";
 import ChangePassword from "./pages/ChangePassword";
 import SettingDetailsPage from "./pages/settings/SettingDetailsPage";
 import ChangePasswordPage from "./pages/settings/ChangePasswordPage";
+import DeleteAccountPage from "./pages/settings/DeleteAccountPage";
 
 const queryClient = new QueryClient();
 
@@ -28,7 +29,14 @@ function App() {
             <Route path="/user/:username" element={<User />} />
             <Route path="/setting" element={<Setting />} />
             <Route element={<SettingDetailsPage />}>
-              <Route path="/setting/change-password" element={<ChangePasswordPage />} />
+              <Route
+                path="/setting/change-password"
+                element={<ChangePasswordPage />}
+              />
+              <Route
+                path="/setting/delete-account"
+                element={<DeleteAccountPage />}
+              />
             </Route>
           </Route>
           <Route path="/login" element={<Login />} />

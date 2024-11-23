@@ -49,7 +49,7 @@ export default function Chat() {
           {data?.chatRooms && data.chatRooms.length === 0 && (
             <div className="flex h-full w-full items-center justify-center">
               <p className="text-sm text-neutral-400">
-                아직 참여한 채팅이 없어요
+                아직 참여한 채팅방이 없어요.
               </p>
             </div>
           )}

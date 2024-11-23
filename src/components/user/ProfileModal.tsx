@@ -27,7 +27,7 @@ export default function ProfileModal({
     if (e.target.files) {
       const file = e.target.files[0];
 
-      // 이미지 파일 형식 확인 (JPG, PNG, GIF 등)
+      // 이미지 파일 형식 확인 (JPG, PNG 등)
       const allowedTypes = ["image/jpeg", "image/png"];
       if (!allowedTypes.includes(file.type)) {
         toast.error(
@@ -45,7 +45,6 @@ export default function ProfileModal({
 
       try {
         const compressedFile = await imageCompression(file, options);
-        console.log(compressedFile.size);
         await uploadProfileImage(compressedFile);
         refetch();
         toast.success("프로필 사진이 변경되었습니다.");

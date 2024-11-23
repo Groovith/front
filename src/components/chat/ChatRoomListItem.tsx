@@ -26,7 +26,7 @@ export default function ChatRoomListItem({
     Icon: Trash2,
     label: "채팅방 삭제",
     action: () => {},
-    color: "red"
+    color: "red",
   };
 
   const dropdownItems =
@@ -44,13 +44,13 @@ export default function ChatRoomListItem({
         onClick={() => handleChatRoomClick(chatRoom.chatRoomId)}
       >
         <img src={chatRoom.imageUrl} className="size-12 rounded-full" />
-        <div className="flex flex-col">
+        <div className="flex flex-col gap-1">
+          <div className="flex items-center gap-2 text-neutral-400">
+            <p className="text-sm">
+              {chatRoom.masterUserName ? chatRoom.masterUserName : "알 수 없음"}
+            </p>
+          </div>
           <h2 className="text-neutral-900">{chatRoom.name}</h2>
-          <p className="text-sm text-neutral-400">
-            {chatRoom.masterUserName
-              ? "@" + chatRoom.masterUserName
-              : "@알 수 없음"}
-          </p>
         </div>
       </div>
 

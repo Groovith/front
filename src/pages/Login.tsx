@@ -35,8 +35,8 @@ export default function Login() {
     <div className="flex h-screen w-screen flex-col">
       <Toaster position="bottom-center" richColors />
       <div className="flex h-full w-full items-center justify-center">
-        <div className="flex w-[400px] flex-col rounded-xl border border-gray-300 p-10">
-          <h1 className="mb-14 text-3xl font-bold">Groovith에 로그인하기</h1>
+        <div className="flex w-[400px] flex-col rounded-xl  border-gray-300 p-10">
+          <h1 className="mb-14 text-2xl font-bold flex-none w-full">Groovith에 로그인하기</h1>
           <form onSubmit={handleSubmit} className="mb-6">
             <div className="mb-6 flex flex-col gap-3">
               <label htmlFor="username">이메일</label>

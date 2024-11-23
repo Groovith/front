@@ -10,6 +10,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "../components/common/Button";
 import { useMutation } from "@tanstack/react-query";
 import { ResponseCode } from "../types/enums";
+import { toast } from "sonner";
 
 export default function Signup() {
   const [email, setEmail] = useState("");
@@ -44,6 +45,7 @@ export default function Signup() {
     mutationKey: ["signup"],
     mutationFn: () => signup({ username, password, email }),
     onSuccess: () => {
+      toast.success("가입이 완료되었습니다.");
       navigate("/login");
     },
     onError: (e) => {
@@ -113,7 +115,7 @@ export default function Signup() {
     e.preventDefault(); // 기본 폼 제출 방지
     if (!validateEmail(email)) {
       setCertificationMessage(
-        "인증번호가 이메일로 전송되었습니다. 5분 안에 회원가입을 완료해주세요.",
+        "인증번호를 전송 중입니다. 서버 상태에 따라 몇 분 소요될 수 있습니다.",
       );
       try {
         const response = await requestEmailCertification({ email });
@@ -183,7 +185,7 @@ export default function Signup() {
   const handleCheckUsername = async () => {
     const usernameErrorMessage = validateUsername(username);
     setUsernameCheckMessage(usernameErrorMessage);
-    
+
     if (username) {
       try {
         const response = await checkUsername({ username });
@@ -233,7 +235,7 @@ export default function Signup() {
   return (
     <div className="flex h-screen w-screen flex-col">
       <div className="flex h-full w-full items-center justify-center">
-        <div className="flex w-[400px] flex-col gap-y-14 rounded-xl border border-gray-300 p-10">
+        <div className="flex w-[400px] flex-col gap-y-14 rounded-xl border-gray-300 p-10">
           <h1 className="text-3xl font-bold">가입하고 같이 들어요!</h1>
           <form onSubmit={handleSubmit}>
             <div className="mb-6 flex flex-col gap-3">
@@ -366,7 +368,7 @@ export default function Signup() {
             <Button className="w-full">가입하기</Button>
           </form>
           <div className="flex items-center gap-4">
-            <p>사실 계정이 있으신가요?</p>
+            <p>계정이 이미 있으신가요?</p>
             <Button
               variant={"ghost"}
               className="font-bold text-sky-600"

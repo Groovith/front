@@ -17,9 +17,9 @@ export default function Setting() {
             <KeyRound />
             <span>비밀번호 변경</span>
           </SettingButtonItem>
-          <SettingButtonItem>
+          <SettingButtonItem onClick={() => navigate("/setting/delete-account")}>
             <UserX2 />
-            <span>회원 탈퇴</span>
+            <span>계정 탈퇴</span>
           </SettingButtonItem>
         </div>
       </div>

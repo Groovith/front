@@ -248,7 +248,7 @@ export const fetchChatRooms = async () => {
   return response.data;
 };
 
-interface CreateChatRoomRequest {
+export interface CreateChatRoomRequest {
   name: string;
   status: ChatRoomPrivacyType;
   permission: ChatRoomPlayerPermissionType;
@@ -267,10 +267,25 @@ export type ChatRoomPrivacyType = "PUBLIC" | "PRIVATE";
 export type ChatRoomPlayerPermissionType = "MASTER" | "EVERYONE";
 
 // 채팅방 생성
-export const createChatRoom = async (request: CreateChatRoomRequest) => {
+export const createChatRoom = async (
+  dto: CreateChatRoomRequest,
+  file: File | null,
+) => {
+  const formData = new FormData();
+  formData.append(
+    "dto",
+    new Blob([JSON.stringify(dto)], { type: "application/json" }),
+  );
+  if (file) formData.append("file", file);
+
   const response = await api.post<{ chatRoomId: number }>(
     "/chatrooms",
-    request,
+    formData,
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    },
   );
   return response.data;
 };
