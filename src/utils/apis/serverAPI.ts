@@ -250,7 +250,7 @@ export const fetchChatRooms = async () => {
 
 export interface CreateChatRoomRequest {
   name: string;
-  status: ChatRoomPrivacyType;
+  privacy: ChatRoomPrivacyType;
   permission: ChatRoomPlayerPermissionType;
 }
 

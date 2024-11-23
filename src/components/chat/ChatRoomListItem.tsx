@@ -2,20 +2,26 @@ import { EllipsisVertical, LogOut, Trash2 } from "lucide-react";
 import DropdownButton, { DropdownItem } from "../common/DropdownButton";
 import { Button } from "../common/Button";
 import { ChatRoomDetailsType } from "../../types/types";
-import { useUserStore } from "../../stores/useUserStore";
+import { deleteChatRoom } from "../../utils/apis/chatroom/deleteChatRoom.api";
+import { toast } from "sonner";
+import { useState } from "react";
+import DeleteChatRoomWarningModal from "./DeleteChatRoomWarningModal";
 
 interface ChatRoomListItemProps {
   chatRoom: ChatRoomDetailsType;
   handleChatRoomClick: (chatRoomId: number) => void;
   leaveChatRoomMutate: (chatRoomId: number) => void;
+  refetch: () => void;
 }
 
 export default function ChatRoomListItem({
   chatRoom,
   handleChatRoomClick,
   leaveChatRoomMutate,
+  refetch
 }: ChatRoomListItemProps) {
-  const { userId } = useUserStore();
+  const [isDeleteChatRoomModalOpen, setDeleteChatRoomModalOpen] =
+    useState(false);
   const leaveChatRoomButton: DropdownItem = {
     Icon: LogOut,
     label: "채팅방 나가기",
@@ -25,14 +31,27 @@ export default function ChatRoomListItem({
   const deleteChatRoomButton: DropdownItem = {
     Icon: Trash2,
     label: "채팅방 삭제",
-    action: () => {},
+    action: () => {
+      setDeleteChatRoomModalOpen(true);
+    },
     color: "red",
   };
 
-  const dropdownItems =
-    chatRoom.masterUserId === userId
-      ? [deleteChatRoomButton]
-      : [leaveChatRoomButton];
+  const handleDeleteChatRoom = async () => {
+    try {
+      await deleteChatRoom(chatRoom.chatRoomId);
+      refetch();
+      setDeleteChatRoomModalOpen(false);
+      toast.message("채팅방이 삭제되었습니다.");
+    } catch (e) {
+      console.error(e);
+      toast.error("채팅방 삭제 중 오류가 발생하였습니다.");
+    }
+  };
+
+  const dropdownItems = chatRoom.isMaster
+    ? [deleteChatRoomButton]
+    : [leaveChatRoomButton];
 
   return (
     <li
@@ -62,6 +81,13 @@ export default function ChatRoomListItem({
           <EllipsisVertical />
         </Button>
       </DropdownButton>
+
+      {isDeleteChatRoomModalOpen && (
+        <DeleteChatRoomWarningModal
+          onClose={() => setDeleteChatRoomModalOpen(false)}
+          handleDeleteChatRoom={handleDeleteChatRoom}
+        />
+      )}
     </li>
   );
 }

@@ -11,6 +11,7 @@ export interface ChatRoomDetailsType {
   imageUrl: string;
   chatRoomId: number;
   name: string;
+  isMaster: boolean;
   masterUserId: number;
   masterUserName: string;
   privacy: "PRIVATE" | "FRIENDS" | "PUBLIC";

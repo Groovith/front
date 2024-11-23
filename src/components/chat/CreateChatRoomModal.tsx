@@ -21,7 +21,7 @@ export default function CreateChatRoomModal({
   onClose,
 }: CreateChatRoomModalProps) {
   const [newChatRoomName, setNewChatRoomName] = useState("");
-  const [chatRoomVisibility, setChatRoomVisibility] =
+  const [chatRoomPrivacy, setChatRoomPrivacy] =
     useState<ChatRoomPrivacyType>("PUBLIC");
   const [musicPlayerPermission, setMusicPlayerPermission] =
     useState<ChatRoomPlayerPermissionType>("EVERYONE");
@@ -47,7 +47,7 @@ export default function CreateChatRoomModal({
       createChatRoomMutate({
         dto: {
           name: newChatRoomName,
-          status: chatRoomVisibility,
+          privacy: chatRoomPrivacy,
           permission: musicPlayerPermission,
         },
         file,
@@ -89,6 +89,15 @@ export default function CreateChatRoomModal({
     }
   };
 
+  const handleDeleteImage = () => {
+    setImage("");
+    setFile(null);
+    const fileInput = document.getElementById("fileInput") as HTMLInputElement;
+    if (fileInput) {
+      fileInput.value = ""; // 파일 입력 필드 값 초기화
+    }
+  };
+
   return (
     <Modal onClose={onClose} closeOnOutsideClick={true}>
       <div className="flex h-full w-full flex-col">
@@ -99,14 +108,18 @@ export default function CreateChatRoomModal({
         {/* 채팅방 사진 */}
         <div className="relative flex h-fit w-full justify-center py-5">
           {image ? (
-            <div className="flex size-fit relative">
+            <div className="relative flex size-fit">
               <img
                 src={image}
                 alt="Image"
                 onClick={() => document.getElementById("fileInput")?.click()}
                 className="size-24 rounded-full border border-neutral-300 bg-neutral-100 object-cover hover:cursor-pointer"
               />
-              <Button variant={"white"} className="absolute bottom-0 right-0 size-fit p-1">
+              <Button
+                variant={"white"}
+                className="absolute bottom-0 right-0 size-fit p-1"
+                onClick={handleDeleteImage}
+              >
                 <X size={18} />
               </Button>
             </div>
@@ -144,8 +157,8 @@ export default function CreateChatRoomModal({
                 type="radio"
                 name="visibility"
                 value="PUBLIC"
-                checked={chatRoomVisibility === "PUBLIC"}
-                onChange={() => setChatRoomVisibility("PUBLIC")}
+                checked={chatRoomPrivacy === "PUBLIC"}
+                onChange={() => setChatRoomPrivacy("PUBLIC")}
                 className="form-radio h-5 w-5 text-blue-600"
               />
               <div className="ml-3 flex flex-col justify-start gap-1">
@@ -160,8 +173,8 @@ export default function CreateChatRoomModal({
                 type="radio"
                 name="visibility"
                 value="PRIVATE"
-                checked={chatRoomVisibility === "PRIVATE"}
-                onChange={() => setChatRoomVisibility("PRIVATE")}
+                checked={chatRoomPrivacy === "PRIVATE"}
+                onChange={() => setChatRoomPrivacy("PRIVATE")}
                 className="form-radio h-5 w-5 text-blue-600"
               />
               <div className="ml-3 flex flex-col justify-start gap-1">

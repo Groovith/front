@@ -2,10 +2,7 @@ import { useState } from "react";
 import ChatHeader from "../components/chat/ChatHeader";
 import { useNavigate } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import {
-  fetchChatRooms,
-  leaveChatRoom,
-} from "../utils/apis/serverAPI";
+import { fetchChatRooms, leaveChatRoom } from "../utils/apis/serverAPI";
 import { ChatRoomDetailsType } from "../types/types";
 import Loading from "./Loading";
 import ChatRoomListItem from "../components/chat/ChatRoomListItem";
@@ -16,12 +13,16 @@ export default function Chat() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
 
-  const { data, isLoading } = useQuery<{
+  const { data, isLoading, refetch } = useQuery<{
     chatRooms: ChatRoomDetailsType[];
   }>({
     queryKey: ["chatRooms"],
     queryFn: () => fetchChatRooms(),
   });
+
+  if (data) {
+    console.log(data);
+  }
 
   const handleChatRoomClick = (chatRoomId: number) => {
     navigate(`/chat/${chatRoomId}`);
@@ -42,7 +43,7 @@ export default function Chat() {
 
   return (
     <>
-      <div className="flex size-full overflow-y-auto justify-center px-10 pt-16 ">
+      <div className="flex size-full justify-center overflow-y-auto px-10 pt-16">
         <div className="flex size-full max-w-screen-sm flex-col gap-5">
           <ChatHeader setIsModalOpen={setIsModalOpen} />
 
@@ -55,13 +56,14 @@ export default function Chat() {
           )}
 
           {data?.chatRooms && data.chatRooms.length > 0 && (
-            <ul className="flex flex-col pb-10 w-full">
+            <ul className="flex w-full flex-col pb-10">
               {data.chatRooms.map((chatRoom) => (
                 <ChatRoomListItem
                   key={chatRoom.chatRoomId}
                   chatRoom={chatRoom}
                   handleChatRoomClick={handleChatRoomClick}
                   leaveChatRoomMutate={leaveChatRoomMutate}
+                  refetch={refetch}
                 />
               ))}
             </ul>
@@ -70,7 +72,7 @@ export default function Chat() {
       </div>
 
       {isModalOpen && (
-        <CreateChatRoomModal onClose={() => setIsModalOpen(false)}/>
+        <CreateChatRoomModal onClose={() => setIsModalOpen(false)} />
       )}
     </>
   );
