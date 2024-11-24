@@ -14,7 +14,7 @@ import { Track } from "../../types/track.type";
  * Axios 설정
  */
 
-const serverURL: string = "http://localhost:8080/api";
+const serverURL: string = "http://groovith.com:8080/api";
 
 // axios 인스턴스 생성
 export const api = axios.create({
