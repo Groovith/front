@@ -15,6 +15,7 @@ import { Track } from "../../types/track.type";
  */
 
 const serverURL: string = "http://groovith.com:8080/api";
+export const brokerURL = "ws://groovith.com:8080/ws"
 
 // axios 인스턴스 생성
 export const api = axios.create({

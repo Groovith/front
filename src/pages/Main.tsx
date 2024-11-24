@@ -3,7 +3,7 @@ import Player from "../layouts/Player";
 import Sidebar from "../layouts/Sidebar";
 import Loading from "./Loading";
 import { useQuery } from "@tanstack/react-query";
-import { getUserDetails } from "../utils/apis/serverAPI";
+import { brokerURL, getUserDetails } from "../utils/apis/serverAPI";
 import { useUser } from "../hooks/useUser";
 import { UserDetailsType } from "../types/types";
 import { Client } from "@stomp/stompjs";
@@ -56,7 +56,7 @@ export default function Main() {
 
     // STOMP 클라이언트 설정
     const client = new Client({
-      brokerURL: "ws://localhost:8080/ws",
+      brokerURL: brokerURL,
       connectHeaders: headers,
       onConnect: () => {
         // 연결 성공 시
