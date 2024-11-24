@@ -9,7 +9,6 @@ import { UserDetailsType } from "../types/types";
 import { Client } from "@stomp/stompjs";
 import { useStompStore } from "../stores/useStompStore";
 import CurrentChatRoom from "../layouts/CurrentChatRoom";
-import { Toaster } from "sonner";
 import BottomNavigation from "../layouts/BottomNavigation";
 
 export default function Main() {
@@ -81,7 +80,6 @@ export default function Main() {
 
   return (
     <>
-      <Toaster position="bottom-center" richColors />
       <div className="flex h-screen w-screen flex-col text-neutral-900 break-keep">
         <div className="flex h-full overflow-hidden">
           <Sidebar />

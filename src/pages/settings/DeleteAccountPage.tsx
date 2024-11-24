@@ -5,7 +5,7 @@ import { Button } from "../../components/common/Button";
 import { deleteAccount } from "../../utils/apis/user/deleteAccount.api";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { AxiosError, isAxiosError } from "axios";
+import { isAxiosError } from "axios";
 
 export default function DeleteAccountPage() {
   const navigate = useNavigate();
@@ -18,7 +18,7 @@ export default function DeleteAccountPage() {
       navigate("/login");
     } catch (e) {
       if (isAxiosError(e)) {
-        if (e.code === AxiosError.ERR_BAD_REQUEST) {
+        if (e.response?.status === 401) {
           toast.error("비밀번호가 일치하지 않습니다.");
         } else {
           toast.error("회원탈퇴 처리 중 문제가 발생하였습니다.");

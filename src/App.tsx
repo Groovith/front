@@ -7,7 +7,6 @@ import Chat from "./pages/Chat";
 import Setting from "./pages/Setting";
 import User from "./pages/User";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Callback } from "./pages/Callback";
 import ResetPassword from "./pages/ResetPassword";
 import ChatRoomPage from "./pages/ChatRoomPage";
 import ChangePassword from "./pages/ChangePassword";
@@ -15,6 +14,7 @@ import SettingDetailsPage from "./pages/settings/SettingDetailsPage";
 import ChangePasswordPage from "./pages/settings/ChangePasswordPage";
 import DeleteAccountPage from "./pages/settings/DeleteAccountPage";
 import Home from "./pages/Home";
+import { Toaster } from "sonner";
 
 const queryClient = new QueryClient();
 
@@ -45,9 +45,9 @@ function App() {
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/change-password" element={<ChangePassword />} />
           <Route path="/signup" element={<Signup />} />
-          <Route path="/callback" element={<Callback />} />
         </Routes>
       </BrowserRouter>
+      <Toaster position="bottom-center" richColors />
     </QueryClientProvider>
   );
 }

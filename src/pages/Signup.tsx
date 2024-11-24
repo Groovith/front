@@ -11,6 +11,10 @@ import { Button } from "../components/common/Button";
 import { useMutation } from "@tanstack/react-query";
 import { ResponseCode } from "../types/enums";
 import { toast } from "sonner";
+import { isAxiosError } from "axios";
+
+const usernameRule =
+  "사용자 이름은 2자 이상, 30자 이하의 영문 소문자, 숫자, 밑줄, 마침표만 허용하며, 시작과 끝에 밑줄이나 마침표를 사용할 수 없습니다.";
 
 export default function Signup() {
   const [email, setEmail] = useState("");
@@ -49,7 +53,28 @@ export default function Signup() {
       navigate("/login");
     },
     onError: (e) => {
-      console.log("회원가입 에러: ", e);
+      if (!isAxiosError(e)) {
+        console.log("회원가입 에러: ", e);
+        return;
+      }
+
+      switch (e.response?.status) {
+        case 401: {
+          toast.error(
+            "이메일 인증번호 유효 시간을 초과하였습니다. 인증번호를 다시 요청해주세요.",
+          );
+          break;
+        }
+        case 400: {
+          toast.error("사용자 이름 혹은 비밀번호 형식이 유효하지 않습니다.");
+          break;
+        }
+        default: {
+          toast.error(
+            "서버에서 문제가 발생하였습니다. 조금 뒤에 다시 시도해주세요.",
+          );
+        }
+      }
     },
   });
 
@@ -65,7 +90,7 @@ export default function Signup() {
   // 비밀번호 규칙 확인 함수
   const validatePassword = (password: string): boolean => {
     const minLength = 8;
-    const maxLength = 32;
+    const maxLength = 64;
     const hasTwoTypes =
       /(?=.*[a-zA-Z])(?=.*[0-9])|(?=.*[a-zA-Z])(?=.*[^a-zA-Z0-9])|(?=.*[0-9])(?=.*[^a-zA-Z0-9])/;
 
@@ -81,7 +106,7 @@ export default function Signup() {
   };
 
   // 비밀번호 조건을 실시간으로 체크하기 위한 상태
-  const isLengthValid = password.length >= 8 && password.length <= 32;
+  const isLengthValid = password.length >= 8 && password.length <= 64;
   const hasTwoTypes =
     /(?=.*[a-zA-Z])(?=.*[0-9])|(?=.*[a-zA-Z])(?=.*[^a-zA-Z0-9])|(?=.*[0-9])(?=.*[^a-zA-Z0-9])/.test(
       password,
@@ -167,26 +192,26 @@ export default function Signup() {
   };
 
   // 사용자 이름 규칙 확인 함수
-  const validateUsername = (username: string): string | null => {
-    const usernameRegex = /^(?!.*[_.]{2})[a-z0-9._]{2,30}$/;
-    if (
-      !usernameRegex.test(username) ||
-      username.startsWith("_") ||
-      username.startsWith(".") ||
-      username.endsWith("_") ||
-      username.endsWith(".")
-    ) {
-      return "사용자 이름은 2자 이상, 30자 이하의 영문 소문자, 숫자, 밑줄, 마침표만 허용하며, 시작과 끝에 밑줄이나 마침표를 사용할 수 없습니다.";
+  const validateUsername = (username: string): boolean => {
+    const usernameRegex = /^[a-z0-9_](?!.*\\.{2})[a-z0-9._]*[a-z0-9_]$/;
+    if (!usernameRegex.test(username)) {
+      setUsernameValid(false);
+      return false;
     }
-    return null;
+    return true;
   };
 
   // 사용자 이름 사용 가능 여부 체크
   const handleCheckUsername = async () => {
-    const usernameErrorMessage = validateUsername(username);
-    setUsernameCheckMessage(usernameErrorMessage);
+    if (!username) {
+      setUsernameCheckMessage(null);
+      setUsernameValid(null);
+    }
 
-    if (username) {
+    if (!validateUsername(username)) {
+      setUsernameCheckMessage(usernameRule);
+      return;
+    } else {
       try {
         const response = await checkUsername({ username });
         if (response.code === ResponseCode.SUCCESS) {
@@ -202,9 +227,6 @@ export default function Signup() {
           setUsernameValid(false);
         }
       }
-    } else {
-      setUsernameCheckMessage(null); // 사용자 이름 입력 필드가 비어 있을 경우 메시지 초기화
-      setUsernameValid(null);
     }
   };
 
@@ -212,23 +234,27 @@ export default function Signup() {
   const handleSubmit = async (e: any) => {
     e.preventDefault();
 
-    // 이메일 중복 확인 호출
-    await handleCheckEmail();
+    try {
+      // 이메일 중복 확인 호출
+      await handleCheckEmail();
 
-    // 비밀번호 검증 및 포커스 이동 처리
-    if (validatePassword(password)) {
-      passwordRef.current?.focus();
-    } else if (password !== passwordVerify) {
-      passwordVerifyRef.current?.focus();
-    } else if (!usernameValid) {
-      usernameRef.current?.focus();
-    } else if (
-      !emailError &&
-      !emailExistsError &&
-      certificationValid &&
-      usernameValid
-    ) {
-      mutate(); // 모든 조건이 충족되면 회원가입 요청
+      // 비밀번호 검증 및 포커스 이동 처리
+      if (validatePassword(password)) {
+        passwordRef.current?.focus();
+      } else if (password !== passwordVerify) {
+        passwordVerifyRef.current?.focus();
+      } else if (!usernameValid) {
+        usernameRef.current?.focus();
+      } else if (
+        !emailError &&
+        !emailExistsError &&
+        certificationValid &&
+        usernameValid
+      ) {
+        mutate(); // 모든 조건이 충족되면 회원가입 요청
+      }
+    } catch (e) {
+      console.error(e);
     }
   };
 
@@ -312,11 +338,11 @@ export default function Signup() {
               <p className="text-sm">
                 {isLengthValid ? (
                   <span className="text-green-500">
-                    ✓ 8자 이상 32자 이하로 입력(공백 제외)
+                    ✓ 8자 이상 64자 이하로 입력(공백 제외)
                   </span>
                 ) : (
                   <span className="text-red-500">
-                    ✗ 8자 이상 32자 이하로 입력(공백 제외)
+                    ✗ 8자 이상 64자 이하로 입력(공백 제외)
                   </span>
                 )}
                 <br />
