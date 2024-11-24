@@ -206,6 +206,7 @@ export default function Signup() {
     if (!username) {
       setUsernameCheckMessage(null);
       setUsernameValid(null);
+      return;
     }
 
     if (!validateUsername(username)) {
@@ -259,7 +260,7 @@ export default function Signup() {
   };
 
   return (
-    <div className="flex h-screen w-screen flex-col">
+    <div className="flex h-fit w-screen flex-col overflow-y-auto">
       <div className="flex h-full w-full items-center justify-center">
         <div className="flex w-[400px] flex-col gap-y-14 rounded-xl border-gray-300 p-10">
           <h1 className="text-3xl font-bold">가입하고 같이 들어요!</h1>

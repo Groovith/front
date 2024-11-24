@@ -7,6 +7,9 @@ import { changeUsername } from "../../utils/apis/user/changeUsername.api";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 
+const usernameRule =
+  "사용자 이름은 2자 이상, 30자 이하의 영문 소문자, 숫자, 밑줄, 마침표만 허용하며, 시작과 끝에 밑줄이나 마침표를 사용할 수 없습니다.";
+
 interface UsernameModalProps {
   onClose: () => void;
   username: string | undefined;
@@ -20,32 +23,32 @@ export default function UsernameModal({
     string | null
   >(null);
   const [usernameValid, setUsernameValid] = useState<boolean | null>(null);
-  const [newUsername, setNewUsername] = useState("");
+  const [newUsername, setNewUsername] = useState(username ? username : "");
   const usernameRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
 
   // 사용자 이름 규칙 확인 함수
-  const validateUsername = (username: string): string | null => {
-    const usernameRegex = /^(?!.*[_.]{2})[a-z0-9._]{2,30}$/;
-    if (
-      !usernameRegex.test(username) ||
-      username.startsWith("_") ||
-      username.startsWith(".") ||
-      username.endsWith("_") ||
-      username.endsWith(".")
-    ) {
+  const validateUsername = (username: string): boolean => {
+    const usernameRegex = /^[a-z0-9_](?!.*\\.{2})[a-z0-9._]*[a-z0-9_]$/;
+    if (!usernameRegex.test(username)) {
       setUsernameValid(false);
-      return "사용자 이름은 2자 이상, 30자 이하의 영문 소문자, 숫자, 밑줄, 마침표만 허용하며, 시작과 끝에 밑줄이나 마침표를 사용할 수 없습니다.";
+      return false;
     }
-    return null;
+    return true;
   };
 
   // 사용자 이름 사용 가능 여부 체크
   const handleCheckUsername = async () => {
-    const usernameErrorMessage = validateUsername(newUsername);
-    setUsernameCheckMessage(usernameErrorMessage);
+    if (!newUsername || username === newUsername) {
+      setUsernameCheckMessage(null);
+      setUsernameValid(null);
+      return;
+    }
 
-    if (!usernameErrorMessage) {
+    if (!validateUsername(newUsername)) {
+      setUsernameCheckMessage(usernameRule);
+      return;
+    } else {
       try {
         const response = await checkUsername({ username: newUsername });
         if (response.code === ResponseCode.SUCCESS) {
@@ -61,11 +64,6 @@ export default function UsernameModal({
           setUsernameValid(false);
         }
       }
-    }
-
-    if (!newUsername) {
-      setUsernameCheckMessage(null); // 사용자 이름 입력 필드가 비어 있을 경우 메시지 초기화
-      setUsernameValid(null);
     }
   };
 
