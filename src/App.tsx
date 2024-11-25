@@ -61,7 +61,7 @@ function App() {
           <Route path="/signup" element={<Signup />} />
         </Routes>
       </BrowserRouter>
-      <Toaster position="bottom-right" richColors />
+      <Toaster position="top-center" richColors closeButton className="mt-[50px]"/>
     </QueryClientProvider>
   );
 }
