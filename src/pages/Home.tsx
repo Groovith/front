@@ -14,7 +14,7 @@ import H2 from "../components/common/H2";
 export default function Home() {
   return (
     <div className="flex size-full items-center justify-center px-10 py-16 overflow-y-auto">
-      <div className="flex size-full max-w-screen-md flex-col gap-10 break-keep mb-12 ">
+      <div className="flex size-full max-w-screen-md flex-col gap-10 break-keep">
         <H1 className="text-3xl">Groovith에 오신 걸 환영합니다!</H1>
 
         <div className="flex flex-col gap-6 text-neutral-700 leading-relaxed">
@@ -93,7 +93,7 @@ export default function Home() {
             </p>
           </div>
         </div>
-        <p className="text-neutral-400">
+        <p className="text-neutral-400 pb-10">
           해당 홈 화면에는 인기 있는 채팅방, 최근 채팅방 등의 컨텐츠를 준비하고 있습니다...!
         </p>
       </div>

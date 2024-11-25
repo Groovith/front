@@ -80,7 +80,7 @@ export default function Main() {
 
   return (
     <>
-      <div className="flex h-screen w-screen flex-col text-neutral-900 break-keep">
+      <div className="flex w-screen h-screen flex-col text-neutral-900 break-keep">
         <div className="flex h-full overflow-hidden">
           <Sidebar />
           <div className="relative flex h-full w-full">

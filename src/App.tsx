@@ -14,11 +14,25 @@ import SettingDetailsPage from "./pages/settings/SettingDetailsPage";
 import ChangePasswordPage from "./pages/settings/ChangePasswordPage";
 import DeleteAccountPage from "./pages/settings/DeleteAccountPage";
 import Home from "./pages/Home";
+import { useEffect } from "react";
 import { Toaster } from "sonner";
 
 const queryClient = new QueryClient();
 
 function App() {
+  useEffect(() => {
+    const setVh = () => {
+      const vh = window.innerHeight * 0.01;
+      document.documentElement.style.setProperty("--vh", `${vh}px`);
+    }
+
+    setVh();
+
+    // 화면 크기 변경될 때 업데이트
+    window.addEventListener("resize", setVh);
+    return () => window.removeEventListener("resize", setVh);
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
@@ -47,7 +61,7 @@ function App() {
           <Route path="/signup" element={<Signup />} />
         </Routes>
       </BrowserRouter>
-      <Toaster position="bottom-center" richColors />
+      <Toaster position="bottom-right" richColors />
     </QueryClientProvider>
   );
 }

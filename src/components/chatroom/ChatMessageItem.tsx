@@ -7,8 +7,8 @@ interface ChatMessageItemProps {
 
 export default function ChatMessageItem({ message }: ChatMessageItemProps) {
   return (
-    <li key={message.messageId} className="flex gap-3">
-      <img src={message.imageUrl} className="size-10 rounded-full object-cover" />
+    <li key={message.messageId} className="flex gap-3 break-normal">
+      <img src={message.imageUrl} className="flex-none size-10 rounded-full object-cover" />
       <div className="flex flex-col gap-1">
         <div className="flex items-center gap-2">
           <p>{message.username}</p>

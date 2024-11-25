@@ -68,7 +68,7 @@ export default function User() {
   // 유저네임이 현재 로그인한 유저네임과 같은지 확인 -> 내 프로필 화면 | 타 유저 프로필 화면 결정
 
   return (
-    <div className="flex flex-col h-full w-full justify-between items-center text-neutral-900">
+    <div className="flex flex-col h-full w-full justify-between items-center text-neutral-900 overflow-y-auto">
       <div className="w-full pt-2 px-2 md:hidden" onClick={() => navigate(-1)}><Button variant={"ghost"}><ChevronLeft /></Button></div>
       <div className="flex w-full h-full max-w-screen-md flex-col gap-10 px-10 py-10">
         <div className="flex items-center gap-8">
@@ -84,7 +84,7 @@ export default function User() {
             </div>
           </div>
         </div>
-        <div className="flex w-full items-center justify-between gap-5">
+        <div className="flex w-full items-center justify-between gap-5 pb-10">
           {userDetails.userRelationship === "SELF" && (
             <div className="flex flex-col w-full h-fit gap-10">
               <div className="flex w-full">
