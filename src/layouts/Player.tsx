@@ -134,29 +134,27 @@ export default function Player() {
     } = playerResponseMessage;
 
     if (action) {
+      if (!player?.current) return;
       switch (action) {
         case "PLAY_TRACK":
-          if (
-            typeof index === "undefined" ||
-            !player?.current ||
-            typeof videoId === "undefined"
-          )
+          if (typeof index === "undefined" || typeof videoId === "undefined")
             return;
           player.current.target.loadVideoById({ videoId: videoId });
           setCurrentPlaylistIndex(index);
           break;
         case "PAUSE":
-          if (!player?.current) return;
           //player.current.target.seekTo(position);
           player.current.target.pauseVideo();
           break;
         case "RESUME":
-          if (!player?.current) return;
           //player.current.target.seekTo(position);
           player.current.target.playVideo();
           break;
+        case "STOP":
+          player.current.target.stopVideo();
+          break;
         case "SEEK":
-          if (typeof position === "undefined" || !player?.current) return;
+          if (typeof position === "undefined") return;
           player.current.target.seekTo(position);
           break;
         case "UPDATE":
@@ -325,7 +323,11 @@ export default function Player() {
       </div>
       <YouTube
         opts={opts}
-        videoId={currentPlaylist[currentPlaylistIndex] ? currentPlaylist[currentPlaylistIndex].videoId : ""}
+        videoId={
+          currentPlaylist[currentPlaylistIndex]
+            ? currentPlaylist[currentPlaylistIndex].videoId
+            : ""
+        }
         onReady={onPlayerReady}
         onStateChange={onPlayerStateChange}
         className={"absolute"}
