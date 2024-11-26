@@ -3,6 +3,7 @@ import { usePlayerStore } from "../stores/usePlayerStore";
 import { getTrackInfo } from "../utils/apis/serverAPI";
 import { PlayerRequestDto } from "../types/types";
 import { useStompStore } from "../stores/useStompStore";
+import YouTube from "react-youtube";
 
 export function usePlayer() {
   const {
@@ -83,15 +84,29 @@ export function usePlayer() {
     if (index >= 0 && index < currentPlaylist.length) {
       try {
         setCurrentPlaylistIndex(index);
-        player?.current?.target.loadVideoById({videoId: currentPlaylist[index].videoId});
+        player?.current?.target.loadVideoById({
+          videoId: currentPlaylist[index].videoId,
+        });
       } catch (e) {
         console.log(e);
       }
     }
   };
 
-  const nextTrack = () => {
+  const trackEnded = () => {
     if (listenTogetherId) {
+      const requestDto: PlayerRequestDto = {
+        action: "TRACK_ENDED",
+      };
+      sendPlayerMessage(listenTogetherId, requestDto);
+      return;
+    }
+
+    nextTrack(true);
+  };
+
+  const nextTrack = (force?: boolean) => {
+    if (listenTogetherId && !force) {
       const requestDto: PlayerRequestDto = {
         action: "NEXT_TRACK",
       };
@@ -150,6 +165,15 @@ export function usePlayer() {
       const response = await getTrackInfo(videoId);
       const updatedCurrentPlaylist = [...currentPlaylist, response];
       setCurrentPlaylist(updatedCurrentPlaylist);
+      // 플레이리스트가 비어있던 경우 자동 재생
+      if (
+        player?.current?.target.getPlayerState() ===
+        YouTube.PlayerState.UNSTARTED
+      ) {
+        player.current.target.loadVideoById({
+          videoId: videoId,
+        });
+      }
     } catch (e) {
       toast.error("음악 추가 중 문제가 발생하였습니다.");
     }
@@ -218,5 +242,6 @@ export function usePlayer() {
     nextTrack,
     previousTrack,
     playAtIndex,
+    trackEnded,
   };
 }

@@ -72,7 +72,6 @@ export default function ChatRoomHeader({
       // 채팅방 참가
       const response = await joinPlayer(chatRoomDetails.chatRoomId);
       setPlayerDetails(response);
-      console.log(response);
 
       setRepeat(response.repeat);
       setCurrentPlaylist(response.currentPlaylist);

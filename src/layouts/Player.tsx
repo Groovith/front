@@ -37,8 +37,14 @@ export default function Player() {
     setCurrentPlaylistIndex,
     setPlayerDetails,
   } = usePlayerStore();
-  const { resumePlayer, pausePlayer, seek, nextTrack, previousTrack } =
-    usePlayer();
+  const {
+    resumePlayer,
+    pausePlayer,
+    seek,
+    nextTrack,
+    previousTrack,
+    trackEnded,
+  } = usePlayer();
   const [newPosition, setNewPosition] = useState(0);
   const { isCurrentChatRoomOpen, toggleCurrentChatRoomOpen } =
     useChatRoomStore();
@@ -62,7 +68,6 @@ export default function Player() {
   const onPlayerReady: YouTubeProps["onReady"] = (event: YouTubeEvent<any>) => {
     playerRef.current = event;
     setPlayer(playerRef);
-    console.log("Player Ready: ", playerRef.current);
     setDuration(player?.current!.target.getDuration());
   };
 
@@ -88,30 +93,24 @@ export default function Player() {
   ) => {
     switch (event.data) {
       case YouTube.PlayerState.UNSTARTED:
-        console.log("Unstarted...");
         setLoading(false);
         break;
       case YouTube.PlayerState.BUFFERING:
-        console.log("Buffering...");
         setLoading(true);
         break;
       case YouTube.PlayerState.PLAYING:
-        console.log("Playing...");
         setLoading(false);
         setPaused(false);
         break;
       case YouTube.PlayerState.PAUSED:
-        console.log("Paused...");
         setLoading(false);
         setPaused(true);
         break;
       case YouTube.PlayerState.ENDED:
-        console.log("Ended...");
         setLoading(false);
-        nextTrack();
+        trackEnded();
         break;
       case YouTube.PlayerState.CUED:
-        console.log("Cued...");
         setLoading(false);
         setPaused(true);
         break;
@@ -208,10 +207,7 @@ export default function Player() {
   };
 
   return (
-    <div
-      className="flex h-[80px] w-full justify-between truncate border-t"
-      onClick={toggleCurrentChatRoomOpen}
-    >
+    <div className="flex h-[80px] w-full">
       {currentPlaylist[currentPlaylistIndex] ? (
         <input
           className="absolute z-40 h-1 w-full cursor-pointer appearance-none bg-neutral-200 accent-[#FF6735] outline-none disabled:accent-gray-200"
@@ -240,90 +236,96 @@ export default function Player() {
           disabled
         />
       )}
-      <div className="ml-6 flex items-center">
-        <div className="flex w-fit items-center justify-start gap-0">
-          <Button
-            variant={"transparent"}
-            className="hidden text-neutral-600 md:flex"
-            onClick={(e) => handleButtonClick(e, previousTrack)}
-          >
-            <SkipBack />
-          </Button>
-          {loading ? (
-            <Button variant={"transparent"} className="flex">
-              <MoonLoader size={18} />
+      <div
+        className="flex w-full justify-between truncate border-t"
+        onClick={toggleCurrentChatRoomOpen}
+      >
+        <div className="ml-6 flex items-center">
+          <div className="flex w-fit items-center justify-start gap-0">
+            <Button
+              variant={"transparent"}
+              className="hidden text-neutral-600 md:flex"
+              onClick={(e) => handleButtonClick(e, previousTrack)}
+            >
+              <SkipBack />
             </Button>
-          ) : paused ? (
+            {loading ? (
+              <Button variant={"transparent"} className="flex">
+                <MoonLoader size={18} />
+              </Button>
+            ) : paused ? (
+              <Button
+                variant={"transparent"}
+                className="text-neutral-600"
+                onClick={(e) => handleButtonClick(e, resumePlayer)}
+                disabled={loading}
+              >
+                <Play />
+              </Button>
+            ) : (
+              <Button
+                variant={"transparent"}
+                className="text-neutral-600"
+                onClick={(e) => handleButtonClick(e, pausePlayer)}
+                disabled={loading}
+              >
+                <Pause />
+              </Button>
+            )}
             <Button
               variant={"transparent"}
               className="text-neutral-600"
-              onClick={(e) => handleButtonClick(e, resumePlayer)}
-              disabled={loading}
+              onClick={(e) => handleButtonClick(e, nextTrack)}
             >
-              <Play />
+              <SkipForward />
+            </Button>
+          </div>
+          {currentPlaylist[currentPlaylistIndex] ? (
+            <div className="ml-2 hidden items-center gap-1 text-sm text-neutral-400 md:flex">
+              <p>{formatDurationSec(position)}</p>
+              <p>/</p>
+              <p>{formatDurationSec(duration)}</p>
+            </div>
+          ) : (
+            <div className="ml-2 hidden items-center gap-1 text-sm text-neutral-400 md:flex">
+              <p>{formatDuration(0)}</p>
+              <p>/</p>
+              <p>{formatDuration(0)}</p>
+            </div>
+          )}
+        </div>
+        <div className="flex items-center truncate">
+          {currentPlaylist[currentPlaylistIndex] ? (
+            <CurrentTrackInfo
+              imgUrl={currentPlaylist[currentPlaylistIndex].imageUrl}
+              trackName={currentPlaylist[currentPlaylistIndex].title}
+              artistName={currentPlaylist[currentPlaylistIndex].artist}
+            />
+          ) : (
+            <p className="text-sm text-neutral-400">재생 중인 곡이 없습니다</p>
+          )}
+        </div>
+        <div className="mr-6 flex items-center">
+          {isCurrentChatRoomOpen ? (
+            <Button
+              variant={"transparent"}
+              onClick={(e) => handleButtonClick(e, toggleCurrentChatRoomOpen)}
+            >
+              <ChevronDown />
             </Button>
           ) : (
             <Button
               variant={"transparent"}
-              className="text-neutral-600"
-              onClick={(e) => handleButtonClick(e, pausePlayer)}
-              disabled={loading}
+              onClick={(e) => handleButtonClick(e, toggleCurrentChatRoomOpen)}
             >
-              <Pause />
+              <ChevronUp />
             </Button>
           )}
-          <Button
-            variant={"transparent"}
-            className="text-neutral-600"
-            onClick={(e) => handleButtonClick(e, nextTrack)}
-          >
-            <SkipForward />
-          </Button>
         </div>
-        {currentPlaylist[currentPlaylistIndex] ? (
-          <div className="ml-2 hidden items-center gap-1 text-sm text-neutral-400 md:flex">
-            <p>{formatDurationSec(position)}</p>
-            <p>/</p>
-            <p>{formatDurationSec(duration)}</p>
-          </div>
-        ) : (
-          <div className="ml-2 hidden items-center gap-1 text-sm text-neutral-400 md:flex">
-            <p>{formatDuration(0)}</p>
-            <p>/</p>
-            <p>{formatDuration(0)}</p>
-          </div>
-        )}
-      </div>
-      <div className="flex items-center truncate">
-        {currentPlaylist[currentPlaylistIndex] ? (
-          <CurrentTrackInfo
-            imgUrl={currentPlaylist[currentPlaylistIndex].imageUrl}
-            trackName={currentPlaylist[currentPlaylistIndex].title}
-            artistName={currentPlaylist[currentPlaylistIndex].artist}
-          />
-        ) : (
-          <p className="text-sm text-neutral-400">재생 중인 곡이 없습니다</p>
-        )}
-      </div>
-      <div className="mr-6 flex items-center">
-        {isCurrentChatRoomOpen ? (
-          <Button
-            variant={"transparent"}
-            onClick={(e) => handleButtonClick(e, toggleCurrentChatRoomOpen)}
-          >
-            <ChevronDown />
-          </Button>
-        ) : (
-          <Button
-            variant={"transparent"}
-            onClick={(e) => handleButtonClick(e, toggleCurrentChatRoomOpen)}
-          >
-            <ChevronUp />
-          </Button>
-        )}
       </div>
       <YouTube
         opts={opts}
+        videoId={currentPlaylist[currentPlaylistIndex] ? currentPlaylist[currentPlaylistIndex].videoId : ""}
         onReady={onPlayerReady}
         onStateChange={onPlayerStateChange}
         className={"absolute"}
