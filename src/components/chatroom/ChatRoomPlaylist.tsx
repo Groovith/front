@@ -1,9 +1,10 @@
 import { ListMusic, ListPlus } from "lucide-react";
 import { useEffect, useState } from "react";
-import { Button } from "../common/Button";
 import { Track } from "../../types/track.type";
 import CurrentPlaylistItem from "./CurrentPlaylistItem";
 import AddTrackModal from "./AddTrackModal";
+import { toast } from "sonner";
+import { ButtonWithText } from "../common/ButtonWithText";
 
 // CurrentPlaylist 컴포넌트에 필요한 props 정의
 interface ChatRoomPlaylistProps {
@@ -15,19 +16,26 @@ interface ChatRoomPlaylistProps {
 export default function ChatRoomPlaylist({
   currentPlaylist,
   currentPlaylistIndex,
-  isListeningChatRoom
+  isListeningChatRoom,
 }: ChatRoomPlaylistProps) {
   const [hoveredTrackIndex, setHoveredTrackIndex] = useState<number | null>(
     null,
   );
   const [addTrackModalVisible, setAddTrackModalVisible] = useState(false);
-  
 
   useEffect(() => {
     if (addTrackModalVisible) {
       document.getElementById("youtube-url-input")?.focus();
     }
   }, [addTrackModalVisible]);
+
+  const handleAddTrackClick = () => {
+    if (isListeningChatRoom) {
+      setAddTrackModalVisible(true);
+    } else {
+      toast.message("음악을 추가하려면 같이 듣기에 참여해주세요.");
+    }
+  };
 
   return (
     <div className="flex size-full flex-1 flex-col overflow-y-auto">
@@ -37,13 +45,7 @@ export default function ChatRoomPlaylist({
           <p>재생목록</p>
         </div>
         <div className="flex items-center">
-          <Button
-            variant={"transparent"}
-            onClick={() => setAddTrackModalVisible(true)}
-            disabled={!isListeningChatRoom}
-          >
-            <ListPlus />
-          </Button>
+          <ButtonWithText onClick={handleAddTrackClick} Icon={ListPlus} text="음악 추가" />
           <AddTrackModal
             addTrackModalVisible={addTrackModalVisible}
             setAddTrackModalVisible={setAddTrackModalVisible}

@@ -55,7 +55,7 @@ export function SearchResults() {
             ))
           ) : (
             <p className="px-3 text-neutral-500">
-              "{query}"로 검색한 채팅방이 없습니다
+              "{query}"로 검색한 채팅방이 없습니다.
             </p>
           )}
         </div>
@@ -105,7 +105,7 @@ export function SearchResults() {
             ))
           ) : (
             <p className="px-3 text-neutral-500">
-              "{query}"로 검색한 사용자가 없습니다
+              "{query}"로 검색한 사용자가 없습니다.
             </p>
           )}
         </div>

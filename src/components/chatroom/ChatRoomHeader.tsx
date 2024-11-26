@@ -1,4 +1,4 @@
-import { ChevronLeft, Headphones, Unplug } from "lucide-react";
+import { ChevronLeft, HeadphoneOff, Headphones } from "lucide-react";
 import {
   ChatRoomDetailsType,
   PlayerResponseDto,
@@ -21,6 +21,7 @@ import ChatRoomHeaderDropdownButton from "./ChatRoomHeaderDropdownButton";
 import InvitationModal from "./InvitationModal";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { ButtonWithText } from "../common/ButtonWithText";
 
 interface ChatRoomHeaderProps {
   chatRoomDetails: ChatRoomDetailsType | undefined;
@@ -29,7 +30,7 @@ interface ChatRoomHeaderProps {
 
 export default function ChatRoomHeader({
   chatRoomDetails,
-  refetchChatRoom
+  refetchChatRoom,
 }: ChatRoomHeaderProps) {
   const [isInvitationModalOpen, setInvitationModalOpen] = useState(false);
   //const [members, setMembers] = useState<UserDetailsType[]>([]);
@@ -179,25 +180,39 @@ export default function ChatRoomHeader({
             ></img>
             <div className="flex flex-col justify-start gap-2">
               <h1>{chatRoomDetails?.name}</h1>
-              <ChatRoomMembers
-                members={members}
-                masterId={chatRoomDetails.masterUserId}
-                openInvitationModal={() => {
-                  setInvitationModalOpen(true);
-                }}
-              />
+              <div className="flex items-center gap-5">
+                <ChatRoomMembers
+                  members={members}
+                  masterId={chatRoomDetails.masterUserId}
+                  openInvitationModal={() => {
+                    setInvitationModalOpen(true);
+                  }}
+                />
+                <div className="flex gap-2 text-xs text-neutral-500">
+                  <p>플레이어 권한:</p>
+                  <p>
+                    {chatRoomDetails.permission === "MASTER"
+                      ? "방장만"
+                      : "모두"}
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
           <div className="flex">
             {listenTogetherId &&
             listenTogetherId === chatRoomDetails.chatRoomId ? (
-              <Button variant={"ghost"} onClick={disconnectListenTogether}>
-                <Unplug />
-              </Button>
+              <ButtonWithText
+                onClick={disconnectListenTogether}
+                Icon={HeadphoneOff}
+                text="연결 해제"
+              />
             ) : (
-              <Button variant={"ghost"} onClick={connectListenTogether}>
-                <Headphones />
-              </Button>
+              <ButtonWithText
+                onClick={connectListenTogether}
+                Icon={Headphones}
+                text="같이 듣기"
+              />
             )}
             <ChatRoomHeaderDropdownButton
               chatRoomDetails={chatRoomDetails}

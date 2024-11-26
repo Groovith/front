@@ -79,18 +79,16 @@ export default function Main() {
   }
 
   return (
-    <>
-      <div className="flex w-screen h-screen flex-col text-neutral-900 break-keep">
-        <div className="flex h-full overflow-hidden">
-          <Sidebar />
-          <div className="relative flex h-full w-full">
-            <CurrentChatRoom />
-            <Outlet />
-          </div>
+    <div className="flex w-full full-vh flex-col break-keep text-neutral-900">
+      <div className="flex h-full overflow-hidden">
+        <Sidebar />
+        <div className="relative flex h-full w-full">
+          <CurrentChatRoom />
+          <Outlet />
         </div>
-        <Player />
-        <BottomNavigation />
       </div>
-    </>
+      <Player />
+      <BottomNavigation />
+    </div>
   );
 }

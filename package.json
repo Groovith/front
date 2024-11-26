@@ -19,7 +19,7 @@
     "browser-image-compression": "^2.0.2",
     "class-variance-authority": "^0.7.0",
     "get-video-id": "^4.1.7",
-    "lucide-react": "^0.411.0",
+    "lucide-react": "^0.461.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-intersection-observer": "^9.13.1",

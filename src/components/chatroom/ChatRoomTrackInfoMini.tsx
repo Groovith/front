@@ -1,6 +1,6 @@
 import { ListMusic } from "lucide-react";
 import { Track } from "../../types/track.type";
-import { Button } from "../common/Button";
+import { ButtonWithText } from "../common/ButtonWithText";
 
 interface ChatRoomTrackInfoMiniProps {
   track: Track | undefined;
@@ -38,13 +38,7 @@ export default function ChatRoomTrackInfoMini({
           </h1>
         )}
 
-        <Button
-          variant={"ghost"}
-          className="text-white"
-          onClick={togglePlaylist}
-        >
-          <ListMusic />
-        </Button>
+        <ButtonWithText onClick={togglePlaylist} Icon={ListMusic} text="재생목록" className="text-white" />
       </div>
     </div>
   );

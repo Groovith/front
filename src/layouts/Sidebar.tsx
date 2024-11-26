@@ -2,10 +2,10 @@ import {
   Home,
   Menu,
   Search,
-  Send,
   UserRound,
   Settings,
   LogOut,
+  MessageCircle,
 } from "lucide-react";
 import logo from "../assets/Logo-Full-BW.png";
 import { Button } from "../components/common/Button";
@@ -14,6 +14,7 @@ import DropdownButton from "../components/common/DropdownButton";
 import { logout } from "../utils/apis/serverAPI";
 import { useUser } from "../hooks/useUser";
 import { useChatRoomStore } from "../stores/useChatRoomStore";
+import { ButtonWithText } from "../components/common/ButtonWithText";
 
 export default function Sidebar() {
   const navigate = useNavigate();
@@ -46,53 +47,63 @@ export default function Sidebar() {
     },
   ];
 
-  const handleButtonClick = (navigateTo:string) => {
+  const handleButtonClick = (navigateTo: string) => {
     navigate(navigateTo);
     closeCurrentChatRoom();
-  }
+  };
+  
+  const buttonStyle = "hover:bg-neutral-100 w-full p-3 rounded-xl text-neutral-700";
 
   return (
     <div className="hidden h-full w-[80px] flex-none flex-col items-center justify-start gap-y-10 border-r border-gray-200 pt-8 md:flex">
       {/* 로고 버튼 */}
       <div>
-        <Button variant={"ghost"}>
+        <Button variant={"ghost"} onClick={() => handleButtonClick("/")}>
           <img src={logo} alt="Logo" className="w-10" />
         </Button>
       </div>
       {/* 그 외 버튼 */}
-      <div className="flex flex-col items-center gap-3">
-        <Button
-          variant={"ghost"}
+      <div className="flex flex-col items-center">
+        <ButtonWithText
           onClick={() => {
             handleButtonClick("/");
           }}
-        >
-          <Home />
-        </Button>
-        <Button
-          variant={"ghost"}
+          Icon={Home}
+          text="홈"
+          className={buttonStyle}
+        />
+        <ButtonWithText
           onClick={() => {
             handleButtonClick("/search");
           }}
-        >
-          <Search />
-        </Button>
-        <Button
-          variant={"ghost"}
+          Icon={Search}
+          text="검색"
+          className={buttonStyle}
+        />
+        <ButtonWithText
           onClick={() => {
             handleButtonClick("/chat");
             setCurrentChatRoomId(-1);
           }}
-        >
-          <Send />
-        </Button>
-        <Button variant={"ghost"} onClick={() => handleButtonClick(`/user/${getUsername()}`)}>
-          <UserRound />
-        </Button>
+          Icon={MessageCircle}
+          text="채팅"
+          className={buttonStyle}
+        />
+        <ButtonWithText
+          onClick={() => handleButtonClick(`/user/${getUsername()}`)}
+          Icon={UserRound}
+          text="프로필"
+          className={buttonStyle}
+        />
         <DropdownButton items={moreButtonItems}>
-          <Button variant={"ghost"}>
-            <Menu />
-          </Button>
+          <ButtonWithText
+            onClick={() => {
+              handleButtonClick("/");
+            }}
+            Icon={Menu}
+            text="더보기"
+            className={buttonStyle}
+          />
         </DropdownButton>
       </div>
     </div>
