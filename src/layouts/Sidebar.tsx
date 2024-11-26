@@ -97,9 +97,7 @@ export default function Sidebar() {
         />
         <DropdownButton items={moreButtonItems}>
           <ButtonWithText
-            onClick={() => {
-              handleButtonClick("/");
-            }}
+            onClick={() => {}}
             Icon={Menu}
             text="더보기"
             className={buttonStyle}
