@@ -21,7 +21,7 @@ export default function ChatRoomTrackInfoMini({
             <img
               src={track.imageUrl}
               alt={track.title}
-              className="h-16 w-16 rounded-md object-cover"
+              className="size-14 rounded-md object-cover"
             />
 
             {/* 음악 정보 */}

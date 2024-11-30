@@ -100,7 +100,7 @@ export default function CreateChatRoomModal({
 
   return (
     <Modal onClose={onClose} closeOnOutsideClick={true}>
-      <div className="flex h-full w-full flex-col">
+      <div className="flex h-fit w-full flex-col">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold">새 채팅방 생성</h1>
         </div>
