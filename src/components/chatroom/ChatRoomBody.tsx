@@ -114,7 +114,7 @@ export default function ChatRoomBody({
 
   return (
     <div
-      className="relative flex h-full flex-col gap-5 overflow-hidden bg-neutral-100"
+      className="relative flex h-full flex-col overflow-hidden bg-neutral-100"
       ref={chatContainerRef}
     >
       <ChatRoomTrackInfoMini
@@ -129,7 +129,7 @@ export default function ChatRoomBody({
         <>
           <ul
             ref={messageContainerRef}
-            className="flex flex-col gap-4 h-full overflow-y-scroll px-5 pb-5 pt-24 md:py-5"
+            className="flex flex-col gap-4 h-full overflow-y-scroll px-5 py-5 md:py-5"
           >
             <div ref={topRef}></div>
             {messages.map((message) => (

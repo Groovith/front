@@ -25,16 +25,16 @@ export function Modal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex min-h-screen items-center justify-center overflow-y-auto"
+      className="fixed inset-0 z-50 flex h-full items-center justify-center"
       onClick={handleOutsideClick}
     >
-      <div className="fixed inset-0 flex min-h-screen w-full items-center justify-center p-10">
-        <div className="fixed inset-0 min-h-screen bg-neutral-950/50"></div>
+      <div className="fixed inset-0 flex h-full w-full items-center justify-center p-10">
+        <div className="fixed inset-0 h-full bg-neutral-950/50"></div>
         <div
-          className="relative flex justify-center w-fit max-w-md rounded-3xl bg-white p-10 shadow-xl"
+          className="relative flex h-fit max-h-full w-fit max-w-md items-center justify-center rounded-3xl bg-white shadow-xl"
           onClick={handleInsideClick} // 모달 내부 클릭 시 이벤트 전파 방지
         >
-          {children}
+          <div className="flex h-full w-full max-h-[80vh] overflow-y-auto p-10">{children}</div>
         </div>
       </div>
     </div>

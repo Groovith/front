@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Button } from "../components/common/Button";
 import { useNavigate } from "react-router-dom";
 import { login } from "../utils/apis/serverAPI";
-import { toast, Toaster } from "sonner";
+import { toast } from "sonner";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -33,7 +33,6 @@ export default function Login() {
 
   return (
     <div className="flex h-screen w-screen flex-col">
-      <Toaster position="bottom-center" richColors />
       <div className="flex h-full w-full items-center justify-center">
         <div className="flex w-[400px] flex-col rounded-xl  border-gray-300 p-10">
           <h1 className="mb-14 text-2xl font-bold flex-none w-full">Groovith에 로그인하기</h1>

@@ -4,6 +4,7 @@ import { Track } from "../../types/track.type";
 import AddTrackModal from "./AddTrackModal";
 import { useState } from "react";
 import CurrentPlaylistItem from "./CurrentPlaylistItem";
+import { toast } from "sonner";
 
 interface ChatRoomPlaylistOverlayProps {
   currentPlaylist: Track[] | undefined;
@@ -26,10 +27,18 @@ export default function ChatRoomPlaylistOverlay({
   const [hoveredTrackIndex, setHoveredTrackIndex] = useState<number | null>(
     null,
   );
+
+  const handleAddTrackClick = () => {
+    if (isListeningChatRoom) {
+      setAddTrackModalVisible(true);
+    } else {
+      toast.message("음악을 추가하려면 같이 듣기에 참여해주세요.");
+    }
+  }
   return (
     <>
       <div
-        className={`fixed right-0 z-10 w-full bg-white transition-transform duration-300 ease-in-out ${
+        className={`fixed right-0 z-10 w-full overflow-hidden bg-white transition-transform duration-300 ease-in-out ${
           show ? "translate-x-0" : "translate-x-full"
         }`}
         style={{ height: height }} // 동적으로 높이 설정
@@ -40,8 +49,7 @@ export default function ChatRoomPlaylistOverlay({
             <Button
               variant={"ghost"}
               className="p-1"
-              onClick={() => setAddTrackModalVisible(true)}
-              disabled={!isListeningChatRoom}
+              onClick={handleAddTrackClick}
             >
               <ListPlus />
             </Button>
@@ -49,17 +57,13 @@ export default function ChatRoomPlaylistOverlay({
               addTrackModalVisible={addTrackModalVisible}
               setAddTrackModalVisible={setAddTrackModalVisible}
             />
-            <Button
-              variant={"ghost"}
-              className="p-1"
-              onClick={togglePlaylist}
-            >
+            <Button variant={"ghost"} className="p-1" onClick={togglePlaylist}>
               <X />
             </Button>
           </div>
         </div>
         <div
-          className="overflow-y-auto flex flex-col"
+          className="flex flex-col overflow-y-auto pb-20"
           style={{ maxHeight: height - 80 }}
         >
           {currentPlaylist?.map((track, index) => (

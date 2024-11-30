@@ -1,8 +1,5 @@
 import { useState } from "react";
-import {
-  ChatRoomPrivacyType,
-  ChatRoomPlayerPermissionType,
-} from "../../utils/apis/serverAPI";
+import { ChatRoomPlayerPermissionType } from "../../utils/apis/serverAPI";
 import { Button } from "../common/Button";
 import { Modal } from "../common/Modal";
 import { ChatRoomDetailsType } from "../../types/types";
@@ -23,8 +20,6 @@ export default function ChatRoomSettingsModal({
   refetch,
 }: ChatRoomSettingsModalProps) {
   const [newChatRoomName, setNewChatRoomName] = useState(chatRoomDetails?.name);
-  const [chatRoomVisibility, setChatRoomVisibility] =
-    useState<ChatRoomPrivacyType>(chatRoomDetails.privacy);
   const [chatRoomPermission, setChatRoomPermission] =
     useState<ChatRoomPlayerPermissionType>(chatRoomDetails.permission);
   const [file, setFile] = useState<File | null>(null);
@@ -37,7 +32,7 @@ export default function ChatRoomSettingsModal({
           chatRoomDetails.chatRoomId,
           {
             name: newChatRoomName,
-            privacy: chatRoomVisibility,
+            privacy: chatRoomDetails.privacy,
             permission: chatRoomPermission,
           },
           file,
@@ -144,46 +139,6 @@ export default function ChatRoomSettingsModal({
           value={newChatRoomName}
           onChange={(e) => setNewChatRoomName(e.target.value)}
         />
-
-        {/* 채팅방 공개 여부 선택 */}
-        <div className="mb-6">
-          <p className="mb-3 font-medium">채팅방 공개 여부</p>
-          <div className="flex flex-col gap-3">
-            <label className="flex items-start">
-              <input
-                type="radio"
-                name="visibility"
-                value="PUBLIC"
-                checked={chatRoomVisibility === "PUBLIC"}
-                onChange={() => setChatRoomVisibility("PUBLIC")}
-                className="form-radio h-5 w-5 text-blue-600"
-              />
-              <div className="ml-3 flex flex-col justify-start gap-1">
-                <span className="font-medium">공개</span>
-                <p className="text-xs font-normal text-gray-500">
-                  검색을 통해 채팅방을 찾을 수 있고, 참여할 수 있습니다.
-                </p>
-              </div>
-            </label>
-            <label className="flex items-start">
-              <input
-                type="radio"
-                name="visibility"
-                value="PRIVATE"
-                checked={chatRoomVisibility === "PRIVATE"}
-                onChange={() => setChatRoomVisibility("PRIVATE")}
-                className="form-radio h-5 w-5 text-blue-600"
-              />
-              <div className="ml-3 flex flex-col justify-start gap-1">
-                <span className="font-medium">비공개</span>
-                <p className="text-xs font-normal text-gray-500">
-                  검색을 통해 채팅방을 찾을 수 없으며, 초대를 통해서만 참여할 수
-                  있습니다.
-                </p>
-              </div>
-            </label>
-          </div>
-        </div>
 
         {/* 음악 플레이어 권한 선택 */}
         <div className="mb-6">
