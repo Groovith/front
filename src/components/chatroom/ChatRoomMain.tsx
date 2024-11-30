@@ -19,7 +19,7 @@ export default function ChatRoomMain({
   return (
     <div className="flex size-full flex-col border-r">
       <ChatRoomHeader chatRoomDetails={chatRoomDetails} refetchChatRoom={refetchChatRoom} />
-      <ChatRoomBody chatRoomId={chatRoomId} playerDetails={playerDetails} />
+      <ChatRoomBody chatRoomId={chatRoomId} playerDetails={playerDetails} chatRoomDetails={chatRoomDetails} />
       <ChatRoomInput chatRoomId={chatRoomId} />
     </div>
   );

@@ -5,6 +5,8 @@ import AddTrackModal from "./AddTrackModal";
 import { useState } from "react";
 import CurrentPlaylistItem from "./CurrentPlaylistItem";
 import { toast } from "sonner";
+import { ButtonWithText } from "../common/ButtonWithText";
+import { ChatRoomDetailsType } from "../../types/types";
 
 interface ChatRoomPlaylistOverlayProps {
   currentPlaylist: Track[] | undefined;
@@ -13,6 +15,7 @@ interface ChatRoomPlaylistOverlayProps {
   togglePlaylist: () => void;
   height?: number;
   isListeningChatRoom: boolean;
+  chatRoomDetails: ChatRoomDetailsType | undefined;
 }
 
 export default function ChatRoomPlaylistOverlay({
@@ -22,6 +25,7 @@ export default function ChatRoomPlaylistOverlay({
   togglePlaylist,
   height = 0, // 기본값을 0으로 설정
   isListeningChatRoom,
+  chatRoomDetails,
 }: ChatRoomPlaylistOverlayProps) {
   const [addTrackModalVisible, setAddTrackModalVisible] = useState(false);
   const [hoveredTrackIndex, setHoveredTrackIndex] = useState<number | null>(
@@ -29,12 +33,20 @@ export default function ChatRoomPlaylistOverlay({
   );
 
   const handleAddTrackClick = () => {
-    if (isListeningChatRoom) {
-      setAddTrackModalVisible(true);
-    } else {
+    if (!isListeningChatRoom) {
       toast.message("음악을 추가하려면 같이 듣기에 참여해주세요.");
+      return;
+    } else if (
+      chatRoomDetails &&
+      chatRoomDetails.permission == "MASTER" &&
+      !chatRoomDetails.isMaster
+    ) {
+      toast.message("해당 채팅방은 방장만 조작 가능합니다.");
+      return;
     }
-  }
+    setAddTrackModalVisible(true);
+  };
+
   return (
     <>
       <div
@@ -43,23 +55,27 @@ export default function ChatRoomPlaylistOverlay({
         }`}
         style={{ height: height }} // 동적으로 높이 설정
       >
-        <div className="flex items-center justify-between px-5 py-8">
-          <h2 className="text-lg font-semibold">재생목록</h2>
-          <div className="flex items-center justify-between gap-2">
-            <Button
-              variant={"ghost"}
-              className="p-1"
-              onClick={handleAddTrackClick}
-            >
-              <ListPlus />
-            </Button>
-            <AddTrackModal
-              addTrackModalVisible={addTrackModalVisible}
-              setAddTrackModalVisible={setAddTrackModalVisible}
-            />
-            <Button variant={"ghost"} className="p-1" onClick={togglePlaylist}>
-              <X />
-            </Button>
+        <div className="flex w-full items-center p-5">
+          <div className="flex w-full h-10 items-center justify-between">
+            <h2 className="text-lg font-semibold">재생목록</h2>
+            <div className="flex items-center justify-between gap-2">
+              <ButtonWithText
+                onClick={handleAddTrackClick}
+                Icon={ListPlus}
+                text="추가"
+              />
+              <AddTrackModal
+                addTrackModalVisible={addTrackModalVisible}
+                setAddTrackModalVisible={setAddTrackModalVisible}
+              />
+              <Button
+                variant={"ghost"}
+                className="p-1"
+                onClick={togglePlaylist}
+              >
+                <X />
+              </Button>
+            </div>
           </div>
         </div>
         <div

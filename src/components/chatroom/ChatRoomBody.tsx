@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { MessageType, PlayerDetailsDto } from "../../types/types";
+import { ChatRoomDetailsType, MessageType, PlayerDetailsDto } from "../../types/types";
 import ChatRoomTrackInfoMini from "./ChatRoomTrackInfoMini";
 import ChatRoomPlaylistOverlay from "./ChatRoomPlaylistOverlay";
 import { useStompStore } from "../../stores/useStompStore";
@@ -13,11 +13,13 @@ import { usePlayerStore } from "../../stores/usePlayerStore";
 
 interface ChatRoomBodyProps {
   chatRoomId: number | null | undefined;
+  chatRoomDetails: ChatRoomDetailsType | undefined;
   playerDetails: PlayerDetailsDto | null;
 }
 
 export default function ChatRoomBody({
   chatRoomId,
+  chatRoomDetails,
   playerDetails,
 }: ChatRoomBodyProps) {
   const { currentPlaylist, currentPlaylistIndex, listenTogetherId } = usePlayerStore();
@@ -162,6 +164,7 @@ export default function ChatRoomBody({
         togglePlaylist={togglePlaylist}
         height={chatContainerRef.current?.clientHeight}
         isListeningChatRoom={isListeningChatRoom}
+        chatRoomDetails={chatRoomDetails}
       />
     </div>
   );

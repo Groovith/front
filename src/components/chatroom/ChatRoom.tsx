@@ -83,7 +83,7 @@ export default function ChatRoom({ chatRoomId }: ChatRoomProps) {
         playerDetails={playerDetails}
       />
       <div className="hidden w-full max-w-[400px] md:flex">
-        <ChatRoomPlayer playerDetails={playerDetails} />
+        <ChatRoomPlayer playerDetails={playerDetails} chatRoomDetails={chatRoomDetails} />
       </div>
     </div>
   );

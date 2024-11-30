@@ -14,7 +14,7 @@ export default function ChatRoomTrackInfoMini({
   return (
     <div className="fixed flex w-full px-5 py-5 md:hidden">
       <div className="absolute inset-0 z-10 h-28 bg-gradient-to-b from-neutral-900 to-transparent opacity-75 md:hidden"></div>{" "}
-      <div className="z-20 flex h-fit w-full items-center justify-between">
+      <div className="z-20 flex h-14 w-full items-center justify-between">
         {track ? (
           <div className="flex w-full items-center overflow-hidden">
             {/* 앨범 커버 */}

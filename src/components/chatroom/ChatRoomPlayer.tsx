@@ -1,15 +1,21 @@
 import { usePlayerStore } from "../../stores/usePlayerStore";
-import { PlayerDetailsDto } from "../../types/types";
+import { ChatRoomDetailsType, PlayerDetailsDto } from "../../types/types";
 import ChatRoomPlaylist from "./ChatRoomPlaylist";
 import ChatRoomTrackInfo from "./ChatRoomTrackInfo";
 
 interface ChatRoomPlayerProps {
   playerDetails: PlayerDetailsDto | null;
+  chatRoomDetails: ChatRoomDetailsType | undefined;
 }
 
-export default function ChatRoomPlayer({ playerDetails }: ChatRoomPlayerProps) {
-  const { currentPlaylist, currentPlaylistIndex, listenTogetherId } = usePlayerStore();
-  const isListeningChatRoom = !playerDetails || playerDetails.chatRoomId === listenTogetherId;
+export default function ChatRoomPlayer({
+  playerDetails,
+  chatRoomDetails,
+}: ChatRoomPlayerProps) {
+  const { currentPlaylist, currentPlaylistIndex, listenTogetherId } =
+    usePlayerStore();
+  const isListeningChatRoom =
+    !playerDetails || playerDetails.chatRoomId === listenTogetherId;
   if (!playerDetails) {
     return (
       <div className="flex size-full flex-col">
@@ -18,6 +24,7 @@ export default function ChatRoomPlayer({ playerDetails }: ChatRoomPlayerProps) {
           currentPlaylist={currentPlaylist}
           currentPlaylistIndex={currentPlaylistIndex}
           isListeningChatRoom={isListeningChatRoom}
+          chatRoomDetails={chatRoomDetails}
         />
       </div>
     );
@@ -34,6 +41,7 @@ export default function ChatRoomPlayer({ playerDetails }: ChatRoomPlayerProps) {
         currentPlaylist={playerDetails.currentPlaylist}
         currentPlaylistIndex={playerDetails.currentPlaylistIndex}
         isListeningChatRoom={isListeningChatRoom}
+        chatRoomDetails={chatRoomDetails}
       />
     </div>
   );
