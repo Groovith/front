@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import { MessageType } from "../../types/types";
 import { formatDateTime } from "../../utils/formatDateTime";
 
@@ -6,9 +7,17 @@ interface ChatMessageItemProps {
 }
 
 export default function ChatMessageItem({ message }: ChatMessageItemProps) {
+  const navigate = useNavigate();
+  const handleProfileClick = () => {
+    navigate(`/user/${message.username}`);
+  };
   return (
     <li key={message.messageId} className="flex gap-3 break-normal">
-      <img src={message.imageUrl} className="flex-none size-10 rounded-full object-cover" />
+      <img
+        src={message.imageUrl}
+        className="size-10 flex-none cursor-pointer rounded-full object-cover"
+        onClick={handleProfileClick}
+      />
       <div className="flex flex-col gap-1">
         <div className="flex items-center gap-2">
           <p>{message.username}</p>
