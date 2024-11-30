@@ -14,8 +14,8 @@ import { Track } from "../../types/track.type";
  * Axios 설정
  */
 
-const serverURL: string = "https://groovith.com:8080/api";
-export const brokerURL = "ws://groovith.com:8080/ws"
+const serverURL: string = "https://groovith.com/api";
+export const brokerURL = "wss://groovith.com/ws"
 // const serverURL: string = "http://localhost:8080/api";
 // export const brokerURL = "ws://localhost:8080/ws"
 
