@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import {
   checkEmail,
   checkEmailCertification,
@@ -14,7 +14,7 @@ import { toast } from "sonner";
 import { isAxiosError } from "axios";
 
 const usernameRule =
-  "사용자 이름은 2자 이상, 30자 이하의 영문 소문자, 숫자, 밑줄, 마침표만 허용하며, 시작과 끝에 밑줄이나 마침표를 사용할 수 없습니다.";
+  "사용자 이름은 2자 이상, 30자 이하의 영문 소문자, 숫자, 밑줄, 마침표만 허용하며, 시작과 끝에 마침표를 사용할 수 없습니다.";
 
 export default function Signup() {
   const [email, setEmail] = useState("");
@@ -135,6 +135,12 @@ export default function Signup() {
     }
   };
 
+  useEffect(() => {
+    if (email.trim()) {
+      handleCheckEmail();
+    }
+  }, [email]);
+
   // 이메일 인증번호 요청
   const handleRequestEmailCertification = async (e: React.MouseEvent) => {
     e.preventDefault(); // 기본 폼 제출 방지
@@ -200,6 +206,10 @@ export default function Signup() {
     }
     return true;
   };
+
+  useEffect(() => {
+    handleCheckUsername();
+  }, [username]);
 
   // 사용자 이름 사용 가능 여부 체크
   const handleCheckUsername = async () => {
@@ -273,8 +283,9 @@ export default function Signup() {
                 type="text"
                 required
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                onBlur={handleCheckEmail} // 이메일 입력 후 focus가 해제되면 중복 확인
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                }}
                 placeholder="example@email.com"
                 className="h-8 w-full rounded-lg border px-3 py-5"
               />
@@ -285,7 +296,7 @@ export default function Signup() {
                 <p className="text-sm text-red-500">{emailExistsError}</p>
               )}
             </div>
-            <Button className="mb-3" onClick={handleRequestEmailCertification}>
+            <Button className="mb-3 px-5" onClick={handleRequestEmailCertification}>
               인증번호 요청
             </Button>
             {certificationMessage && (
@@ -300,8 +311,10 @@ export default function Signup() {
                 type="password"
                 required
                 value={emailCertification}
-                onChange={(e) => setEmailCertification(e.target.value)}
-                onBlur={handleEmailCertificationBlur} // 포커스 해제 시 인증번호 확인
+                onChange={(e) => {
+                  setEmailCertification(e.target.value);
+                  handleEmailCertificationBlur();
+                }}
                 placeholder="··········"
                 className="h-8 w-full rounded-lg border px-3 py-5 placeholder:text-xl"
               />
@@ -321,10 +334,11 @@ export default function Signup() {
                 type="text"
                 required
                 value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                onChange={(e) => {
+                  setUsername(e.target.value);
+                }}
                 placeholder="username"
                 className="h-8 w-full rounded-lg border px-3 py-5"
-                onBlur={handleCheckUsername}
               />
             </div>
             {usernameCheckMessage && (
