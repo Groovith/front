@@ -175,7 +175,7 @@ export default function ChatRoomHeader({
 
             <img
               src={chatRoomDetails.imageUrl}
-              className="mr-3 size-12 rounded-full object-cover"
+              className="mr-3 size-12 rounded-full object-cover flex-none"
             ></img>
             <div className="flex flex-col justify-start gap-2 w-full truncate">
               <h1 className="w-full truncate">{chatRoomDetails?.name}</h1>
